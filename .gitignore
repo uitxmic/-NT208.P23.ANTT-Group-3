@@ -14,9 +14,6 @@ pnpm-debug.log*
 # Dependency directories
 jspm_packages/
 
-# dotenv environment files
-.env
-.env.*.local
 
 # Next.js build
 .next/

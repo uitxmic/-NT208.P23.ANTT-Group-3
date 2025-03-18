@@ -1,4 +1,6 @@
 const usersRouter = require('./users');
+const voucherRouter = require('./voucher');
+const postingRouter = require('./posting');
 
 function routes(app) 
 {
@@ -8,6 +10,10 @@ function routes(app)
     );
 
     app.use('/users', usersRouter);
+
+    app.use('/voucher', voucherRouter);
+
+    app.use('/posting', postingRouter);
 
 } 
 

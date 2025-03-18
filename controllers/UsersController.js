@@ -57,6 +57,7 @@ class UsersController
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
     }
+
 }
 
 module.exports = new UsersController;

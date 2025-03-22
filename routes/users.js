@@ -7,4 +7,5 @@ router.use('/getUsers', usersController.GetAllUser);
 
 router.use('/getUserById', usersController.GetUserById);
 
+
 module.exports = router;

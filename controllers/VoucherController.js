@@ -36,7 +36,7 @@ class VoucherController
         }
     }
 
-    // [GET] /users/getVoucherByUserId/:UserId
+    // [GET] /voucher/getVoucherByUserId/:UserId
     GetVoucherByUserId = async (req, res) =>
     {
         const { UserId } = req.params;

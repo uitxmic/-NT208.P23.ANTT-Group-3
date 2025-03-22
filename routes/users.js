@@ -7,4 +7,6 @@ router.use('/getUsers', usersController.GetAllUser);
 
 router.use('/getUserById', usersController.GetUserById);
 
+router.use('/createrUser', usersController.CreateUser);
+
 module.exports = router;

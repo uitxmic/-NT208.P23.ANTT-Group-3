@@ -58,6 +58,29 @@ class UsersController
         }
     }
 
+    // [POST] /users/createUser
+    CreateUser = async (req, res) =>
+    {
+        const { Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, AvgRate  } = req.body;
+        const token = req.headers['authorization'];
+
+        if (!token){
+            return res.status(401).json({error: 'Unauthorized'});
+        }
+
+        if (!Username || !Fullname || !PasswordHash || !Email || !PhoneNumber || !UserRoleId || !AvgRate){
+            return res.status(400).json({error: 'Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, and AvgRate are required in request body'});
+        }
+
+        try{
+            const [results] = await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', [Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, AvgRate]);
+            res.json(results[0]);
+        }catch(error){
+            console.error('Error creating user:', error);
+            return res.status(500).json({error: 'Error creating user'});
+        }
+    }
+
 }
 
 module.exports = new UsersController;

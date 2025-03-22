@@ -1,7 +1,6 @@
 CALL fn_create_user('john_doe', 'John Doe', 'hashed_password_123', 'john@example.com', '0987654321', 2, 0);
 
 SELECT * FROM `User`;
-
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_create_user; $$

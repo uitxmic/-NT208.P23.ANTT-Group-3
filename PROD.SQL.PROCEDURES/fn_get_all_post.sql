@@ -1,4 +1,3 @@
-
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_get_all_post;$$

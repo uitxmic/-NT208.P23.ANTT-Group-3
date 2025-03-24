@@ -138,6 +138,102 @@ class PostingController
             return res.status(500).json({ error: 'Error getting posting' });
         }
     }
+
+    // [PUT] /posting/updatePosting
+    UpdatePosting = async (req, res) =>
+    {
+        const {PostId, VoucherId, Postname, Content } = req.body;
+
+        if (!PostId || !Postname || !Content)
+        {
+            return res.status(400).json({ error: 'PostId, Postname, and Content are required in request body' });
+        }
+
+        try 
+        {
+            const [results] = await this.connection.query(`CALL fn_update_post(?, ?, ?, ?)`, [PostId, VoucherId, Postname, Content]);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error updating posting:', err);
+            return res.status(500).json({ error: 'Error updating posting' });
+        }
+    }
+
+    // [PUT] /posting/deactivePosting
+    DeactivePosting = async (req, res) =>
+    {
+        const { PostId } = req.body;
+
+        if (!PostId)
+        {
+            return res.status(400).json({ error: 'PostId is required in request body' });
+        }
+
+        try 
+        {
+            const [results] = await this.connection.query(`CALL fn_deactive_post(?)`, [PostId]);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error deactivating posting:', err);
+            return res.status(500).json({ error: 'Error deactivating posting' });
+        }
+    }
+
+    // [PUT] /posting/activePosting
+    ActivePosting = async (req, res) =>
+    {
+        const { PostId } = req.body;
+
+        if (!PostId)
+        {
+            return res.status(400).json({ error: 'PostId is required in request body' });
+        }
+
+        try 
+        {
+            const [results] = await this.connection.query(`CALL fn_active_post(?)`, [PostId]);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error activating posting:', err);
+            return res.status(500).json({ error: 'Error activating posting' });
+        }
+    }
+
+    // [GET] /posting/getActivePostings
+    GetActivePostings = async (req, res) =>
+    {
+        try 
+        {
+            const [results] = await this.connection.query(`CALL fn_get_active_post()`);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error getting active postings:', err);
+            return res.status(500).json({ error: 'Error getting active postings' });
+        }
+    }
+
+    // [GET] /posting/getDeactivePostings
+    GetDeactivePostings = async (req, res) =>
+    {
+        try 
+        {
+            const [results] = await this.connection.query(`CALL fn_get_deactive_post()`);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error getting deactive postings:', err);
+            return res.status(500).json({ error: 'Error getting deactive postings' });
+        }
+    }
 }
 
 module.exports = new PostingController();

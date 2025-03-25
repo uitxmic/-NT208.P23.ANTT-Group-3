@@ -3,13 +3,16 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.13.0",
+    "mysql2": "^3.14.0",
     "pug": "^3.0.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "twilio": "^5.5.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }

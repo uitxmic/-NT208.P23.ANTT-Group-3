@@ -1,7 +1,5 @@
 const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
-const express = require('express');
-const router = express.Router();
 require('dotenv').config();
 
 class PostingController
@@ -211,7 +209,6 @@ class PostingController
         try 
         {
             const [results] = await this.connection.query(`CALL fn_get_active_post()`);
-
             res.json(results[0]);
 
         } catch (err) {
@@ -226,7 +223,6 @@ class PostingController
         try 
         {
             const [results] = await this.connection.query(`CALL fn_get_deactive_post()`);
-
             res.json(results[0]);
 
         } catch (err) {

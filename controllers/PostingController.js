@@ -32,12 +32,12 @@ class PostingController
 
         if (!token)
         {
-            return res.status(401).json({ error: 'Unauthorized' });
+            return res.status(401).json({ error: 'Unauthorized' , id: '-1'});
         }
 
         if (!VoucherId || !Postname || !Content)
         {
-            return res.status(400).json({ error: 'VoucherId, Postname, and Content are required in request body' });
+            return res.status(400).json({ error: 'VoucherId, Postname, and Content are required in request body', id: '-1' });
         }
 
         try 
@@ -52,7 +52,7 @@ class PostingController
 
         } catch (err) {
             console.error('Error creating posting:', err);
-            return res.status(500).json({ error: 'Error creating posting' });
+            return res.status(500).json({ error: 'Error creating posting', id: '-1' });
         }
     }
 

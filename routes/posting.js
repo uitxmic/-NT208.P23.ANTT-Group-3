@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 // private api
 router.use('/createPosting', postingController.CreatePosting);
-router.use('/getPostings/:UserId', postingController.GetPostingsByUserId);
+router.use('/getPostingsByUserId/:UserId', postingController.GetPostingsByUserId);
 router.use('/getAllPostings', postingController.GetAllPostings);
 router.use('/getPostingByPostId/:PostId', postingController.GetPostingByPostId);
 router.use('/updatePosting', postingController.UpdatePosting);

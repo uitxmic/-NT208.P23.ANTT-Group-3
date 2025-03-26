@@ -1,10 +1,18 @@
 const { createServer } = require('node:http');
+const hbs = require('express-handlebars');
 require('dotenv').config();
 
 const express = require('express');
 const app = express();
 
 app.use(express.json());
+
+//Template engine
+app.engine('hbs', hbs.engine({
+  extname: 'hbs',
+}));
+app.set('view engine', 'hbs');
+app.set('views', 'views');
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOSTNAME;

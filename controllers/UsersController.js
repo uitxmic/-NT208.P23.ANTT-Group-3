@@ -83,8 +83,14 @@ class UsersController
         }
     }
 
+    //[GET] /users/login
+    GetLogin = async (req, res) =>
+    {
+        res.render('login');
+    }
+
     // [POST] /users/login
-    Login = async (req, res) =>
+    PostLogin = async (req, res) =>
     {
         const { Username, Password } = req.body;
         if (!Username || !Password){

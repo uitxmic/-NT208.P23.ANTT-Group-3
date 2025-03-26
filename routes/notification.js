@@ -4,7 +4,7 @@ const router = express.Router();
 const authMiddleware = require('../middlewares/authMiddleware');
 const notificationController = require('../controllers/NotificationController');
 
-//router.use(authMiddleware);
+router.use(authMiddleware);
 
 // private api
 router.use('/getNotiById/:NotiId', notificationController.GetNotificationsByUserId);

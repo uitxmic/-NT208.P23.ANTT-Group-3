@@ -1,4 +1,5 @@
 const { createServer } = require('node:http');
+const hbs = require('express-handlebars');
 const routes = require('./routes/index');
 require('dotenv').config();
 
@@ -7,6 +8,13 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+//Template engine
+app.engine('hbs', hbs.engine({
+  extname: 'hbs',
+}));
+app.set('view engine', 'hbs');
+app.set('views', 'views');
 
 routes(app);
 

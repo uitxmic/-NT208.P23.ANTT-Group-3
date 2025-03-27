@@ -55,8 +55,8 @@ class VoucherController
 
         try 
         {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
+            var secretKey = process.env.JWT_SECRET;
+            var decoded = jwt.verify(token, secretKey);
             console.log('Decoded:', decoded);
 
             console.log('UserId:', UserId);
@@ -74,6 +74,34 @@ class VoucherController
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
     }
+
+    // [POST] /voucher/giveVoucher
+    GiveVoucher = async (req, res) =>
+        {
+            const { recipient_phonenumber, voucher_name } = req.body;
+            const token = req.headers.authorization?.split(" ")[1];
+            console.log(req.headers.authorization);
+    
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized: No token provided" });
+            }
+    
+            try {
+                const secretKey = process.env.JWT_SECRET;
+                const decoded = jwt.verify(token, secretKey);
+                const Sender_ID = decoded.UserId;
+    
+                if (!recipient_phonenumber || !voucher_name) {
+                    return res.status(400).json({ message: "Recipient phone number and voucher name are required in request body" });
+                }
+    
+                const [result] = await this.connection.execute("CALL fn_giveaway(?, ?, ?)", [recipient_phonenumber, Sender_ID, voucher_name]);
+                return res.json(result[0]);
+            } catch (error) {
+                console.error('Query error:', error);
+                return res.status(500).json({ message: "Internal Server Error", error: error.message });
+            }
+        }
 }
 
 module.exports = new VoucherController;

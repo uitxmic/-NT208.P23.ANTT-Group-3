@@ -15,7 +15,8 @@ BEGIN
         END AS Status
     FROM Post P 
     JOIN Voucher V ON P.VoucherId = V.VoucherId
-    WHERE P.UserId = post_id;
+    WHERE P.UserId = post_id
+    ORDER BY IsActive DESC;
 END $$
 
 DELIMITER ;

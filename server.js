@@ -1,15 +1,21 @@
 const { createServer } = require('node:http');
+const routes = require('./routes/index');
 require('dotenv').config();
 
 const express = require('express');
 const app = express();
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+routes(app);
+
+app.set('view engine', 'pug');
+app.set('views', './views');
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOSTNAME;
 
-const routes = require('./routes/index');
 
 // Ensure routes is a function
 if (typeof routes === 'function') {

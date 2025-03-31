@@ -1,39 +1,13 @@
 const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const connectDB = require('../src/config/connectDB.js');
 
 class VoucherController
 {
     constructor()
     {
-        this.initConnection();
-    }
-
-    async initConnection() 
-    {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-            console.log('Connected to the database (async)');
-            const jwt = require('jsonwebtoken');
-
-            const user = {
-                UserId: 2,
-                Username: 'user2',
-                role: 'user'
-            };
-
-            const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-            console.log('Test token:', token);
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+        this.connection = connectDB;
     }
 
     // [GET] /voucher/getVoucherByUserId/:UserId

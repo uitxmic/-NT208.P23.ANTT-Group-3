@@ -1,27 +1,13 @@
 const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const connectDB = require('../src/config/connectDB.js');
 
 class PostingController
 {
     constructor()
     {
-        this.initConnection();
-    }
-
-    async initConnection() 
-    {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+        this.connection = connectDB;
     }
 
     // [POST] /posting/createPosting

@@ -1,28 +1,14 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
+const connectDB = require('../src/config/connectDB.js');
 
 class NotificationController
 {
     constructor()
     {
-        this.initConnection();
+        this.connection = connectDB;
     }
 
-    async initConnection() 
-    {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-            console.log('Connected to the database (async)');
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
-    }
     // [Get] /notification
     Get20LastestNotifications = async (req, res) =>
     {

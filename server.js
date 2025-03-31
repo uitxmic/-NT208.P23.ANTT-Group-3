@@ -4,6 +4,7 @@ const routes = require('./routes/index');
 require('dotenv').config();
 
 const express = require('express');
+const path = require('node:path');
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -14,12 +15,9 @@ app.engine('hbs', hbs.engine({
   extname: 'hbs',
 }));
 app.set('view engine', 'hbs');
-app.set('views', 'views');
+app.set('views', path.join(__dirname, 'views'));
 
 routes(app);
-
-app.set('view engine', 'pug');
-app.set('views', './views');
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOSTNAME;

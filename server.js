@@ -1,6 +1,7 @@
 const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
 const cookieParser = require("cookie-parser");
+const routes = require('./routes/index');
 require('dotenv').config();
 
 const express = require('express');
@@ -16,11 +17,14 @@ app.engine('hbs', hbs.engine({
 }));
 app.set('view engine', 'hbs');
 app.set('views', 'views');
+routes(app);
+
+app.set('view engine', 'pug');
+app.set('views', './views');
 
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOSTNAME;
 
-const routes = require('./routes/index');
 
 // Ensure routes is a function
 if (typeof routes === 'function') {

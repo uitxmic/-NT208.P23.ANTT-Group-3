@@ -9,4 +9,7 @@ router.get('/login', usersController.GetLogin);
 router.use('/createUser', usersController.CreateUser);
 router.post('/login', usersController.PostLogin);
 
+router.use('/changePassword', usersController.ChangePassword);
+  
+
 module.exports = router;

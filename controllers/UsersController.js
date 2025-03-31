@@ -59,7 +59,7 @@ class UsersController
         try 
         {
             const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
-            res.json(results[0]); // Chỉ trả về kết quả SELECT
+            res.json(results[0]);
         } 
         catch (error) {
             console.error('Query error:', error);
@@ -85,7 +85,7 @@ class UsersController
         }
     }
 
-    // [GET] /users/login
+    //[GET] /users/login
     GetLogin = async (req, res) =>
     {
         res.render('login');
@@ -94,7 +94,10 @@ class UsersController
     // [POST] /users/login
     PostLogin = async (req, res) =>
     {   
+    PostLogin = async (req, res) =>
+    {
         const { Username, Password } = req.body;
+
         if (!Username || !Password){
             return res.status(400).json({error: 'Username and Password are required in request body'});
         }
@@ -102,11 +105,11 @@ class UsersController
 
         try{
             const [results] = await this.connection.query('CALL fn_login(?, ?)', [Username, hashedPassword]);
-            console.log(results); 
             if (results[0][0] && results[0][0].Message == "Login Successful"){
                 const access_token = jwt.sign({
                     UserId: results[0][0].UserId,
-                    Username: Username}, 
+                    Username: Username,
+                    Email: results[0][0].Email,}, 
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
                 const session_id = crypto.randomBytes(16).toString('hex');
@@ -128,6 +131,39 @@ class UsersController
             return res.status(500).json({error: 'Error logging in'});
         }
     }
+
+    // [POST] /users/changePassword
+    ChangePassword = async (req, res) =>
+    {
+        const { OldPassword, NewPassword } = req.body;
+        const token = req.headers['authorization']?.split(" ")[1];
+
+        if (!token){
+            return res.status(401).json({error: 'Unauthorized'});
+        }
+        if (!OldPassword || !NewPassword){
+            return res.status(400).json({error: 'UserId, OldPassword, and NewPassword are required in request body'});
+        }
+        var hashedOldPassword = this.hashPassword(OldPassword);
+        var hashedNewPassword = this.hashPassword(NewPassword);
+
+        try{
+            var secretKey = process.env.JWT_SECRET;
+            var decode = jwt.verify(token, secretKey);
+            var Username = decode.Username;
+
+            const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
+            if (results[0][0] && results[0][0].Message == "Change Password Successfully"){
+                return res.json(results[0][0].Message);
+            }
+            else{
+                return res.status(401).json({ error: 'UserId or OldPassword is incorrect' });
+            }
+        }catch(error){
+            console.error('Error changing password:', error);
+            return res.status(500).json({error: 'Error changing password'});
+        }
+    }
 }
-exports.sessions = sessions;
-module.exports = new UsersController();
+
+module.exports = new UsersController;

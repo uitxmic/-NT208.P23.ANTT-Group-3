@@ -2,6 +2,8 @@ const mysql = require('mysql2/promise');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const fs = require('fs');
+const sessions = {};
 
 class UsersController
 {
@@ -83,7 +85,7 @@ class UsersController
         }
     }
 
-    //[GET] /users/login
+    // [GET] /users/login
     GetLogin = async (req, res) =>
     {
         res.render('login');
@@ -91,7 +93,7 @@ class UsersController
 
     // [POST] /users/login
     PostLogin = async (req, res) =>
-    {
+    {   
         const { Username, Password } = req.body;
         if (!Username || !Password){
             return res.status(400).json({error: 'Username and Password are required in request body'});
@@ -107,8 +109,17 @@ class UsersController
                     Username: Username}, 
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
-                return res.json({access_token: access_token});
-            }
+                const session_id = crypto.randomBytes(16).toString('hex');
+                sessions[session_id] = access_token;
+                console.log('sessionssfse:', sessions);
+                try{
+                    fs.writeFileSync('sessions.json', JSON.stringify(sessions));
+                    console.log('Wrote sessions to file');
+                } catch(error){
+                    console.error('Error writing sessions to file:', error);
+                }
+                res.cookie('session_id', session_id, {httpOnly: true, secure: true, sameSite: 'none'}).redirect('/dashboard');
+                }
             else{
                 return res.status(401).json({ error: 'Username or Password is incorrect' });
             }
@@ -118,5 +129,5 @@ class UsersController
         }
     }
 }
-
-module.exports = new UsersController;
+exports.sessions = sessions;
+module.exports = new UsersController();

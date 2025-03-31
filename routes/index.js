@@ -3,6 +3,7 @@ const voucherRouter = require('./voucher');
 const postingRouter = require('./posting');
 const tradeRouter = require('./trade');
 const notificationRouter = require('./notification');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 function routes(app) 
 {
@@ -20,6 +21,11 @@ function routes(app)
     app.use('/trade', tradeRouter);
 
     app.use('/notification', notificationRouter);
+
+    app.get('/dashboard', (req, res) => {
+        app.use(authMiddleware);
+        res.render('dashboard');
+    });
 } 
 
 module.exports = routes;

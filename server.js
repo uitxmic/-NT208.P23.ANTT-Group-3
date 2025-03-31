@@ -1,10 +1,13 @@
 const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
+const cookieParser = require("cookie-parser");
 require('dotenv').config();
 
 const express = require('express');
 const app = express();
 
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Template engine

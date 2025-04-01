@@ -77,6 +77,7 @@ npm install
   npm start
 ```
 Lưu ý: Mở *http://localhost:3000* để truy cập website.
+new thing f
 
 ---
 ## Liên hệ & Đóng góp

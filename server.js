@@ -11,6 +11,7 @@ const hostname = process.env.HOSTNAME;
 
 const routes = require('./routes/index');
 
+
 // Ensure routes is a function
 if (typeof routes === 'function') {
   routes(app);

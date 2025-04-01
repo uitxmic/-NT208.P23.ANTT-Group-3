@@ -6,14 +6,17 @@ import axios from 'axios'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [apiData, setApiData] = useState({}); 
 
   const fetchAPI = async () => {
     const response = await axios.get("http://localhost:3000/test");
     if(response.status === 200) {
       console.log(response.data.message);
+      setApiData(response.data);
     }
     else {
       console.error("Error fetching data");
+      setApiData({});
     }
   };
 
@@ -39,6 +42,12 @@ function App() {
         </button>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
+        </p>
+        <p>
+          <br></br>
+          <p>Dữ liệu từ API:</p>
+          <pre>{JSON.stringify(apiData, null, 2)}</pre>
+          <p>Message từ API: {apiData.message}</p>
         </p>
       </div>
       <p className="read-the-docs">

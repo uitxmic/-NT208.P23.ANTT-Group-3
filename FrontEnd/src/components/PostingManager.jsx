@@ -214,7 +214,7 @@ const PostManager = () => {
                   <div key={post.PostId} className="border rounded-lg p-4">
                     {post.VoucherImage && (
                       <img
-                        src={`http://localhost:3000/images/${post.VoucherImage}`}
+                        src={post.VoucherImage}
                         alt={post.VoucherName}
                         className="w-full h-40 object-cover rounded-lg mb-4"
                       />

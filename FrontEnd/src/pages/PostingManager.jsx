@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './NavigaBar';
-import Sidebar from './Sidebar';
+import Navbar from '../components/NavigaBar';
+import Sidebar from '../components/Sidebar';
 import { jwtDecode } from 'jwt-decode'; // Correct default import
 
 // Hàm lấy UserId từ AccessToken
@@ -23,9 +23,36 @@ const PostManager = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [voucher, setVoucher] = useState([]);
+  const [selectedVoucherId, setSelectedVoucherId] = useState('');
 
   // Token hardcode
   const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjMsIlVzZXJuYW1lIjoidXNlcjMiLCJFbWFpbCI6ImJvYjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM1OTczNTksImV4cCI6MTc0MzYyMjU1OX0.nLB2-FrONWoNgjwxU59lezFy50fT253DGxMjZuv-NMs";
+
+  // Hàm lấy VoucherId từ UserId
+  const fetchVoucher = async () => {
+    try {
+      const UserId = getUserIdFromToken(token);
+      const response = await fetch(`http://localhost:3000/voucher/getVoucherByUserId/${UserId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch voucher ID');
+      }
+
+      const data = await response.json();
+      setVoucher(data); // Giả sử bạn muốn lấy voucher đầu tiên trong danh sách
+      console.log('Voucher data:', data); // Debug
+    } catch (error) {
+      console.error('Error fetching voucher ID:', error);
+      setError(error.message || 'An error occurred while fetching voucher ID.');
+      return null;
+    }
+  };
 
   // Hàm lấy danh sách bài đăng
   const fetchPosts = async () => {
@@ -60,7 +87,10 @@ const PostManager = () => {
   // Gọi API lấy danh sách bài đăng khi component được mount
   useEffect(() => {
     fetchPosts();
+    fetchVoucher();
   }, []);
+
+
 
   // Hàm xử lý khi người dùng chọn file hình ảnh
   const handleImageChange = (e) => {
@@ -85,7 +115,7 @@ const PostManager = () => {
     }
 
     const jsonData = {
-      VoucherId: 1,
+      VoucherId: selectedVoucherId,
       Postname: postname,
       Content: description
     };
@@ -94,7 +124,7 @@ const PostManager = () => {
     }
 
     try {
-      console.log('Creating post with data:', { postname, description}); // Debug
+      console.log('Creating post with data:', { postname, description }); // Debug
       const response = await fetch('http://localhost:3000/posting/createPosting', {
         method: 'POST',
         headers: {
@@ -136,6 +166,30 @@ const PostManager = () => {
         <div className="flex-1 p-8 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-8">Post Management</h1>
 
+          {/* Hiển thị các Voucher trả về từ API getVoucherByUserId */}
+          {Array.isArray(voucher) && voucher.length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-8">
+              <h2 className="text-2xl font-bold mb-4">Voucher Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {voucher.map((item) => (
+                  <div key={item.VoucherId} className="border rounded-lg p-4">
+                    <img
+                      src={item.VoucherImage}
+                      alt={item.VoucherName}
+                      className="w-full h-40 object-cover rounded-lg mb-4"
+                    />
+                    <h3 className="text-lg font-bold">{item.VoucherName}</h3>
+                    <p className="text-gray-600">Label: {item.Label}</p>
+                    <p className="text-gray-600">Price: ${item.Price}</p>
+                    <p className="text-gray-600">
+                      Expiration Date: {new Date(item.ExpirationDay).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Thông báo thành công hoặc lỗi */}
           {success && (
             <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-center">
@@ -153,6 +207,28 @@ const PostManager = () => {
             <h2 className="text-2xl font-bold mb-6">Create New Post</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
+                <label htmlFor="voucher" className="block text-gray-600 mb-2">
+                  Voucher
+                </label>
+                <select
+                  id="voucher"
+                  value={selectedVoucherId}
+                  onChange={(e) => setSelectedVoucherId(e.target.value)}
+                  className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                >
+                  <option value="" disabled>
+                    Select a voucher
+                  </option>
+                  {Array.isArray(voucher) && voucher.length > 0 ? (
+                    voucher.map((item) => (
+                      <option key={item.VoucherId} value={item.VoucherId}>
+                        {item.VoucherName}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Loading vouchers...</option>
+                  )}
+                </select>
                 <label htmlFor="description" className="block text-gray-600 mb-2">
                   Postname
                 </label>
@@ -193,9 +269,8 @@ const PostManager = () => {
               </div>
               <button
                 type="submit"
-                className={`w-full p-3 rounded-lg text-white transition duration-300 ${
-                  loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                }`}
+                className={`w-full p-3 rounded-lg text-white transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                  }`}
                 disabled={loading}
               >
                 {loading ? 'Posting...' : 'Create Post'}

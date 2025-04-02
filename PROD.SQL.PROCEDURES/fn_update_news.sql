@@ -10,7 +10,7 @@ DROP PROCEDURE IF EXISTS fn_update_news;$$
 CREATE PROCEDURE fn_update_news(
     IN in_post_id INT,
     IN in_voucher_id INT,
-    IN in_postname VARCHAR(255),
+    IN in_postname VARCHAR(100),
     IN in_content TEXT
 )
 BEGIN

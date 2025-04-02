@@ -15,8 +15,8 @@ DROP PROCEDURE IF EXISTS fn_create_news;$$
 CREATE PROCEDURE fn_create_news(
     IN in_voucher_id INT,
     IN in_user_id INT,
-    IN in_postname VARCHAR(255),
-    IN in_content TEXT
+    IN in_postname VARCHAR(100),
+    IN in_content TEXT 
 )
 BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION

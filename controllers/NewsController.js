@@ -53,21 +53,20 @@ class NewsController{
     // [POST] /news/create
     CreateNews = async (req, res) => {
         const { VoucherId, Postname, Content } = req.body;
-        const token = req.headers['authorization'];
-
+        
+        // Tạm thời bỏ check token để test
+        /*const token = req.headers['authorization'];
         if (!token) {
             return res.status(401).json({ error: 'Unauthorized' });
-        }
+        }*/
 
         if (!VoucherId || !Postname || !Content) {
             return res.status(400).json({ error: 'VoucherId, Postname, and Content are required in request body' });
         }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.UserId;
-
+            // Hardcode UserId = 1 để test
+            const UserId = 1;
             const [results] = await this.connection.query('CALL fn_create_news(?, ?, ?, ?)', 
                 [VoucherId, UserId, Postname, Content]);
 

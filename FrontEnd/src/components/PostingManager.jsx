@@ -98,10 +98,10 @@ const PostManager = () => {
       const response = await fetch('http://localhost:3000/posting/createPosting', {
         method: 'POST',
         headers: {
-          ContentType: 'application/json',
+          'Content-Type': 'application/json',
           Authorization: `${token}`,
         },
-        body: jsonData,
+        body: JSON.stringify(jsonData),
       });
 
       if (!response.ok) {

@@ -1,12 +1,19 @@
+import Sidebar from "../components/Dashboard";
+import Header from "../components/SalesChart";
+import Dashboard from "../components/Sidebar";
+
 function Home() {
   return (
-    <>
-      <div className="container">
-        <h1>Welcome to the Home Page</h1>
-        <p>This is a simple home page.</p>
+    <div className="flex">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-100 min-h-screen">
+        
       </div>
-    </>
-  )
+    </div>
+  );
 }
 
-export default Home
+export default Home;

@@ -25,7 +25,7 @@ class NewsController{
     // [GET] /news
     GetAllNews = async (req, res) => {
         try {
-            const [results] = await this.connection.query('CALL fn_get_all_post()');
+            const [results] = await this.connection.query('CALL fn_get_all_news()');
             res.json(results[0]);
         } catch (error) {
             console.error('Error getting all news:', error);
@@ -42,7 +42,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_show_post_info_by_id(?)', [PostId]);
+            const [results] = await this.connection.query('CALL fn_get_news_by_id(?)', [PostId]);
             res.json(results[0]);
         } catch (error) {
             console.error('Error getting news by ID:', error);
@@ -68,7 +68,7 @@ class NewsController{
             const decoded = jwt.verify(token, secretKey);
             const UserId = decoded.UserId;
 
-            const [results] = await this.connection.query('CALL fn_create_post(?, ?, ?, ?)', 
+            const [results] = await this.connection.query('CALL fn_create_news(?, ?, ?, ?)', 
                 [VoucherId, UserId, Postname, Content]);
 
             res.json(results[0]);
@@ -92,7 +92,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_update_post(?, ?, ?, ?)', 
+            const [results] = await this.connection.query('CALL fn_update_news(?, ?, ?, ?)', 
                 [PostId, VoucherId, Postname, Content]);
 
             res.json(results[0]);
@@ -116,7 +116,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_deactive_post(?)', [PostId]);
+            const [results] = await this.connection.query('CALL fn_deactivate_news(?)', [PostId]);
             res.json(results[0]);
         } catch (error) {
             console.error('Error deactivating news:', error);
@@ -138,7 +138,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_active_post(?)', [PostId]);
+            const [results] = await this.connection.query('CALL fn_activate_news(?)', [PostId]);
             res.json(results[0]);
         } catch (error) {
             console.error('Error activating news:', error);

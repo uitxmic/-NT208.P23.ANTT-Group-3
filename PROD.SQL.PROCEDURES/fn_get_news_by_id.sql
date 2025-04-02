@@ -2,6 +2,12 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_get_news_by_id;$$
 
+/*
+* Lấy thông tin chi tiết của một tin tức theo ID
+* Input: post_id - ID của bài đăng cần xem
+* Output: Chi tiết bài đăng, voucher và thông tin người đăng
+*/
+
 CREATE PROCEDURE fn_get_news_by_id(IN post_id INT)
 BEGIN
     SELECT 

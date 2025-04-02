@@ -2,6 +2,16 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_create_news;$$
 
+/*
+* Tạo tin tức mới về voucher
+* Input:
+*   - in_voucher_id: ID của voucher
+*   - in_user_id: ID người đăng
+*   - in_postname: Tiêu đề bài đăng
+*   - in_content: Nội dung bài đăng
+* Output: Message và ID của bài đăng mới
+*/
+
 CREATE PROCEDURE fn_create_news(
     IN in_voucher_id INT,
     IN in_user_id INT,

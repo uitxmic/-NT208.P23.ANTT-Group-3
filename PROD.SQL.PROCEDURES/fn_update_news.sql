@@ -2,6 +2,11 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_update_news;$$
 
+/*
+* Cập nhật thông tin tin tức
+* Output: Message và ID của bài đăng đã cập nhật
+*/
+
 CREATE PROCEDURE fn_update_news(
     IN in_post_id INT,
     IN in_voucher_id INT,

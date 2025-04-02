@@ -2,6 +2,13 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_get_all_news;$$
 
+/*
+* Lấy tất cả tin tức về voucher với thông tin chi tiết
+* Bao gồm: thông tin bài đăng, voucher và người đăng
+* Sắp xếp: theo ngày đăng mới nhất
+* Trạng thái: Active/Inactive/Expired
+*/
+
 CREATE PROCEDURE fn_get_all_news()
 BEGIN
     SELECT 

@@ -27,7 +27,9 @@ class UsersController
     }
 
     hashPassword = (password) => {
-        return crypto.createHash('sha256').update(password).digest('hex');
+        const hashed = crypto.createHash('sha256').update(password).digest('hex');
+        console.log(`Hashed password for "${password}": ${hashed}`);
+        return hashed;
     }
 
     // [Get] /users/getUsers
@@ -108,7 +110,7 @@ class UsersController
                     Email: results[0][0].Email,}, 
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
-                return res.json({access_token: access_token});
+                return res.json({state:"success", access_token: access_token});
             }
             else{
                 return res.status(401).json({ error: 'Username or Password is incorrect' });

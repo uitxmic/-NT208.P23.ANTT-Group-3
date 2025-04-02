@@ -5,6 +5,17 @@ import { FaSearch, FaBell } from 'react-icons/fa';
 const Navbar = () => {
   return (
     <div className="bg-white shadow-md p-4 flex justify-between items-center">
+      { /* Logo và tên ứng dụng để quay về main */ }
+      <div className="flex items-center space-x-2">
+        <img
+          src="../assets/logo.png"
+          alt="Logo"
+          className="w-10 h-10"
+        />
+        <Link to="/" className="text-xl font-bold text-gray-800">
+          VoucherHub
+        </Link>
+      </div>
       {/* Thanh tìm kiếm */}
       <div className="relative w-1/3">
         <input

@@ -13,8 +13,8 @@ const Sidebar = () => {
           </Link>
         </li>
         <li className="mb-4">
-          <Link to="#" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-            <FaBox className="mr-2" /> Products
+          <Link to="posting-manager" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            <FaBox className="mr-2" /> Posting Manager
           </Link>
         </li>
         <li className="mb-4">

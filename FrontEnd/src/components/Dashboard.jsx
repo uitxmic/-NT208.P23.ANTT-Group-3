@@ -1,6 +1,6 @@
 import React from 'react';
 import Sidebar from './Sidebar';
-import Navbar from './Navbar';
+import Navbar from './NavigaBar';
 import SalesChart from './SalesChart';
 import { FaUsers, FaBox, FaDollarSign, FaClock } from 'react-icons/fa';
 

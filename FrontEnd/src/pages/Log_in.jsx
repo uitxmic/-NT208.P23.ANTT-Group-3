@@ -32,7 +32,7 @@ const Log_in = () => {
       const data = await response.json();
       if (data.state === 'success') { 
 
-        navigate('/');
+        navigate('/sidebar');
       } else {
         setError('Invalid username or password');
       }

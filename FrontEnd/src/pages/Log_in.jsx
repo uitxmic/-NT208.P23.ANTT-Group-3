@@ -34,6 +34,9 @@ const Log_in = () => {
         // Lưu access_token vào localStorage
         localStorage.setItem('access_token', data.access_token);
         navigate('/');
+      if (data.state === 'success') { 
+
+        navigate('/sidebar');
       } else {
         setError('Invalid username or password');
       }

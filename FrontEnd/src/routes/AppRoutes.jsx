@@ -5,6 +5,7 @@ import PostManager from "../pages/PostingManager";
 import VoucherList from "../pages/Valid_vouchers";
 import UserVoucherList from "../pages/Valid_user's_voucher";
 import Payment from "../pages/Payment";
+import Sidebar from "../components/Sidebar";
 function AppRoutes() {
   return (
     <Routes>
@@ -14,6 +15,7 @@ function AppRoutes() {
       <Route path="/shop-vouchers" element={<VoucherList />} />
       <Route path="/user-vouchers" element={<UserVoucherList />} />
       {<Route path="/payment" element={<Payment />} /> }
+      <Route path="/sidebar" element={<Sidebar />} />
     </Routes>
   );
 }

@@ -9,6 +9,7 @@ DROP PROCEDURE IF EXISTS fn_create_news;$$
 *   - in_user_id: ID người đăng
 *   - in_postname: Tiêu đề bài đăng
 *   - in_content: Nội dung bài đăng
+*   - in_expire_days: Số ngày hết hạn (mặc định là 7 ngày)
 * Output: Message và ID của bài đăng mới
 */
 

@@ -53,29 +53,45 @@ class NewsController{
     // [POST] /news/create
     CreateNews = async (req, res) => {
         const { VoucherId, Postname, Content } = req.body;
-        
-        // Tạm thời bỏ check token để test
-        /*const token = req.headers['authorization'];
+    
+        // Kiểm tra token
+        const token = req.headers['authorization'];
         if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }*/
-
-        if (!VoucherId || !Postname || !Content) {
-            return res.status(400).json({ error: 'VoucherId, Postname, and Content are required in request body' });
+            return res.status(401).json({ error: 'Unauthorized: Token is missing' });
         }
-
+    
+        let UserId;
         try {
-            // Hardcode UserId = 1 để test
-            const UserId = 1;
-            const [results] = await this.connection.query('CALL fn_create_news(?, ?, ?, ?)', 
-                [VoucherId, UserId, Postname, Content]);
-
+            // Giải mã token để lấy UserId
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            UserId = decoded.UserId; // Giả sử token chứa UserId
+        } catch (error) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        }
+    
+        // Kiểm tra dữ liệu đầu vào
+        if (!VoucherId || !Postname || !Content) {
+            return res.status(400).json({
+                error: 'VoucherId, Postname, and Content are required in request body',
+            });
+        }
+    
+        try {
+            // Gọi stored procedure
+            const [results] = await this.connection.query(
+                'CALL fn_create_news(?, ?, ?, ?)',
+                [VoucherId, UserId, Postname, Content]
+            );
+    
+            // Trả về kết quả
             res.json(results[0]);
         } catch (error) {
             console.error('Error creating news:', error);
-            res.status(500).json({ error: 'Error creating news' });
+            res.status(500).json({
+                error: `Error creating news: ${error.sqlMessage || error.message}`,
+            });
         }
-    }
+    };
 
     // [PUT] /news/update
     UpdateNews = async (req, res) => {

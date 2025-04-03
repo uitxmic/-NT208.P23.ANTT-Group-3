@@ -6,6 +6,8 @@ const tradeController = require('../controllers/TradeController');
 
 //router.use(authMiddleware);
 
-router.use('/', tradeController.Get20LastestPosts);
+router.use('/20lastestposts', tradeController.Get20LastestPosts);
+
+router.use('/paymentbybalance', tradeController.PaymentByBalance);
 
 module.exports = router;

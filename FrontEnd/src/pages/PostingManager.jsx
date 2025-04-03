@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/NavigaBar';
 import Sidebar from '../components/Sidebar';
+import { jwtDecode } from 'jwt-decode'; 
 import { jwtDecode } from 'jwt-decode'; // Correct default import
 
 // Hàm lấy UserId từ AccessToken
@@ -23,6 +24,8 @@ const PostManager = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem('access_token'));
+  // Token hardcode
   const [voucher, setVoucher] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState('');
 
@@ -63,6 +66,7 @@ const PostManager = () => {
         return;
       }
 
+      console.log('Fetching posts for UserId:', UserId);
       console.log('Fetching posts for UserId:', UserId); // Debug
       const response = await fetch(`http://localhost:3000/posting/getPostingsByUserId/${UserId}`, {
         method: 'GET',
@@ -87,6 +91,8 @@ const PostManager = () => {
   // Gọi API lấy danh sách bài đăng khi component được mount
   useEffect(() => {
     fetchPosts();
+  }, []);
+
     fetchVoucher();
   }, []);
 
@@ -115,6 +121,7 @@ const PostManager = () => {
     }
 
     const jsonData = {
+      VoucherId: 1,
       VoucherId: selectedVoucherId,
       Postname: postname,
       Content: description
@@ -124,6 +131,7 @@ const PostManager = () => {
     }
 
     try {
+      console.log('Creating post with data:', { postname, description}); // Debug
       console.log('Creating post with data:', { postname, description }); // Debug
       const response = await fetch('http://localhost:3000/posting/createPosting', {
         method: 'POST',
@@ -207,6 +215,7 @@ const PostManager = () => {
             <h2 className="text-2xl font-bold mb-6">Create New Post</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
+
                 <label htmlFor="voucher" className="block text-gray-600 mb-2">
                   Voucher
                 </label>
@@ -269,6 +278,9 @@ const PostManager = () => {
               </div>
               <button
                 type="submit"
+                className={`w-full p-3 rounded-lg text-white transition duration-300 ${
+                  loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
                 className={`w-full p-3 rounded-lg text-white transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
                   }`}
                 disabled={loading}

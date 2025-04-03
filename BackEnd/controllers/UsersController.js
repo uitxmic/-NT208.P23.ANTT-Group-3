@@ -153,6 +153,32 @@ class UsersController
             return res.status(500).json({error: 'Error changing password'});
         }
     }
+
+    // [GET] /users/getUserBalance
+    GetUserBalance = async (req, res) => {
+        const token = req.headers.authorization?.split(" ")[1];
+    
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+    
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.UserId;
+    
+            const [result] = await this.connection.execute("CALL fn_get_user_balance(?)", [userId]);
+    
+            if (!result[0] || result[0].length === 0) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            return res.status(200).json({ message: "Success", balance: result[0][0].AccountBalance });
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    };
 }
 
 module.exports = new UsersController;

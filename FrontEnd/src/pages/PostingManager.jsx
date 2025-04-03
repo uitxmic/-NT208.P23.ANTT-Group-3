@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './NavigaBar';
-import Sidebar from './Sidebar';
-import { jwtDecode } from 'jwt-decode'; // Correct default import
+import Navbar from '../components/NavigaBar';
+import Sidebar from '../components/Sidebar';
+import { jwtDecode } from 'jwt-decode'; 
 
 // Hàm lấy UserId từ AccessToken
 const getUserIdFromToken = (token) => {
@@ -23,9 +23,8 @@ const PostManager = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-
+  const [token, setToken] = useState(localStorage.getItem('access_token'));
   // Token hardcode
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjMsIlVzZXJuYW1lIjoidXNlcjMiLCJFbWFpbCI6ImJvYjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM1OTczNTksImV4cCI6MTc0MzYyMjU1OX0.nLB2-FrONWoNgjwxU59lezFy50fT253DGxMjZuv-NMs";
 
   // Hàm lấy danh sách bài đăng
   const fetchPosts = async () => {
@@ -36,7 +35,7 @@ const PostManager = () => {
         return;
       }
 
-      console.log('Fetching posts for UserId:', UserId); // Debug
+      console.log('Fetching posts for UserId:', UserId);
       const response = await fetch(`http://localhost:3000/posting/getPostingsByUserId/${UserId}`, {
         method: 'GET',
         headers: {

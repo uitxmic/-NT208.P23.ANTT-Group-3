@@ -18,6 +18,16 @@ const Sidebar = () => {
           </Link>
         </li>
         <li className="mb-4">
+          <Link to="/shop-vouchers" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            <FaBox className="mr-2" /> Shop Vouchers {/* Có thể thay FaBox bằng icon khác */}
+          </Link>
+        </li>
+        <li className="mb-4">
+          <Link to="/user-vouchers" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            <FaBox className="mr-2" /> Vouchers Manager {/* Có thể thay FaBox bằng icon khác */}
+          </Link>
+        </li>
+        {/* <li className="mb-4">
           <Link to="#" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <FaHeart className="mr-2" /> Favorites
           </Link>
@@ -77,7 +87,7 @@ const Sidebar = () => {
           <Link to="#" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <FaTable className="mr-2" /> Table
           </Link>
-        </li>
+        </li> */}
       </ul>
     </div>
   );

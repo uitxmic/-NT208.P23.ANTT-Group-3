@@ -15,23 +15,24 @@ const Log_in = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+  
     try {
       const response = await fetch('http://localhost:3000/users/login', {
-        method: 'POST', // Sử dụng phương thức POST
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Username, Password }), // Gửi username và password
+        body: JSON.stringify({ Username, Password }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Invalid username or password');
       }
-
+  
       const data = await response.json();
-      if (data.state === 'success') { 
-
+      if (data.state === 'success') {
+        // Lưu access_token vào localStorage
+        localStorage.setItem('access_token', data.access_token);
         navigate('/');
       } else {
         setError('Invalid username or password');

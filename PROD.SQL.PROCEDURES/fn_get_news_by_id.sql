@@ -10,7 +10,10 @@ DROP PROCEDURE IF EXISTS fn_get_news_by_id;$$
 
 CREATE PROCEDURE fn_get_news_by_id(IN post_id INT)
 BEGIN
+    /*lấy thông tin chi tiết của một bài đăng kết hợp với thông tin của voucher và người dùng*/
     SELECT 
+
+    /*Post info*/
         p.PostId,
         p.VoucherId,
         p.UserId,
@@ -19,11 +22,12 @@ BEGIN
         p.Date,
         p.Expire,
         p.IsActive,
+    /*Voucher info*/
         v.VoucherName,
         v.Label,
         v.VoucherImage,
-        v.Description AS VoucherDescription,
         v.Price,
+    /*User info*/
         u.Username,
         u.Fullname,
         CASE 

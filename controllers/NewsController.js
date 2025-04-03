@@ -82,15 +82,20 @@ class NewsController{
         const { PostId, VoucherId, Postname, Content } = req.body;
         const token = req.headers['authorization'];
 
+        // check if token is valid
         if (!token) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
+
+        //check input
         if (!PostId || !Postname || !Content) {
             return res.status(400).json({ error: 'PostId, Postname, and Content are required in request body' });
         }
 
         try {
+            
+        //call stored procedure to update news
             const [results] = await this.connection.query('CALL fn_update_news(?, ?, ?, ?)', 
                 [PostId, VoucherId, Postname, Content]);
 

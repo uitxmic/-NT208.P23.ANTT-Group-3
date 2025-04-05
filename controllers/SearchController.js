@@ -67,6 +67,48 @@ class SearchController {
             res.status(500).json({ error: 'Error searching posts' });
         }
     };
+
+    // [GET] /search/users
+    SearchUsers = async (req, res) => {
+        const { searchTerm, isVerified } = req.query;
+    
+        try {
+            const [results] = await this.connection.query(
+                'CALL fn_search_users(?, ?)',
+                [searchTerm || '', isVerified || null]
+            );
+            res.json(results[0]);
+        } catch (error) {
+            console.error('Error searching users:', error);
+            res.status(500).json({ error: 'Error searching users' });
+        }
+    };
+
+    // [GET] /search/users apply filters
+    SearchUsersWithFilters = async(req,res) =>{
+        const{ searchTerm, minFeedback, minSold, sortBy} = req.query;
+        
+        const validSortOptions = ['feedback_asc', 'feedback_desc', 'sold_asc', 'sold_desc'];
+        if (sortBy && !validSortOptions.includes(sortBy)) {
+            return res.status(400).json({ error: 'Invalid sortBy value.' });
+        }
+
+        try{
+            const[results] = await this.connection.query(
+                'CALL fn_search_users_with_filters(?, ?, ?, ?)',
+                [
+                searchTerm || '', 
+                minFeedback || null, 
+                minSold || null, 
+                sortBy || 'feedback_desc'
+            ]
+            );
+            res.json(results[0]);
+        } catch(error){
+            console.error('Error searching users with filters:', error);
+            res.status(500).json({ error: 'Error searching users with filters' });
+        }
+    }
 }
 
 module.exports = new SearchController();

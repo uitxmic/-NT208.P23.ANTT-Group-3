@@ -4,13 +4,14 @@ const postingRouter = require('./posting');
 const tradeRouter = require('./trade');
 const notificationRouter = require('./notification');
 const newsRouter = require('./news');
-
+const searchRouter = require('./search');
 function routes(app) 
 {
     app.get('/test', (req, res) => {
         res.json({message: 'Test route'});
     }
     );
+    app.use('/search', searchRouter);
 
     app.use('/users', usersRouter);
 

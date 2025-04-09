@@ -11,7 +11,10 @@ const corsOptions = {
 
 const express = require('express');
 const path = require('node:path');
+const initRedis = require('./PROD.SQL.PROCEDURES/init.redis');
 const app = express();
+
+initRedis.initRedis()
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));

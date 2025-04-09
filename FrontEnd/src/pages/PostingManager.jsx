@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/NavigaBar';
 import Sidebar from '../components/Sidebar';
-import { jwtDecode } from 'jwt-decode'; 
 import { jwtDecode } from 'jwt-decode'; // Correct default import
 
 // Hàm lấy UserId từ AccessToken
@@ -30,7 +29,7 @@ const PostManager = () => {
   const [selectedVoucherId, setSelectedVoucherId] = useState('');
 
   // Token hardcode
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjMsIlVzZXJuYW1lIjoidXNlcjMiLCJFbWFpbCI6ImJvYjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM1OTczNTksImV4cCI6MTc0MzYyMjU1OX0.nLB2-FrONWoNgjwxU59lezFy50fT253DGxMjZuv-NMs";
+  //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjMsIlVzZXJuYW1lIjoidXNlcjMiLCJFbWFpbCI6ImJvYjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM1OTczNTksImV4cCI6MTc0MzYyMjU1OX0.nLB2-FrONWoNgjwxU59lezFy50fT253DGxMjZuv-NMs";
 
   // Hàm lấy VoucherId từ UserId
   const fetchVoucher = async () => {
@@ -93,6 +92,7 @@ const PostManager = () => {
     fetchPosts();
   }, []);
 
+  useEffect(() => {
     fetchVoucher();
   }, []);
 
@@ -281,8 +281,6 @@ const PostManager = () => {
                 className={`w-full p-3 rounded-lg text-white transition duration-300 ${
                   loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
                 }`}
-                className={`w-full p-3 rounded-lg text-white transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                  }`}
                 disabled={loading}
               >
                 {loading ? 'Posting...' : 'Create Post'}

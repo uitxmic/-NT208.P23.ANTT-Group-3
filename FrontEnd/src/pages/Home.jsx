@@ -1,3 +1,4 @@
+import BannerCarousel from "../components/BannerCarousel";
 import Footer from "../components/Footer";
 import Navbar from "../components/NavigaBar";
 
@@ -123,7 +124,11 @@ function Home() {
             </div>
           </section>
 
-          {/* Call to Action (Styled like Got It) */}
+          {/* Section to display news to user */}
+
+          <BannerCarousel />
+
+          {/* Call to Action*/}
           <section className="bg-red-500 text-white p-8 rounded-lg text-center">
             <h2 className="text-3xl font-bold mb-4">
               Bạn có voucher để bán?

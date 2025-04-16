@@ -21,7 +21,7 @@ const Profile = () => {
                     return;
                 }
 
-                // Giải mã token để lấy userId
+                
                 const decoded = jwtDecode(token);
                 const userId = decoded.UserId; // Giả định token chứa userId
                 console.log("hahhaha", userId);

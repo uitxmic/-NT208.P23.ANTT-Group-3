@@ -43,21 +43,30 @@ class GoogleCloudController {
         idToken: tokenId,
         audience: process.env.GOOGLE_CLIENT_ID
       });
-
+      
       const payload = ticket.getPayload();
       const userId = payload['sub'];
       const email = payload['email'];
       const name = payload['name'];
-      const phone = payload['phone_number'];
 
 
-      // Kiểm tra xem người dùng đã tồn tại trong cơ sở dữ liệu chưa
       const [rows] = await this.connection.query('CALL fn_get_user_by_email(?)', [email]);
 
       if (rows[0].length === 0) {
-        // Nếu người dùng chưa tồn tại, thêm người dùng mới vào cơ sở dữ liệu
-        await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', [name, name, '', email, '', 2, 0]);
+        console.log('User not found, creating new user...');
+        const params = [
+          name,         
+          name,         
+          "123",            
+          email,        
+          "123",           
+          2,           
+          0,             
+        ];
+        console.log('SQL Parameters:', params); // Log tham số
+        await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', params);
       }
+  
 
       // Tạo access token và trả về cho client
       const accessToken = this.GenerateAccessToken({ userId, email });

@@ -83,17 +83,26 @@ const Navbar = () => {
               to="/signup"
               className="text-blue-600 font-medium hover:bg-blue-100 px-3 py-1 rounded-md transition-all duration-200"
             >
-              Sign Up
+              Đăng ký
             </Link>
           </>
         ) : (
-          <button
-            onClick={handleLogout}
-            className="text-blue-600 font-medium hover:bg-blue-100 px-3 py-1 rounded-md transition-all duration-200"
-          >
-            Logout
-          </button>
-        )}
+          <>
+            <button
+              onClick={() => navigate('/profile')}
+              className="text-blue-600 font-medium hover:bg-blue-100 px-3 py-1 rounded-md transition-all duration-200"
+            >
+              Hồ sơ của tôi
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="text-blue-600 font-medium hover:bg-blue-100 px-3 py-1 rounded-md transition-all duration-200"
+            >
+              Đăng xuất
+            </button>
+          </>)
+        }
       </div>
     </div>
   );

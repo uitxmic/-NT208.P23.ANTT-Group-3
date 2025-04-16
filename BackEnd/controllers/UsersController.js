@@ -70,12 +70,12 @@ class UsersController
     // [POST] /users/createUser
     CreateUser = async (req, res) =>
     {
-        const { Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, AvgRate  } = req.body;
+        const { Username, Fullname, Password, Email, PhoneNumber, UserRoleId, AvgRate  } = req.body;
 
-        if (!Username || !Fullname || !PasswordHash || !Email || !PhoneNumber || !UserRoleId || !AvgRate){
+        if (!Username || !Fullname || !Password || !Email || !PhoneNumber || !UserRoleId || !AvgRate){
             return res.status(400).json({error: 'Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, and AvgRate are required in request body'});
         }
-        var hashedPassword = this.hashPassword(PasswordHash);
+        var hashedPassword = this.hashPassword(Password);
         try{
             const [results] = await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', [Username, Fullname, hashedPassword, Email, PhoneNumber, UserRoleId, AvgRate]);
             res.json(results[0]);

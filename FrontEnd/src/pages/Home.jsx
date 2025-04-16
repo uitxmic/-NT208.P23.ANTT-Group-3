@@ -1,6 +1,7 @@
 import BannerCarousel from "../components/BannerCarousel";
 import Footer from "../components/Footer";
 import Navbar from "../components/NavigaBar";
+import PostList from "../components/PostsList";
 
 function Home() {
   return (
@@ -145,24 +146,7 @@ function Home() {
 
       {/* Display 20 Latest Posts */}
       <section className="py-12">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          Bài viết mới nhất
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 20 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                Bài viết {index + 1}
-              </h3>
-              <p className="text-gray-600">
-                Đây là nội dung mô tả ngắn gọn cho bài viết số {index + 1}.
-              </p>
-              <button className="mt-4 text-red-500 font-semibold hover:underline">
-                Đọc thêm
-              </button>
-            </div>
-          ))}
-        </div>
+        <PostList />
       </section>
 
       {/* Footer */}

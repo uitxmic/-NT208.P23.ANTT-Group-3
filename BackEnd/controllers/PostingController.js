@@ -92,7 +92,7 @@ class PostingController
         }
     }
 
-    // [GET] /posting/getAllPostings without token
+    // [GET] /posting/getAllPostings 
     GetAllPostings = async (req, res) =>
     {
         const token = req.headers['authorization'];
@@ -230,6 +230,22 @@ class PostingController
             return res.status(500).json({ error: 'Error getting deactive postings' });
         }
     }
+
+    // [GET] /posting/get20LastestPostings
+    Get20LastestPostings = async (req, res) =>
+    {
+        try 
+        {
+            const [results] = await this.connection.query(`CALL fn_get_20_lastest_posts()`);
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error getting 20 lastest postings:', err);
+            return res.status(500).json({ error: 'Error getting 20 lastest postings' });
+        }
+    }
+
+
 }
 
 module.exports = new PostingController();

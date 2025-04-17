@@ -46,18 +46,21 @@ class UsersController
         }
     }
 
-    // [POST] /users/getUserById
+    // /users/getUserById
     GetUserById = async (req, res) =>
-    {
-        const { UserId } = req.body;
-
-        if (!UserId)
-        {
-        return res.status(400).json({ error: 'UserId is required in request body' });
+    {   
+        const token = req.headers.authorization?.split(" ")[1];
+    
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
         }
 
         try 
         {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const UserId = decoded.userId;
+
             const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
             res.json(results[0]);
         } 
@@ -105,9 +108,9 @@ class UsersController
             const [results] = await this.connection.query('CALL fn_login(?, ?)', [Username, hashedPassword]);
             if (results[0][0] && results[0][0].Message == "Login Successful"){
                 const access_token = jwt.sign({
-                    UserId: results[0][0].UserId,
-                    Username: Username,
-                    Email: results[0][0].Email,}, 
+                    userId: results[0][0].UserId,
+                    username: Username,
+                    email: results[0][0].Email,}, 
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
                 return res.json({state:"success", access_token: access_token});
@@ -139,7 +142,7 @@ class UsersController
         try{
             var secretKey = process.env.JWT_SECRET;
             var decode = jwt.verify(token, secretKey);
-            var Username = decode.Username;
+            var Username = decode.username;
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
             if (results[0][0] && results[0][0].Message == "Change Password Successfully"){
@@ -165,7 +168,7 @@ class UsersController
         try {
             const secretKey = process.env.JWT_SECRET;
             const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.UserId;
+            const userId = decoded.userId;
     
             const [result] = await this.connection.execute("CALL fn_get_user_balance(?)", [userId]);
     

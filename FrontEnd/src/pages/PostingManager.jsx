@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/NavigaBar';
-import Sidebar from '../components/Sidebar';
+import Layout from '../components/Layout';
 import { jwtDecode } from 'jwt-decode'; // Correct default import
 
 // Hàm lấy UserId từ AccessToken
@@ -167,10 +166,9 @@ const PostManager = () => {
   console.log('Rendering PostManager...'); // Debug
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <Navbar />
+    <Layout>
+      <div className="flex flex-col h-screen bg-gray-100">
       <div className="flex flex-1">
-        <Sidebar />
         <div className="flex-1 p-8 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-8">Post Management</h1>
 
@@ -321,6 +319,7 @@ const PostManager = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

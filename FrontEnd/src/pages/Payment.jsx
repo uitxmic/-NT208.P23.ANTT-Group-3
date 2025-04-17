@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Navbar from '../components/NavigaBar';
+import Layout from '../components/Layout';
 import UserBalance from '../components/UserBalance';
 
 const Payment = () => {
@@ -84,6 +84,7 @@ const Payment = () => {
 
   if (!voucher) {
     return (
+      <Layout>
       <div className="flex flex-col min-h-screen bg-gray-100">
         <Navbar />
         <div className="flex-1 p-6">
@@ -92,12 +93,13 @@ const Payment = () => {
           </div>
         </div>
       </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <Navbar />
+    <Layout>
+      <div className="flex flex-col min-h-screen bg-gray-100">
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold text-center mb-6">Payment</h1>
 
@@ -199,6 +201,7 @@ const Payment = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

@@ -45,7 +45,6 @@ const Log_in = () => {
     }
   };
 
-  // Hàm xử lý đăng nhập bằng Google
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     setError('');
     setLoading(true);
@@ -56,13 +55,13 @@ const Log_in = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ tokenId: credentialResponse.credential }), // Gửi ID Token
+        body: JSON.stringify({ tokenId: credentialResponse.credential }), 
       });
 
       const data = await response.json();
       if (data.state === 'success') {
         localStorage.setItem('access_token', data.access_token);
-        navigate('/'); // Điều hướng sau khi đăng nhập Google thành công
+        navigate('/'); 
       } else {
         throw new Error(data.error || 'Google login failed');
       }
@@ -80,7 +79,7 @@ const Log_in = () => {
   };
 
   return (
-    <GoogleOAuthProvider clientId="269747751566-9p1a31qjqacmtf57h78c1fkl0b97ggrc.apps.googleusercontent.com"> {/* Thay bằng Client ID thực tế */}
+    <GoogleOAuthProvider clientId="269747751566-9p1a31qjqacmtf57h78c1fkl0b97ggrc.apps.googleusercontent.com">
       <div className="flex flex-col h-screen bg-gray-100">
         {/* Navbar */}
         <Navbar />

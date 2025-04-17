@@ -57,7 +57,7 @@ class TradeController
         try {
           var secretKey = process.env.JWT_SECRET;
           var decode = jwt.verify(token, secretKey);
-          var UserId = decode.UserId;
+          var UserId = decode.userId;
       
           const [result] = await this.connection.execute('CALL fn_payment_by_userbalance(?, ?)', [UserId, VoucherId]);
       

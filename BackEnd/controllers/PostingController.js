@@ -44,7 +44,7 @@ class PostingController
         {
             const secretKey = process.env.JWT_SECRET;
             const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.UserId;
+            const UserId = decoded.userId;
 
             const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content]);
 
@@ -71,7 +71,7 @@ class PostingController
         {
             const secretKey = process.env.JWT_SECRET;   
             const decoded = jwt.verify(token, secretKey);
-            const RequestUserId = decoded.UserId;
+            const RequestUserId = decoded.userId;
 
             console.log('RequestUserId:', RequestUserId);
             console.log('UserId:', UserId);

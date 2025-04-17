@@ -60,7 +60,7 @@ class VoucherController
             console.log('Decoded:', decoded);
 
             console.log('UserId:', UserId);
-            console.log('Decoded UserId:', decoded.UserId);
+            console.log('Decoded UserId:', decoded.userId);
 
             if (decoded.UserId !== Number(UserId)) {
                 return res.status(403).json({ error: 'You are not allowed to access this user\'s data' });
@@ -89,7 +89,7 @@ class VoucherController
             try {
                 const secretKey = process.env.JWT_SECRET;
                 const decoded = jwt.verify(token, secretKey);
-                const Sender_ID = decoded.UserId;
+                const Sender_ID = decoded.userId;
     
                 if (!recipient_phonenumber || !voucher_name) {
                     return res.status(400).json({ message: "Recipient phone number and voucher name are required in request body" });
@@ -114,7 +114,7 @@ class VoucherController
         try {
             const secretKey = process.env.JWT_SECRET;
             const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.UserId;
+            const userId = decoded.userId;
     
             // Truyền userId vào stored procedure
             const [result] = await this.connection.execute("CALL fn_get_all_valid_vouchers(?)", [userId]);
@@ -141,7 +141,7 @@ class VoucherController
         try {
             const secretKey = process.env.JWT_SECRET;
             const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.UserId;
+            const userId = decoded.userId;
     
             // Truyền userId vào stored procedure
             const [result] = await this.connection.execute("CALL fn_get_all_valid_User_vouchers(?)", [userId]);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/NavigaBar';
+import Layout from '../components/Layout';
 
 const VoucherList = () => {
   const [vouchers, setVouchers] = useState([]);
@@ -53,61 +53,61 @@ const VoucherList = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <Navbar />
+    <Layout>
+      <div className="flex flex-col min-h-screen bg-gray-100">
 
-      {/* Nội dung chính */}
-      <div className="flex-1 p-6">
-        <h1 className="text-3xl font-bold text-center mb-6">Available Vouchers</h1>
+{/* Nội dung chính */}
+<div className="flex-1 p-6">
+  <h1 className="text-3xl font-bold text-center mb-6">Available Vouchers</h1>
 
-        {/* Hiển thị lỗi nếu có */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-            {error}
-          </div>
-        )}
-
-        {/* Hiển thị loading */}
-        {loading ? (
-          <p className="text-center">Loading vouchers...</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {vouchers.length > 0 ? (
-              vouchers.map((voucher) => (
-                <div
-                  key={voucher.VoucherId}
-                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
-                >
-                  {/* Hình ảnh voucher */}
-                  <img
-                    src={voucher.VoucherImage || 'https://via.placeholder.com/150'}
-                    alt={voucher.VoucherName}
-                    className="w-full h-40 object-cover rounded-md mb-4"
-                  />
-                  {/* Thông tin voucher */}
-                  <h2 className="text-xl font-semibold">{voucher.VoucherName}</h2>
-                  <p className="text-gray-600">{voucher.Label}</p>
-                  <p className="text-gray-800 font-bold mt-2">Price: ${voucher.Price}</p>
-                  <p className="text-gray-500 text-sm">
-                    Expires: {new Date(voucher.ExpirationDay).toLocaleDateString()}
-                  </p>
-                  {/* Nút Buy Voucher */}
-                  <button
-                    onClick={() => handleBuyVoucher(voucher)}
-                    className="mt-4 w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                  >
-                    Buy Voucher
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="text-center col-span-full">No vouchers available.</p>
-            )}
-          </div>
-        )}
-      </div>
+  {/* Hiển thị lỗi nếu có */}
+  {error && (
+    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
+      {error}
     </div>
+  )}
+
+  {/* Hiển thị loading */}
+  {loading ? (
+    <p className="text-center">Loading vouchers...</p>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {vouchers.length > 0 ? (
+        vouchers.map((voucher) => (
+          <div
+            key={voucher.VoucherId}
+            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
+          >
+            {/* Hình ảnh voucher */}
+            <img
+              src={voucher.VoucherImage || 'https://via.placeholder.com/150'}
+              alt={voucher.VoucherName}
+              className="w-full h-40 object-cover rounded-md mb-4"
+            />
+            {/* Thông tin voucher */}
+            <h2 className="text-xl font-semibold">{voucher.VoucherName}</h2>
+            <p className="text-gray-600">{voucher.Label}</p>
+            <p className="text-gray-800 font-bold mt-2">Price: ${voucher.Price}</p>
+            <p className="text-gray-500 text-sm">
+              Expires: {new Date(voucher.ExpirationDay).toLocaleDateString()}
+            </p>
+            {/* Nút Buy Voucher */}
+            <button
+              onClick={() => handleBuyVoucher(voucher)}
+              className="mt-4 w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            >
+              Buy Voucher
+            </button>
+          </div>
+        ))
+      ) : (
+        <p className="text-center col-span-full">No vouchers available.</p>
+      )}
+    </div>
+  )}
+</div>
+</div>
+    </Layout>
   );
 };
 

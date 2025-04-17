@@ -31,7 +31,7 @@ const UserBalance = ({ setBalance }) => {
 
         const data = await response.json();
         if (data.message === 'Success') {
-          setBalance(data.balance); // Cập nhật số dư vào state của Payment
+          setBalance(data.balance); 
         } else {
           throw new Error(data.message || 'Failed to fetch balance');
         }

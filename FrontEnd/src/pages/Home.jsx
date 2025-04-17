@@ -13,12 +13,12 @@ function Home() {
       <div className="flex flex-1" style={{ marginTop: '4rem' }}>
         {/* Main Section */}
         <main className="flex-1 p-6">
-          {/* Hero Section (Inspired by Got It) */}
+          {/* Hero Section */}
           <section className="flex flex-col md:flex-row items-center justify-center py-12">
             {/* Left Side: Image of a phone */}
             <div className="md:w-1/2 flex justify-center">
               <img
-                src="https://via.placeholder.com/300x600.png?text=Phone+Mockup"
+                src="https://img.gotit.vn/compress/gotit_website/1709263961_yLb5z.png"
                 alt="Phone Mockup"
                 className="w-64 md:w-80"
               />

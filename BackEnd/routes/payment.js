@@ -1,27 +1,8 @@
 const express = require('express');
 const MomoPaymentController = require('../controllers/MomoPaymentController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
-
-router.post('/create-payment', async (req, res) => {
-    const { amount, UserId } = req.body;
-
-    if (!amount || !UserId) {
-        return res.status(400).json({ error: 'Missing amount or userId' });
-    }
-
-    try {
-        const requestBody = MomoPaymentController.createPaymentRequest(
-            amount,
-            `Nạp tiền cho người dùng ${UserId}`,
-            UserId
-        );
-        const response = await MomoPaymentController.sendPaymentRequest(requestBody);
-        res.json(response);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 router.get('/momo/redirect', async (req, res) => {
     console.log('Received redirect from MoMo:', req.query); 
@@ -42,6 +23,30 @@ router.get('/momo/redirect', async (req, res) => {
     } catch (error) {
         console.error('Error in redirect handler:', error.message, error.stack);
         return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+// Middleware to check authentication
+router.use(authMiddleware);
+
+router.post('/create-payment', async (req, res) => {
+    const { amount, UserId } = req.body;
+
+    if (!amount || !UserId) {
+        return res.status(400).json({ error: 'Missing amount or userId' });
+    }
+
+    try {
+        const requestBody = MomoPaymentController.createPaymentRequest(
+            amount,
+            `Nạp tiền cho người dùng ${UserId}`,
+            UserId
+        );
+        const response = await MomoPaymentController.sendPaymentRequest(requestBody);
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 

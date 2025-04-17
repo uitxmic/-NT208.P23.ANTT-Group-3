@@ -2,6 +2,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 dotenv.config();
 
 
@@ -45,6 +46,8 @@ class MomoPaymentController {
     }
 
     createPaymentRequest(amount, orderInfo, extraData = "") {
+
+
         const requestId = this.partnerCode + new Date().getTime();
         const orderId = requestId;
 

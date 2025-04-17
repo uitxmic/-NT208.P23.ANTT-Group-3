@@ -6,8 +6,8 @@ import VoucherList from "../pages/Valid_vouchers";
 import UserVoucherList from "../pages/Valid_user's_voucher";
 import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
+import Deposit from "../components/Deposit";
 import Layout from "../components/Layout"; // Import Layout
-
 function AppRoutes() {
   return (
     <Routes>
@@ -26,6 +26,7 @@ function AppRoutes() {
               <Route path="/user-vouchers" element={<UserVoucherList />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/profile" element={<UserProfile />} />
+              <Route path="/deposit" element={<Deposit />} />
             </Routes>
           </Layout>
         }

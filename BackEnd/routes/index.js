@@ -4,6 +4,7 @@ const postingRouter = require('./posting');
 const tradeRouter = require('./trade');
 const notificationRouter = require('./notification');
 const googlecloud = require('./googlecloud');
+const momoPayment = require('./payment');
 
 function routes(app) {
     app.get('/test', (req, res) => {
@@ -22,6 +23,8 @@ function routes(app) {
     app.use('/notification', notificationRouter);
 
     app.use('/googlecloud', googlecloud);
+
+    app.use('/payment', momoPayment);
 }
 
 module.exports = routes;

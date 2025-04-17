@@ -1,6 +1,8 @@
 // src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Deposit from '../components/Deposit';
+import { jwtDecode } from 'jwt-decode';
 import Layout from '../components/Layout';  
 
 const Profile = () => {
@@ -55,7 +57,7 @@ const Profile = () => {
 
     fetchProfile();
   }, [navigate]);
-
+                 
   if (loading) {
     return (
       <Layout>        
@@ -106,12 +108,16 @@ const Profile = () => {
               Trạng thái xác thực: {user?.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
             </p>
             <div className="flex space-x-4 mt-4">
+
               <button className="mt-4 bg-gradient-to-r from-green-400 to-blue-500 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-gray-200 transition duration-200">
                 Chỉnh sửa hồ sơ
               </button>
-              <button className="mt-4 bg-gradient-to-r from-green-400 to-blue-500 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-gray-200 transition duration-200">
-                Chỉnh sửa hồ sơ
-              </button>
+              <button
+                                className="mt-4 bg-gradient-to-r from-pink-400 to-yellow-300 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-white transition duration-200"
+                                onClick={() => navigate('/deposit')}
+                            >
+                                Nạp tiền vào hệ thống
+                            </button>
             </div>
           </div>
         </div>

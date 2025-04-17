@@ -22,7 +22,7 @@ const BannerCarousel = () => {
   // Dữ liệu cho các slide (hình ảnh chính)
   const slides = [
     {
-      image: '/path-to-hotpot-image.jpg', // Đường dẫn đến hình ảnh lẩu Thái
+      image: 'https://estellaplace.com.vn/Data/Sites/1/News/3428/2025_redeem_hdl..._fb_post-(1).jpg', // Đường dẫn đến hình ảnh lẩu Thái
       title: 'ĐẠI TIỆC LẨU THÁI',
       subtitle: 'ĐẬM ĐÀ - CHUẨN VỊ',
       logo: '/path-to-mor-fai-logo.png', // Logo Mor-Fai

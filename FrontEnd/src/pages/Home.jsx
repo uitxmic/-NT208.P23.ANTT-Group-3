@@ -6,22 +6,22 @@ import PostList from "../components/PostsList";
 function Home() {
   return (
     <Layout>
-      <div className="flex flex-col min-h-screen bg-pink-50">
-        {/* Main Content */}
-        <div className="flex flex-1" style={{ marginTop: '4rem' }}>
-          {/* Main Section */}
-          <main className="flex-1 p-6">
-            {/* Hero Section (Inspired by Got It) */}
-            <section className="bg-white rounded-lg shadow-sm py-12 mb-12">
-              <div className="flex flex-col md:flex-row items-center justify-center">
-                {/* Left Side: Image of a phone */}
-                <div className="md:w-1/2 flex justify-center">
-                  <img
-                    src="https://via.placeholder.com/300x600.png?text=Phone+Mockup"
-                    alt="Phone Mockup"
-                    className="w-64 md:w-80"
-                  />
-                </div>
+    <div className="flex flex-col min-h-screen bg-pink-50">
+      {/* Main Content */}
+      <div className="flex flex-1" style={{ marginTop: '4rem' }}>
+        {/* Main Section */}
+        <main className="flex-1 p-6">
+          {/* Hero Section (Inspired by Got It) */}
+          <section className="bg-white rounded-lg shadow-sm py-12 mb-12">
+            <div className="flex flex-col md:flex-row items-center justify-center">
+              {/* Left Side: Image of a phone */}
+              <div className="md:w-1/2 flex justify-center">
+                <img
+                src="https://img.gotit.vn/compress/gotit_website/1709263961_yLb5z.png"
+                alt="Phone Mockup"
+                  className="w-64 md:w-80"
+                />
+              </div>
 
                 {/* Right Side: Text and Stats */}
                 <div className="md:w-1/2 text-center md:text-left mt-8 md:mt-0">

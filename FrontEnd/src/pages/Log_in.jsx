@@ -1,5 +1,6 @@
-import React, { useState } from 'react'; // Thêm useState
-import { Link, useNavigate } from 'react-router-dom'; // Thêm useNavigate
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'; // Thêm Google OAuth
 import Navbar from '../components/NavigaBar';
 
 const Log_in = () => {
@@ -8,9 +9,9 @@ const Log_in = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
+  const navigate = useNavigate();
 
-  // Hàm xử lý khi người dùng nhấn nút đăng nhập
+  // Hàm xử lý đăng nhập bằng Username/Password
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -18,11 +19,11 @@ const Log_in = () => {
 
     try {
       const response = await fetch('http://localhost:3000/users/login', {
-        method: 'POST', // Sử dụng phương thức POST
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Username, Password }), // Gửi username và password
+        body: JSON.stringify({ Username, Password }),
       });
 
       if (!response.ok) {
@@ -30,8 +31,8 @@ const Log_in = () => {
       }
 
       const data = await response.json();
-      if (data.state === 'success') { 
-
+      if (data.state === 'success') {
+        localStorage.setItem('access_token', data.access_token);
         navigate('/');
       } else {
         setError('Invalid username or password');
@@ -44,80 +45,122 @@ const Log_in = () => {
     }
   };
 
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3000/googlecloud/signInWithGoogle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tokenId: credentialResponse.credential }), 
+      });
+
+      const data = await response.json();
+      if (data.state === 'success') {
+        localStorage.setItem('access_token', data.access_token);
+        navigate('/'); 
+      } else {
+        throw new Error(data.error || 'Google login failed');
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      setError(error.message || 'Failed to login with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLoginFailure = () => {
+    setError('Google login failed');
+    setLoading(false);
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      {/* Navbar */}
-      <Navbar />
+    <GoogleOAuthProvider clientId="269747751566-9p1a31qjqacmtf57h78c1fkl0b97ggrc.apps.googleusercontent.com">
+      <div className="flex flex-col h-screen bg-gray-100">
+        {/* Navbar */}
+        <Navbar />
 
-      {/* Nội dung chính: Form đăng nhập */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
+        {/* Nội dung chính: Form đăng nhập */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
 
-          {/* Hiển thị thông báo lỗi nếu có */}
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-              {error}
-            </div>
-          )}
+            {/* Hiển thị thông báo lỗi nếu có */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
+                {error}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit}>
-            {/* Username */}
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-600 mb-2">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={Username} // Gán giá trị từ state
-                onChange={(e) => setUsername(e.target.value)} // Cập nhật state khi người dùng nhập
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                placeholder="Enter your username"
-                required
+            {/* Form đăng nhập Username/Password */}
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label htmlFor="username" className="block text-gray-600 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={Username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="Enter your username"
+                  required
+                />
+              </div>
+
+              <div className="mb-6">
+                <label htmlFor="password" className="block text-gray-600 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={Password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className={`w-full p-3 rounded-lg text-white transition duration-300 ${
+                  loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
+                disabled={loading}
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </form>
+
+            {/* Nút Đăng nhập với Google */}
+            <div className="mt-4 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginFailure}
+                disabled={loading}
               />
             </div>
 
-            {/* Password */}
-            <div className="mb-6">
-              <label htmlFor="password" className="block text-gray-600 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={Password} // Gán giá trị từ state
-                onChange={(e) => setPassword(e.target.value)} // Cập nhật state khi người dùng nhập
-                className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-
-            {/* Nút Login */}
-            <button
-              type="submit"
-              className={`w-full p-3 rounded-lg text-white transition duration-300 ${
-                loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-              }`}
-              disabled={loading} // Vô hiệu hóa nút khi đang loading
-            >
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-          </form>
-
-          {/* Liên kết đến trang Sign Up */}
-          <p className="text-center mt-4 text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-500 hover:underline">
-              Sign Up
-            </Link>
-          </p>
+            {/* Liên kết đến trang Sign Up */}
+            <p className="text-center mt-4 text-gray-600">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-blue-500 hover:underline">
+                Sign Up
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 

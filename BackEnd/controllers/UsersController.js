@@ -1,9 +1,8 @@
 const mysql = require('mysql2/promise');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 const fs = require('fs');
-const sessions = {};
+const { Cookie } = require('express-session');
 
 class UsersController
 {
@@ -93,8 +92,6 @@ class UsersController
 
     // [POST] /users/login
     PostLogin = async (req, res) =>
-    {   
-    PostLogin = async (req, res) =>
     {
         const { Username, Password } = req.body;
 
@@ -106,23 +103,30 @@ class UsersController
         try{
             const [results] = await this.connection.query('CALL fn_login(?, ?)', [Username, hashedPassword]);
             if (results[0][0] && results[0][0].Message == "Login Successful"){
+
+                // Lưu thông tin người dùng vào session
+                req.session.user = {
+                    UserId: results[0][0].UserId,
+                    Username: Username,
+                    Email: results[0][0].Email
+                };
+
+                // Tạo access token
                 const access_token = jwt.sign({
                     UserId: results[0][0].UserId,
                     Username: Username,
-                    Email: results[0][0].Email,}, 
-                    process.env.JWT_SECRET,
-                    {expiresIn: process.env.JWT_EXPIRE});
-                const session_id = crypto.randomBytes(16).toString('hex');
-                sessions[session_id] = access_token;
-                console.log('sessionssfse:', sessions);
-                try{
-                    fs.writeFileSync('sessions.json', JSON.stringify(sessions));
-                    console.log('Wrote sessions to file');
-                } catch(error){
-                    console.error('Error writing sessions to file:', error);
-                }
-                res.cookie('session_id', session_id, {httpOnly: true, secure: true, sameSite: 'none'}).redirect('/dashboard');
-                }
+                    Email: results[0][0].Email
+                }, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+                res.cookie('session_id', req.sessionID, {
+                    maxAge: 1000 * 60 * 60, // 1 hour
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
+                    sameSite: 'Strict' // Only send cookie in the same site
+                });
+
+                res.json({ message: 'Login successful', access_token });
+            }
             else{
                 return res.status(401).json({ error: 'Username or Password is incorrect' });
             }
@@ -164,6 +168,29 @@ class UsersController
             return res.status(500).json({error: 'Error changing password'});
         }
     }
+
+    // [GET] /users/session
+    GetSession = async (req, res) =>
+    {
+        const sessionId = req.cookies['session_id'];
+
+        if (!sessionId) {
+            return res.status(400).json({ error: 'Session ID is required' });
+        }
+
+        this.redisClient.get(`sess:${sessionId}`, (err, sessionData) => {
+            if (err) {
+                console.error('Error fetching session:', err);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            if (sessionData) {
+                const session = JSON.parse(sessionData);
+                res.json({ session });
+            } else {
+                res.status(404).json({ error: 'Session not found' });
+            }
+        });
+    }
 }
 
-module.exports = new UsersController;
+module.exports = new UsersController();

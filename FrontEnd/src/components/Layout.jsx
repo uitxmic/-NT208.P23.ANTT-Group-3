@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './NavigaBar';
 import Sidebar from './Sidebar';
+import ErrorBoundary from './ErrorBoundary'; // Import ErrorBoundary
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -47,7 +48,9 @@ const Layout = ({ children }) => {
         }`}
         style={{ height: sidebarHeight }} // Áp dụng chiều cao động
       >
-        <Sidebar />
+        <ErrorBoundary>
+          <Sidebar />
+        </ErrorBoundary>
       </div>
 
       {/* Nội dung chính */}

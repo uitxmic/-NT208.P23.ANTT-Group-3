@@ -8,6 +8,7 @@ import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
 import Deposit from "../components/Deposit";
 import Layout from "../components/Layout"; // Import Layout
+import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 function AppRoutes() {
   return (
     <Routes>
@@ -18,17 +19,19 @@ function AppRoutes() {
       <Route
         path="/*"
         element={
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/posting-manager" element={<PostManager />} />
-              <Route path="/shop-vouchers" element={<VoucherList />} />
-              <Route path="/user-vouchers" element={<UserVoucherList />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route path="/profile" element={<UserProfile />} />
-              <Route path="/deposit" element={<Deposit />} />
-            </Routes>
-          </Layout>
+          <ErrorBoundary>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/posting-manager" element={<PostManager />} />
+                <Route path="/shop-vouchers" element={<VoucherList />} />
+                <Route path="/user-vouchers" element={<UserVoucherList />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/deposit" element={<Deposit />} />
+              </Routes>
+            </Layout>
+          </ErrorBoundary>
         }
       />
     </Routes>

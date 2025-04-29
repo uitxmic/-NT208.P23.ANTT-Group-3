@@ -58,7 +58,7 @@ class SearchController {
                     minInteractions || '0',
                     minDaysPosted || null,
                     maxDaysPosted || null,
-                    sortBy || 'date_desc',
+                    sortBy || 'date_asc',
                     startDate || null,
                     endDate || null
                 ]
@@ -72,12 +72,12 @@ class SearchController {
 
     // [GET] /search/users
     SearchUsers = async (req, res) => {
-        const { searchTerm, isVerified } = req.query;
+        const { searchTerm, role_id } = req.query;
     
         try {
             const [results] = await this.connection.query(
                 'CALL fn_search_users(?, ?)',
-                [searchTerm || '', isVerified || null]
+                [searchTerm || '', role_id]
             );
             res.json(results[0]);
         } catch (error) {

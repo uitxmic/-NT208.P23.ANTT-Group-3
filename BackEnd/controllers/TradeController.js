@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 class TradeController
@@ -37,6 +38,41 @@ class TradeController
         }
 
     }
-}
+
+    // [UPDATE] /trade/paymentbybalance
+    PaymentByBalance = async (req, res) => {
+        const { VoucherId } = req.body;
+        const token = req.headers['authorization']?.split(" ")[1];
+      
+
+      
+        if (!token) {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+      
+        if (!VoucherId) {
+          return res.status(400).json({ error: 'VoucherId is required in request body' });
+        }
+      
+        try {
+          var secretKey = process.env.JWT_SECRET;
+          var decode = jwt.verify(token, secretKey);
+          var UserId = decode.userId;
+      
+          const [result] = await this.connection.execute('CALL fn_payment_by_userbalance(?, ?)', [UserId, VoucherId]);
+      
+          const message = result[0][0]?.message;
+      
+          if (message === 'Payment successful') {
+            return res.status(200).json({ message: 'Success' });
+          } else {
+            return res.status(400).json({ error: message });
+          }
+        } catch (error) {
+          console.error('Error processing payment:', error);
+          return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        }
+      }
+    }
 
 module.exports = new TradeController;

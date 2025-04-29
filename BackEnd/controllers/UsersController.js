@@ -28,7 +28,9 @@ class UsersController
     }
 
     hashPassword = (password) => {
-        return crypto.createHash('sha256').update(password).digest('hex');
+        const hashed = crypto.createHash('sha256').update(password).digest('hex');
+        console.log(`Hashed password for "${password}": ${hashed}`);
+        return hashed;
     }
 
     // [Get] /users/getUsers
@@ -45,18 +47,21 @@ class UsersController
         }
     }
 
-    // [POST] /users/getUserById
+    // /users/getUserById
     GetUserById = async (req, res) =>
-    {
-        const { UserId } = req.body;
-
-        if (!UserId)
-        {
-        return res.status(400).json({ error: 'UserId is required in request body' });
+    {   
+        const token = req.headers.authorization?.split(" ")[1];
+    
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
         }
 
         try 
         {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const UserId = decoded.userId;
+
             const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
             res.json(results[0]);
         } 
@@ -69,12 +74,12 @@ class UsersController
     // [POST] /users/createUser
     CreateUser = async (req, res) =>
     {
-        const { Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, AvgRate  } = req.body;
+        const { Username, Fullname, Password, Email, PhoneNumber, UserRoleId, AvgRate  } = req.body;
 
-        if (!Username || !Fullname || !PasswordHash || !Email || !PhoneNumber || !UserRoleId || !AvgRate){
+        if (!Username || !Fullname || !Password || !Email || !PhoneNumber || !UserRoleId || !AvgRate){
             return res.status(400).json({error: 'Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, and AvgRate are required in request body'});
         }
-        var hashedPassword = this.hashPassword(PasswordHash);
+        var hashedPassword = this.hashPassword(Password);
         try{
             const [results] = await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', [Username, Fullname, hashedPassword, Email, PhoneNumber, UserRoleId, AvgRate]);
             res.json(results[0]);
@@ -113,6 +118,12 @@ class UsersController
 
                 // Tạo access token
                 const access_token = jwt.sign({
+                    userId: results[0][0].UserId,
+                    username: Username,
+                    email: results[0][0].Email,}, 
+                    process.env.JWT_SECRET,
+                    {expiresIn: process.env.JWT_EXPIRE});
+                return res.json({state:"success", access_token: access_token});
                     UserId: results[0][0].UserId,
                     Username: Username,
                     Email: results[0][0].Email
@@ -154,7 +165,7 @@ class UsersController
         try{
             var secretKey = process.env.JWT_SECRET;
             var decode = jwt.verify(token, secretKey);
-            var Username = decode.Username;
+            var Username = decode.username;
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
             if (results[0][0] && results[0][0].Message == "Change Password Successfully"){
@@ -168,6 +179,33 @@ class UsersController
             return res.status(500).json({error: 'Error changing password'});
         }
     }
+
+    // [GET] /users/getUserBalance
+    GetUserBalance = async (req, res) => {
+        const token = req.headers.authorization?.split(" ")[1];
+    
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+    
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+    
+            const [result] = await this.connection.execute("CALL fn_get_user_balance(?)", [userId]);
+    
+            if (!result[0] || result[0].length === 0) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            return res.status(200).json({ message: "Success", balance: result[0][0].AccountBalance });
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    };
+}
 
     // [GET] /users/session
     GetSession = async (req, res) =>

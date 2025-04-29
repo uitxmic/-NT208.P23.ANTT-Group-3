@@ -3,12 +3,13 @@ const voucherRouter = require('./voucher');
 const postingRouter = require('./posting');
 const tradeRouter = require('./trade');
 const notificationRouter = require('./notification');
+const googlecloud = require('./googlecloud');
+const momoPayment = require('./payment');
 const authMiddleware = require('../middlewares/authMiddleware');
 
-function routes(app) 
-{
+function routes(app) {
     app.get('/test', (req, res) => {
-        res.json({message: 'Test route'});
+        res.json({ message: 'Test route' });
     }
     );
 
@@ -21,6 +22,11 @@ function routes(app)
     app.use('/trade', tradeRouter);
 
     app.use('/notification', notificationRouter);
+
+    app.use('/googlecloud', googlecloud);
+
+    app.use('/payment', momoPayment);
+}
 
     app.get('/dashboard', (req, res) => {
         app.use(authMiddleware);

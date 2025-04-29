@@ -8,4 +8,9 @@ router.use('/getVoucherByUserId/:UserId', usersController.GetVoucherByUserId);
 
 router.use('/giveVoucher', VoucherController.GiveVoucher);
 
+router.use('/getValidVoucher', VoucherController.GetValidVouchers);
+
+router.use('/getValidUserVoucher', VoucherController.GetValidUserVouchers);
+
+
 module.exports = router;

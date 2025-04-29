@@ -11,6 +11,8 @@ router.use('/createUser', usersController.CreateUser);
 router.post('/login', usersController.PostLogin);
 
 router.use('/changePassword', usersController.ChangePassword);
+router.use('/userbalance', usersController.GetUserBalance);
+  
 router.get('/session', usersController.GetSession);
 
 module.exports = router;

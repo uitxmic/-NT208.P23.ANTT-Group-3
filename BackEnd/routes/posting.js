@@ -5,6 +5,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const postingController = require('../controllers/PostingController');
 
 // public api
+router.use('/get20LastestPostings', postingController.Get20LastestPostings);
 
 router.use(authMiddleware);
 
@@ -18,5 +19,6 @@ router.use('/deactivePosting', postingController.DeactivePosting);
 router.use('/activePosting', postingController.ActivePosting);
 router.use('/getActivePostings', postingController.GetActivePostings);
 router.use('/getDeactivePostings', postingController.GetDeactivePostings);
+
 
 module.exports = router;

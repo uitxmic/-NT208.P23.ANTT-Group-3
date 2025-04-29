@@ -60,7 +60,7 @@ class VoucherController
             console.log('Decoded:', decoded);
 
             console.log('UserId:', UserId);
-            console.log('Decoded UserId:', decoded.UserId);
+            console.log('Decoded UserId:', decoded.userId);
 
             if (decoded.UserId !== Number(UserId)) {
                 return res.status(403).json({ error: 'You are not allowed to access this user\'s data' });
@@ -89,7 +89,7 @@ class VoucherController
             try {
                 const secretKey = process.env.JWT_SECRET;
                 const decoded = jwt.verify(token, secretKey);
-                const Sender_ID = decoded.UserId;
+                const Sender_ID = decoded.userId;
     
                 if (!recipient_phonenumber || !voucher_name) {
                     return res.status(400).json({ message: "Recipient phone number and voucher name are required in request body" });
@@ -102,6 +102,61 @@ class VoucherController
                 return res.status(500).json({ message: "Internal Server Error", error: error.message });
             }
         }
+
+    // [GET] /voucher/getValidVoucher
+    GetValidVouchers = async (req, res) => {
+        const token = req.headers.authorization?.split(" ")[1];
+    
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+    
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+    
+            // Truyền userId vào stored procedure
+            const [result] = await this.connection.execute("CALL fn_get_all_valid_vouchers(?)", [userId]);
+    
+            // Kiểm tra kết quả trả về
+            if (!result[0] || result[0].length === 0) {
+                return res.status(200).json({ message: "No valid vouchers found", data: [] });
+            }
+    
+            return res.status(200).json({ message: "Success", data: result[0] });
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    };
+
+    GetValidUserVouchers = async (req, res) => {
+        const token = req.headers.authorization?.split(" ")[1];
+    
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+    
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+    
+            // Truyền userId vào stored procedure
+            const [result] = await this.connection.execute("CALL fn_get_all_valid_User_vouchers(?)", [userId]);
+    
+            // Kiểm tra kết quả trả về
+            if (!result[0] || result[0].length === 0) {
+                return res.status(200).json({ message: "No valid user's vouchers found", data: [] });
+            }
+    
+            return res.status(200).json({ message: "Success", data: result[0] });
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    };
 }
 
 module.exports = new VoucherController;

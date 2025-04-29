@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const { start } = require('repl');
 require('dotenv').config();
 
 class SearchController {
@@ -47,18 +48,19 @@ class SearchController {
 
     // [GET] /search/posts
     SearchPosts = async (req, res) => {
-        const { searchTerm, isVerified, minInteractions, minDaysPosted, maxDaysPosted, sortBy } = req.query;
+        const { searchTerm, minInteractions, minDaysPosted, maxDaysPosted, sortBy, startDate, endDate } = req.query;
 
         try {
             const [results] = await this.connection.query(
                 'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?)',
                 [
                     searchTerm || '',
-                    isVerified || null,
-                    minInteractions || null,
+                    minInteractions || '0',
                     minDaysPosted || null,
                     maxDaysPosted || null,
-                    sortBy || 'date_desc'
+                    sortBy || 'date_desc',
+                    startDate || null,
+                    endDate || null
                 ]
             );
             res.json(results[0]);

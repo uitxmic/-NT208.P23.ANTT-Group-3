@@ -9,7 +9,8 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // Trạng thái mở modal tìm kiếm, mặc định đóng
+  const [searchTerm, setSearchTerm] = useState(""); // Trạng thái cho ô tìm kiếm
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
 
@@ -97,12 +98,17 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         <input
           type="text"
           placeholder="Search"
+          value={searchTerm} // Gán giá trị cho ô tìm kiếm
+          onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật giá trị sau khi nhập nội dung tìm kiếm
           className="w-full p-2 pl-10 border border-blue-200 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
           onFocus={() => setIsFilterOpen(true)} // Mở modal khi focus vào input
-          readOnly // Chỉ đọc để không cho phép nhập liệu trực tiếp
         />
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
-        {isFilterOpen && (<SearchFilterModal onClose={() => setIsFilterOpen(false)} />)}
+        {isFilterOpen && (<SearchFilterModal
+            onClose={() => setIsFilterOpen(false)}
+            searchTerm={searchTerm} // Truyền xuống modal
+          />
+        )}
       </div>
 
       {/* Phần bên phải */}

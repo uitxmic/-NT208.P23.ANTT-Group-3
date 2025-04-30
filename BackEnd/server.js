@@ -1,9 +1,9 @@
 const path = require('node:path'); // Giữ lại nếu dùng trong config path
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const routes = require('./routes/index'); // require routes SAU dotenv
 const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
 const cookieParser = require("cookie-parser");
-const routes = require('./routes/index'); // require routes SAU dotenv
 const cors = require('cors');
 const corsOptions = {
   origin: ['http://localhost:5173'],

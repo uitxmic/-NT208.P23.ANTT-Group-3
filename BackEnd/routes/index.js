@@ -26,12 +26,11 @@ function routes(app) {
     app.use('/googlecloud', googlecloud);
 
     app.use('/payment', momoPayment);
-}
 
     app.get('/dashboard', (req, res) => {
         app.use(authMiddleware);
         res.render('dashboard');
     });
-} 
+}
 
 module.exports = routes;

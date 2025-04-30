@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add this to your global CSS file (e.g., index.css) */
+.animate-slide {
+  display: flex;
+  animation: slide 15s linear infinite;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(+50%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

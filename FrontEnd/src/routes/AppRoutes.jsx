@@ -8,6 +8,9 @@ import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
 import Deposit from "../components/Deposit";
 import Layout from "../components/Layout"; // Import Layout
+
+import News from "../pages/News";
+import NewsDetail from "../pages/NewsDetail";
 function AppRoutes() {
   return (
     <Routes>
@@ -27,6 +30,8 @@ function AppRoutes() {
               <Route path="/payment" element={<Payment />} />
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/deposit" element={<Deposit />} />
+              <Route path="/news" element={<News />} />
+<Route path="/news/:id" element={<NewsDetail />} />
             </Routes>
           </Layout>
         }

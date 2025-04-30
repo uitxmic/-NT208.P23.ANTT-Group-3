@@ -2,12 +2,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FaSearch, FaBell, FaBars } from 'react-icons/fa'; // Thêm FaBars cho nút hamburger
 import UserBalance from './UserBalance';
+import SearchFilterModal from './SearchFilterModal'; // Import modal filter nếu cần
 
 const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   const isLoggedIn = !!localStorage.getItem('access_token');
   const navigate = useNavigate();
   const [balance, setBalance] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
 
@@ -96,8 +98,11 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
           type="text"
           placeholder="Search"
           className="w-full p-2 pl-10 border border-blue-200 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+          onFocus={() => setIsFilterOpen(true)} // Mở modal khi focus vào input
+          readOnly // Chỉ đọc để không cho phép nhập liệu trực tiếp
         />
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
+        {isFilterOpen && (<SearchFilterModal onClose={() => setIsFilterOpen(false)} />)}
       </div>
 
       {/* Phần bên phải */}

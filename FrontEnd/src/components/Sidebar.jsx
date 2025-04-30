@@ -27,6 +27,11 @@ const Sidebar = () => {
             <FaBox className="mr-2" /> Vouchers Manager
           </Link>
         </li>
+        <li className="mb-4">
+          <Link to="/news" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+      <span className="mr-2 fas fa-newspaper"></span> News
+          </Link>
+        </li>
       </ul>
     </div>
   );

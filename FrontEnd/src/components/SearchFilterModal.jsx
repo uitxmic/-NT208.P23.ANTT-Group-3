@@ -49,14 +49,13 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
     <div className="absolute z-50 left-0 right-0 top-12 bg-white shadow-lg rounded-lg p-6">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 mb-3">
-          <label className="font-semibold">Tìm kiếm theo:</label>
+          <label className="font-semibold">Danh mục tìm kiếm:</label>
           <select value={type} onChange={handleTypeChange} className="border p-2 rounded">
             <option value="vouchers">Voucher</option>
             <option value="posts">Bài đăng</option>
             <option value="users">Người dùng</option>
           </select>
         </div>
-        {/* Không có trường nhập từ khóa ở đây */}
         {type === "vouchers" && (
           <>
             <div className="flex gap-2">

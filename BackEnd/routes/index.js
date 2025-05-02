@@ -5,6 +5,8 @@ const tradeRouter = require('./trade');
 const notificationRouter = require('./notification');
 const googlecloud = require('./googlecloud');
 const momoPayment = require('./payment');
+const searchRouter = require('./search');
+const newsRouter = require('./news');
 
 function routes(app) {
     app.get('/test', (req, res) => {

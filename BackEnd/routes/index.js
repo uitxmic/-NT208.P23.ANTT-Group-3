@@ -25,6 +25,10 @@ function routes(app) {
     app.use('/googlecloud', googlecloud);
 
     app.use('/payment', momoPayment);
-}
 
+    app.use('/search', searchRouter);
+
+    app.use('/news', newsRouter);
+
+}
 module.exports = routes;

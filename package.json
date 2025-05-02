@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "@react-oauth/google": "^0.12.1",
-    "carousel": "^0.0.3",
-    "google-auth-library": "^9.15.1",
-    "react-slick": "^0.30.3",
-    "slick-carousel": "^1.8.1"
-  }
-}

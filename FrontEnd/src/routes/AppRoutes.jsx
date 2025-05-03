@@ -31,7 +31,7 @@ function AppRoutes() {
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/deposit" element={<Deposit />} />
               <Route path="/news" element={<News />} />
-<Route path="/news/:id" element={<NewsDetail />} />
+              <Route path="/news/:id" element={<NewsDetail />} />
             </Routes>
           </Layout>
         }

@@ -11,8 +11,8 @@ const postSortOptions = [
   { value: "date_asc", label: "Cũ nhất" },
 ];
 const userSortOptions = [
-  { value: "feedback_asc", label: "tăng dần" },
-  { value: "feedback_desc", label: "giảm dần" },
+  { value: "feedback_asc", label: "Số lượng feedback tăng dần" },
+  { value: "feedback_desc", label: "Số lượng feedback giảm dần" },
   { value: "sold_asc", label: "Số lượng bán tăng dần" },
   { value: "sold_desc", label: "Số lượng bán giảm dần" },
 ];
@@ -41,7 +41,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
       .filter(([k, v]) => v !== "" && v !== undefined)
       .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
       .join("&");
-    navigate(`/search?type=${type}&${query}`);
+    navigate(`/search/${type}?${query}`);
     onClose();
   };
 
@@ -49,7 +49,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
     <div className="absolute z-50 left-0 right-0 top-12 bg-white shadow-lg rounded-lg p-6">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 mb-3">
-          <label className="font-semibold">Tìm kiếm theo:</label>
+          <label className="font-semibold">Danh mục tìm kiếm:</label>
           <select value={type} onChange={handleTypeChange} className="border p-2 rounded">
             <option value="vouchers">Voucher</option>
             <option value="posts">Bài đăng</option>
@@ -212,7 +212,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
               onChange={handleChange}
               className="border p-2 rounded"
             >
-              <option value="">Sắp xếp</option>
+              <option value="">Sắp xếp theo</option>
               {userSortOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}

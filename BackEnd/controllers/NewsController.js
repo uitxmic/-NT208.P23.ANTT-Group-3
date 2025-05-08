@@ -9,11 +9,14 @@ class NewsController{
 
     async initConnection(){
         try{
-           this.connection = await mysql.createConnection({
+           this.pool = mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
+            waitForConnections: true,
+            connectionLimit: 5,
+            queueLimit: 0,
            });
 
            console.log('Connected to the database (async)');
@@ -25,7 +28,7 @@ class NewsController{
     // [GET] /news
     GetAllNews = async (req, res) => {
         try {
-            const [results] = await this.connection.query('CALL fn_get_all_news()');
+            const [results] = await this.pool.query('CALL fn_get_all_news()');
             res.json(results[0]);
         } catch (error) {
             console.error('Error getting all news:', error);
@@ -42,7 +45,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_get_news_by_id(?)', [PostId]);
+            const [results] = await this.pool.query('CALL fn_get_news_by_id(?)', [PostId]);
             res.json(results[0]);
         } catch (error) {
             console.error('Error getting news by ID:', error);
@@ -67,7 +70,7 @@ class NewsController{
         try {
             // Hardcode UserId = 1 để test
             const UserId = 1;
-            const [results] = await this.connection.query('CALL fn_create_news(?, ?, ?, ?)', 
+            const [results] = await this.pool.query('CALL fn_create_news(?, ?, ?, ?)', 
                 [VoucherId, UserId, Postname, Content]);
 
             res.json(results[0]);
@@ -91,7 +94,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_update_news(?, ?, ?, ?)', 
+            const [results] = await this.pool.query('CALL fn_update_news(?, ?, ?, ?)', 
                 [PostId, VoucherId, Postname, Content]);
 
             res.json(results[0]);

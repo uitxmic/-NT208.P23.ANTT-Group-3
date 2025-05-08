@@ -5,8 +5,7 @@ DROP PROCEDURE IF EXISTS fn_get_all_news;$$
 /*
 * Lấy tất cả tin tức về voucher với thông tin chi tiết
 * Bao gồm: thông tin bài đăng, voucher và người đăng
-* Sắp xếp: theo ngày đăng mới nhất
-* Trạng thái: Active/Inactive/Expired
+* Sắp xếp theo ngày đăng mới nhất
 */
 
 CREATE PROCEDURE fn_get_all_news()
@@ -22,7 +21,7 @@ BEGIN
         p.IsActive,
         v.VoucherName,
         v.Label,
-        v.VoucherImage,
+        -- v.VoucherImage,
         u.Username,
         CASE 
             WHEN p.Expire < CURDATE() THEN 'Expired'

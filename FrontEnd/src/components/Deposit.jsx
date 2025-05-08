@@ -28,7 +28,8 @@ const Deposit = () => {
 
             console.log(token);
             const decoded = jwtDecode(token);
-            const userId = decoded.UserId; // Giả định token chứa userId
+            const userId = decoded.userId; // Giả định token chứa userId
+            console.log(userId); // Log userId để kiểm tra
 
             const response = await fetch('http://localhost:3000/payment/create-payment', {
                 method: 'POST',

@@ -7,15 +7,11 @@ import UserVoucherList from "../pages/Valid_user's_voucher";
 import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
 import Deposit from "../components/Deposit";
-import NewsDetail from "../pages/NewsDetail";
 import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
-<<<<<<< HEAD
-=======
 import NewsDetail from "../pages/NewsDetail";
 
->>>>>>> 12fefe204592cfcd7f0b33317eef2dd618557c2b
 function AppRoutes() {
   return (
     <Routes>
@@ -38,10 +34,6 @@ function AppRoutes() {
                 <Route path="/deposit" element={<Deposit />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsDetail />} />
-<<<<<<< HEAD
-=======
-
->>>>>>> 12fefe204592cfcd7f0b33317eef2dd618557c2b
               </Routes>
             </Layout>
           </ErrorBoundary>

@@ -9,8 +9,6 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   const [balance, setBalance] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -141,20 +139,15 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
               </span>
             </div>
 
-            {/* Avatar và Username với Dropdown */}
+
             <div
               className="relative group"
               onMouseEnter={() => setIsDropdownOpen(true)}
               onMouseLeave={handleMouseLeaveParent}
             >
               <div className="flex items-center space-x-2 cursor-pointer">
-                <img
-                  src={userInfo?.Avatar || 'https://via.placeholder.com/40'}
-                  alt="User Avatar"
-                  className="w-10 h-10 rounded-full shadow-sm"
-                />
                 <span className="text-blue-700 font-medium">
-                  {userInfo?.Username || 'User'}
+                  {userInfo?.Username || 'Người dùng'}
                 </span>
               </div>
 

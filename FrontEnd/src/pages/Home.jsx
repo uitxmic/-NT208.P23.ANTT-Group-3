@@ -144,21 +144,6 @@ function Home() {
               </section>
             </main>
 
-            {/* Quảng cáo bên phải */}
-            <aside className="hidden lg:block w-64 p-6">
-              <div className="bg-pink-600 text-white rounded-lg shadow-md p-4">
-                <span className="inline-block bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full mb-2">
-                  Deal Hot
-                </span>
-                <img
-                  src="https://via.placeholder.com/200x150.png?text=Combo+Chicken+Burger+Set"
-                  alt="Combo Chicken Burger Set"
-                  className="w-full h-32 object-cover rounded-md mb-2"
-                />
-                <h3 className="text-lg font-semibold">Combo Chicken Burger Set</h3>
-                <p className="text-sm">Up to 40% Off</p>
-              </div>
-            </aside>
           </div>
 
           {/* Display 20 Latest Posts */}

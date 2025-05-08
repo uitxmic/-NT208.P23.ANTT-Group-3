@@ -10,8 +10,7 @@ const UserBalance = ({ setBalance }) => {
     const fetchBalance = async () => {
       const token = localStorage.getItem('access_token');
       if (!token) {
-        setError('Please login to continue');
-        setTimeout(() => navigate('/login'), 2000);
+        setError('');
         return;
       }
 

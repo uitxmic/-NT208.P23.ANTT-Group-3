@@ -1,9 +1,16 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FaSearch, FaBell, FaBars } from 'react-icons/fa'; // Thêm FaBars cho nút hamburger
+import { FaSearch, FaBell, FaBars } from 'react-icons/fa';
 import UserBalance from './UserBalance';
 
-const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
+const Navbar = ({
+  toggleSidebar,
+  isSidebarOpen,
+  language,
+  setLanguage,
+  showLanguageDropdown,
+  setShowLanguageDropdown,
+}) => {
   const isLoggedIn = !!localStorage.getItem('access_token');
   const navigate = useNavigate();
   const [balance, setBalance] = useState(null);
@@ -71,6 +78,31 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
     }
   };
 
+  // Dịch ngôn ngữ
+  const getText = () => {
+    return language === 'vi'
+      ? {
+          title: 'VoucherHub',
+          searchPlaceholder: 'Tìm kiếm',
+          balanceLabel: 'Số dư:',
+          profile: 'Hồ sơ của tôi',
+          logout: 'Đăng xuất',
+          login: 'Đăng nhập',
+          signup: 'Đăng ký',
+        }
+      : {
+          title: 'VoucherHub',
+          searchPlaceholder: 'Search',
+          balanceLabel: 'Balance:',
+          profile: 'My Profile',
+          logout: 'Logout',
+          login: 'Login',
+          signup: 'Sign Up',
+        };
+  };
+
+  const text = getText();
+
   return (
     <div className="bg-gradient-to-r from-pink-100 to-white shadow-lg p-3 flex justify-between items-center fixed top-0 left-0 right-0 z-40">
       {/* Phần bên trái: Nút hamburger và Logo */}
@@ -88,7 +120,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
           to="/"
           className="text-2xl font-bold text-blue-700 hover:text-pink-400 transition-colors duration-200"
         >
-          VoucherHub
+          {text.title}
         </Link>
       </div>
 
@@ -96,7 +128,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
       <div className="relative w-1/3">
         <input
           type="text"
-          placeholder="Search"
+          placeholder={text.searchPlaceholder}
           className="w-full p-2 pl-10 border border-blue-200 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
           onFocus={() => setIsFilterOpen(true)} // Mở modal khi focus vào input
         />
@@ -114,17 +146,50 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         </div>
 
         {/* Lựa chọn ngôn ngữ */}
-        <div className="flex items-center space-x-2">
-          <img
-            src="https://flagcdn.com/w40/gb.png"
-            alt="UK Flag"
-            className="w-6 h-4 rounded-sm shadow-sm"
-          />
-          <select className="border border-blue-200 bg-white text-blue-700 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200">
-            <option>English</option>
-            <option>Vietnamese</option>
-            <option>Spanish</option>
-          </select>
+        <div className="relative">
+          <button
+            onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+            className="text-blue-700 hover:text-blue-900 focus:outline-none flex items-center space-x-2"
+          >
+            <img
+              src={language === 'vi' ? 'https://flagcdn.com/w40/vn.png' : 'https://flagcdn.com/w40/gb.png'}
+              alt={language === 'vi' ? 'Vietnam Flag' : 'UK Flag'}
+              className="w-6 h-4 rounded-sm shadow-sm"
+            />
+            <span>{language === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+          </button>
+          {showLanguageDropdown && (
+            <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+              <button
+                onClick={() => {
+                  setLanguage('vi');
+                  setShowLanguageDropdown(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+              >
+                <img
+                  src="https://flagcdn.com/w40/vn.png"
+                  alt="Vietnam Flag"
+                  className="w-6 h-4 rounded-sm"
+                />
+                <span>Tiếng Việt</span>
+              </button>
+              <button
+                onClick={() => {
+                  setLanguage('en');
+                  setShowLanguageDropdown(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+              >
+                <img
+                  src="https://flagcdn.com/w40/gb.png"
+                  alt="UK Flag"
+                  className="w-6 h-4 rounded-sm"
+                />
+                <span>English</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Hiển thị số dư */}
@@ -133,12 +198,11 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
           <div className="flex items-center space-x-4">
             {/* Số dư */}
             <div className="flex items-center space-x-1 bg-pink-200 text-blue-700 px-4 py-2 rounded-full shadow-md">
-              <span className="text-sm font-medium">Balance:</span>
+              <span className="text-sm font-medium">{text.balanceLabel}</span>
               <span className="text-sm font-semibold">
                 ${balance !== null ? balance : '0'}
               </span>
             </div>
-
 
             <div
               className="relative group"
@@ -161,13 +225,13 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                     onClick={() => navigate('/profile')}
                     className="block w-full text-left px-4 py-2 text-blue-600 hover:bg-blue-100 transition-all duration-200"
                   >
-                    Hồ sơ của tôi
+                    {text.profile}
                   </button>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-blue-600 hover:bg-blue-100 transition-all duration-200"
                   >
-                    Đăng xuất
+                    {text.logout}
                   </button>
                 </div>
               )}
@@ -181,13 +245,13 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
               to="/login"
               className="text-blue-600 font-medium hover:bg-blue-100 px-3 py-1 rounded-md transition-all duration-200"
             >
-              Login
+              {text.login}
             </Link>
             <Link
               to="/signup"
               className="text-blue-600 font-medium hover:bg-blue-100 px-3 py-1 rounded-md transition-all duration-200"
             >
-              Đăng ký
+              {text.signup}
             </Link>
           </>
         )}

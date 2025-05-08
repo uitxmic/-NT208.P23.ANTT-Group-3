@@ -18,5 +18,3 @@ BEGIN
 END $$
 
 DELIMITER ;
-
-CALL fn_get_all_valid_vouchers(3);

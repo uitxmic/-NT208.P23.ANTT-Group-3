@@ -3,17 +3,15 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS fn_get_all_post;$$
 CREATE PROCEDURE fn_get_all_post()
 BEGIN
-   SELECT 
-        PostId, P.VoucherId, P.UserId, Postname, Content, Date,
-        VoucherName, Label, VoucherImage,
+   SELECT PostId, VoucherId, UserId, PostName, VouImg, Content, Price, Date, Expire, Quantity, UpVote, UpDown
         IsActive,
         CASE 
             WHEN Expire < CURDATE() THEN 'Expired'
             WHEN IsActive = FALSE THEN 'Inactive'
             ELSE 'Active'
-        END AS Status
+        END AS Status 
     FROM Post P 
-    JOIN Voucher V ON P.VoucherId = V.VoucherId
+	WHERE IsVerified IS TRUE
     ORDER BY IsActive DESC;
 END $$
 

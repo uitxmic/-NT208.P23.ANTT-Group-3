@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './NavigaBar';
 import Sidebar from './Sidebar';
-import ErrorBoundary from './ErrorBoundary'; // Import ErrorBoundary
+import Footer from './Footer'; // Import Footer
+import ErrorBoundary from './ErrorBoundary';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarHeight, setSidebarHeight] = useState('calc(100vh - 64px)'); // Chiều cao mặc định
+  const [language, setLanguage] = useState('vi'); // Mặc định là Tiếng Việt
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false); // Quản lý trạng thái dropdown
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Tính chiều cao tối đa của trang
+  // Tính chiều cao tối đa của trang cho Sidebar
   useEffect(() => {
     const updateSidebarHeight = () => {
       const documentHeight = Math.max(
@@ -22,13 +25,11 @@ const Layout = ({ children }) => {
         document.body.clientHeight,
         document.documentElement.clientHeight
       );
-      // Chiều cao của Sidebar = chiều cao trang - chiều cao Navbar
       const navbarHeight = 64; // Chiều cao của Navbar (px)
       const newHeight = `${documentHeight - navbarHeight}px`;
       setSidebarHeight(newHeight);
     };
 
-    // Cập nhật chiều cao khi tải trang và khi thay đổi kích thước
     updateSidebarHeight();
     window.addEventListener('resize', updateSidebarHeight);
     window.addEventListener('scroll', updateSidebarHeight);
@@ -40,7 +41,7 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`fixed top-16 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
@@ -49,24 +50,34 @@ const Layout = ({ children }) => {
         style={{ height: sidebarHeight }} // Áp dụng chiều cao động
       >
         <ErrorBoundary>
-          <Sidebar />
+          <Sidebar language={language} />
         </ErrorBoundary>
       </div>
 
-      {/* Nội dung chính */}
+      {/* Nội dung chính và Navbar */}
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
-        <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+        <Navbar
+          toggleSidebar={toggleSidebar}
+          isSidebarOpen={isSidebarOpen}
+          language={language}
+          setLanguage={setLanguage}
+          showLanguageDropdown={showLanguageDropdown}
+          setShowLanguageDropdown={setShowLanguageDropdown}
+        />
 
         {/* Nội dung chính của trang */}
         <div
-          className={`flex-1 p-6 transition-all duration-300 ${
+          className={`flex-1 transition-all duration-300 bg-gray-100 ${
             isSidebarOpen ? 'ml-64' : 'ml-0'
           }`}
         >
-          {children}
+          <div className="p-6">{children}</div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer language={language} />
     </div>
   );
 };

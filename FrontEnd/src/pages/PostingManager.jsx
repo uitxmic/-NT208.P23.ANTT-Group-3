@@ -7,7 +7,7 @@ const getUserIdFromToken = (token) => {
   try {
     const decoded = jwtDecode(token); // Use jwtDecode (default export)
     console.log('Decoded token:', decoded); // Debug: Log the decoded token
-    return decoded.UserId;
+    return decoded.userId;
   } catch (error) {
     console.error('Invalid token:', error);
     return null;
@@ -31,6 +31,7 @@ const PostManager = () => {
   const fetchVoucher = async () => {
     try {
       const UserId = getUserIdFromToken(token);
+      console.log('Fetching voucher for UserId:', UserId); // Debug
       const response = await fetch(`http://localhost:3000/voucher/getVoucherByUserId/${UserId}`, {
         method: 'GET',
         headers: {

@@ -27,9 +27,6 @@ const PostManager = () => {
   const [voucher, setVoucher] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState('');
 
-  // Token hardcode
-  //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjMsIlVzZXJuYW1lIjoidXNlcjMiLCJFbWFpbCI6ImJvYjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM1OTczNTksImV4cCI6MTc0MzYyMjU1OX0.nLB2-FrONWoNgjwxU59lezFy50fT253DGxMjZuv-NMs";
-
   // Hàm lấy VoucherId từ UserId
   const fetchVoucher = async () => {
     try {
@@ -123,7 +120,10 @@ const PostManager = () => {
       VoucherId: 1,
       VoucherId: selectedVoucherId,
       Postname: postname,
-      Content: description
+      Content: description,
+      VouImg: image ? image.name : null,
+      Price: 0,
+      Quantity: 0,
     };
     if (image) {
       formData.append('image', image);

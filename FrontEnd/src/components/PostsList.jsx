@@ -49,9 +49,9 @@ const PostsList = () => {
                         className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
                     >
                         {/* Hình ảnh bài đăng */}
-                        {post.VoucherImage ? (
+                        {post.VouImg ? (
                             <img
-                                src={post.VoucherImage}
+                                src={post.VouImg}
                                 alt={post.Postname}
                                 className="w-full h-48 object-cover"
                             />

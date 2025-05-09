@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Log_in from "../pages/Log_in";
+import Sign_up from "../pages/Sign_up";
 import PostManager from "../pages/PostingManager";
 import PostingPage from "../pages/PostingPage";
 import UserVoucherList from "../pages/Valid_user's_voucher";
@@ -10,19 +11,20 @@ import Deposit from "../components/Deposit";
 import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
-import NewsDetail from "../pages/NewsDetail"; 
+import NewsDetail from "../pages/NewsDetail";
+
+
 function AppRoutes() {
   return (
     <Routes>
       {/* Các route không cần Layout */}
       <Route path="/login" element={<Log_in />} />
-
+      <Route path="/signup" element={<Sign_up />} />
       {/* Các route sử dụng Layout */}
       <Route
         path="/*"
         element={
           <ErrorBoundary>
-            <Layout>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/posting-manager" element={<PostManager />} />
@@ -31,8 +33,10 @@ function AppRoutes() {
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/deposit" element={<Deposit />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:id" element={<NewsDetail />} />
+                {/* Thêm các route khác ở đây */}
               </Routes>
-            </Layout>
           </ErrorBoundary>
         }
       />

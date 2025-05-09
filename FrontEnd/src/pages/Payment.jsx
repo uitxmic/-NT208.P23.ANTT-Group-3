@@ -11,6 +11,7 @@ const Payment = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [momoQRCodeUrl, setMomoQRCodeUrl] = useState(null);
 
   const voucher = state?.voucher;
 
@@ -20,6 +21,30 @@ const Payment = () => {
       setTimeout(() => navigate('/shop-vouchers'), 2000);
     }
   }, [voucher, navigate]);
+
+  async function getMomoQRCodeUrl(amount, userId, token) {
+    try {
+      const response = await fetch('http://localhost:3000/payment/create-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: JSON.stringify({
+          amount: parseInt(amount),
+          UserId: userId,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to get QR code');
+      }
+      const data = await response.json();
+      return data.payUrl;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
 
   const handlePayment = async () => {
     if (!paymentMethod) {
@@ -74,6 +99,16 @@ const Payment = () => {
         }
       } else if (paymentMethod === 'bank') {
         setSuccess('Please complete the payment using your bank account.');
+      } else if (paymentMethod === 'momo') {
+        console.log(voucher.Price);
+        const qrCodeUrl = await getMomoQRCodeUrl(voucher.Price*1000, 1, token);
+        console.log(qrCodeUrl);
+        if (qrCodeUrl) {
+          window.open(qrCodeUrl, '_blank'); // Open QR code URL in new tab
+          setSuccess('Bạn vui lòng quét mã QR bằng ứng dụng MoMo để hoàn tất thanh toán.');
+        } else {
+          throw new Error('Failed to generate MoMo QR code');
+        }
       }
     } catch (err) {
       setError(err.message || 'An error occurred during payment');
@@ -82,125 +117,127 @@ const Payment = () => {
     }
   };
 
-  if (!voucher) {
-    return (
-      <Layout>
-      <div className="flex flex-col min-h-screen bg-gray-100">
-        <Navbar />
-        <div className="flex-1 p-6">
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-            No voucher selected. Redirecting to voucher list...
-          </div>
-        </div>
-      </div>
-      </Layout>
-    );
-  }
-
+  // Rest of the component remains the same, but modify the MoMo section in the JSX
   return (
     <Layout>
       <div className="flex flex-col min-h-screen bg-gray-100">
-      <div className="flex-1 p-6">
-        <h1 className="text-3xl font-bold text-center mb-6">Payment</h1>
+        <div className="flex-1 p-6">
+          <Layout>
+            <div className="flex flex-col min-h-screen bg-gray-100">
+              <div className="flex-1 p-6">
+                <h1 className="text-3xl font-bold text-center mb-6">Payment</h1>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-center">
-            {success}
-          </div>
-        )}
+                {error && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-center">
+                    {success}
+                  </div>
+                )}
 
-        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-          <h2 className="text-2xl font-bold mb-4">Voucher Details</h2>
-          <div className="flex items-center space-x-4">
-            <img
-              src={voucher?.VoucherImage || 'https://via.placeholder.com/150'}
-              alt={voucher?.VoucherName}
-              className="w-32 h-32 object-cover rounded-md"
-            />
-            <div>
-              <h3 className="text-xl font-semibold">{voucher?.VoucherName}</h3>
-              <p className="text-gray-600">{voucher?.Label}</p>
-              <p className="text-gray-800 font-bold mt-2">Price: ${voucher?.Price}</p>
-              <p className="text-gray-500 text-sm">
-                Expires: {voucher?.ExpirationDay ? new Date(voucher.ExpirationDay).toLocaleDateString() : 'N/A'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Select Payment Method</h2>
-
-          <UserBalance setBalance={setBalance} />
-
-          {balance !== null ? (
-            <p className="text-gray-600 mb-4">
-              Your Balance: <span className="font-semibold">${balance}</span>
-            </p>
-          ) : (
-            <p className="text-gray-600 mb-4">Loading balance...</p>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="balance"
-                  checked={paymentMethod === 'balance'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="form-radio"
-                />
-                <span>Pay with User Balance</span>
-              </label>
-            </div>
-
-            <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="bank"
-                  checked={paymentMethod === 'bank'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="form-radio"
-                />
-                <span>Pay with Bank Account</span>
-              </label>
-              {paymentMethod === 'bank' && (
-                <div className="mt-4">
-                  <p className="text-gray-600">
-                    Bank: <span className="font-semibold">Your Bank Name</span>
-                  </p>
-                  <p className="text-gray-600">
-                    Account Number: <span className="font-semibold">1234-5678-9012</span>
-                  </p>
-                  <p className="text-gray-600">
-                    Amount: <span className="font-semibold">${voucher?.Price}</span>
-                  </p>
+                <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+                  <h2 className="text-2xl font-bold mb-4">Voucher Details</h2>
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={voucher?.VouImg || 'https://via.placeholder.com/150'}
+                      alt={voucher?.PostName || 'Voucher Image'}
+                      className="w-32 h-32 object-cover rounded-md"
+                    />
+                    <div>
+                      <h3 className="text-xl font-semibold">{voucher?.PostName}</h3>
+                      <p className="text-gray-600">{voucher?.Label}</p>
+                      <p className="text-orange-600 font-bold mt-2">Giá: {voucher.Price}.000 ₫</p>
+                      <p className="text-gray-500 text-sm">
+                        Ngày hết hạn: {voucher?.Expire ? new Date(voucher.Expire).toLocaleDateString() : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
 
-          <button
-            onClick={handlePayment}
-            className={`mt-6 w-full p-3 rounded-lg text-white transition duration-300 ${
-              loading || balance === null ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-            }`}
-            disabled={loading || balance === null}
-          >
-            {loading ? 'Processing...' : 'Confirm Payment'}
-          </button>
+                <div className="bg-white p-6 rounded-lg shadow-lg">
+                  <h2 className="text-2xl font-bold mb-4">Lựa chọn phương thức thanh toán</h2>
+
+                  <UserBalance setBalance={setBalance} />
+
+                  {balance !== null ? (
+                    <p className="text-gray-600 mb-4">
+                      Số dư tài khoản của bạn: <span className="font-semibold">{balance}.000 ₫</span>
+                    </p>
+                  ) : (
+                    <p className="text-gray-600 mb-4">Loading balance...</p>
+                  )}
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="balance"
+                          checked={paymentMethod === 'balance'}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="form-radio"
+                        />
+                        <span>Thanh toán với số dư tài khoản của bạn</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="bank"
+                          checked={paymentMethod === 'bank'}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="form-radio"
+                        />
+                        <span>Pay with Bank Account</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="momo"
+                          checked={paymentMethod === 'momo'}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="form-radio"
+                        />
+                        <span>Thanh toán với ví MoMo</span>
+                      </label>
+                      {paymentMethod === 'momo' && (
+                        <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                          <p className="text-gray-700 mb-1">
+                            Nhấn nút bên dưới để lấy mã QR và quét bằng ứng dụng MoMo.
+                          </p>
+                          <span className="text-xs text-yellow-700">
+                            Lưu ý: Giao dịch này không được bảo vệ, bạn sẽ chuyển tiền trực tiếp cho người bán.
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handlePayment}
+                    className={`mt-6 w-full p-3 rounded-lg text-white transition duration-300 ${loading || balance === null ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                      }`}
+                    disabled={loading || balance === null}
+                  >
+                    {loading ? 'Processing...' : 'Confirm Payment'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Layout>
         </div>
       </div>
-    </div>
     </Layout>
   );
 };

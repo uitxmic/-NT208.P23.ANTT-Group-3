@@ -72,22 +72,28 @@ class UsersController
     }
 
     // [POST] /users/createUser
-    CreateUser = async (req, res) =>
-    {
-        const { Username, Fullname, Password, Email, PhoneNumber, UserRoleId, AvgRate  } = req.body;
+    CreateUser = async (req, res) => {
+        const { Username, Fullname, Password, Email, PhoneNumber } = req.body;
+    
+        if (!Username || !Fullname || !Password || !Email || !PhoneNumber) {
+            return res.status(400).json({
+                error: 'Username, Fullname, Password, Email, and PhoneNumber are required in request body'
+            });
+        }
+        const hashedPassword = this.hashPassword(Password);
 
-        if (!Username || !Fullname || !Password || !Email || !PhoneNumber || !UserRoleId || !AvgRate){
-            return res.status(400).json({error: 'Username, Fullname, PasswordHash, Email, PhoneNumber, UserRoleId, and AvgRate are required in request body'});
-        }
-        var hashedPassword = this.hashPassword(Password);
-        try{
-            const [results] = await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', [Username, Fullname, hashedPassword, Email, PhoneNumber, UserRoleId, AvgRate]);
+    
+        try {
+            const [results] = await this.connection.query(
+                'CALL fn_create_user(?, ?, ?, ?, ?)',
+                [Username, Fullname, hashedPassword, Email, PhoneNumber]
+            );
             res.json(results[0]);
-        }catch(error){
+        } catch (error) {
             console.error('Error creating user:', error);
-            return res.status(500).json({error: 'Error creating user'});
+            return res.status(500).json({ error: 'Error creating user' });
         }
-    }
+    };
 
     //[GET] /users/login
     GetLogin = async (req, res) =>

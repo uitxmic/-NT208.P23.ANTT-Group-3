@@ -16,9 +16,10 @@ BEGIN
     FROM Post P 
     JOIN Voucher V ON P.VoucherId = V.VoucherId
     WHERE P.UserId = user_id
+    GROUP BY PostId, P.VoucherId, P.UserId, Postname, Content, Date, VoucherName, Label, VouImg, Price, IsActive
     ORDER BY IsActive DESC;
 END $$
 
 DELIMITER ;
 
-CALL fn_show_post_info_by_id(3)
+CALL fn_show_post_info_by_id(22)

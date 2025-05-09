@@ -61,12 +61,8 @@ class VoucherController {
         try {
             var secretKey = process.env.JWT_SECRET;
             var decoded = jwt.verify(token, secretKey);
-            console.log('Decoded:', decoded);
 
-            console.log('UserId:', UserId);
-            console.log('Decoded UserId:', decoded.userId);
-
-            if (decoded.UserId !== Number(UserId)) {
+            if (Number(decoded.userId) !== Number(UserId.trim())) {
                 return res.status(403).json({ error: 'You are not allowed to access this user\'s data' });
             }
 

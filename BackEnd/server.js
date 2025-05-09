@@ -17,6 +17,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 //Template engine
 app.engine('hbs', hbs.engine({

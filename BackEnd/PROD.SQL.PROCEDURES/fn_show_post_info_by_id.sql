@@ -6,7 +6,7 @@ CREATE PROCEDURE fn_show_post_info_by_id(IN user_id INT)
 BEGIN
    SELECT 
         PostId, P.VoucherId, P.UserId, Postname, Content, Date,
-        VoucherName, Label, VoucherImage, Price,
+        VoucherName, Label, VouImg, Price,
         IsActive,
         CASE 
             WHEN Expire < CURDATE() THEN 'Expired'

@@ -39,7 +39,7 @@ BEGIN
     WHERE UserId = p_UserId;
 
     SELECT Price INTO v_VoucherPrice
-    FROM `Voucher`
+    FROM Post
     WHERE VoucherId = p_VoucherId;
     
     select UserId into v_UserId

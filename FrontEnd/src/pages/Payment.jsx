@@ -22,17 +22,21 @@ const Payment = () => {
     }
   }, [voucher, navigate]);
 
-  async function getMomoQRCodeUrl(amount, userId, token) {
+  async function getMomoQRCodeUrl(amount, userId, voucher, token) {
     try {
-      const response = await fetch('http://localhost:3000/payment/create-payment', {
+      console.log('kkkkkk');
+      console.log(token);
+      const response = await fetch('http://localhost:3000/payment/create-payment-voucher', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token,
         },
         body: JSON.stringify({
-          amount: parseInt(amount),
-          UserId: userId,
+          amount,
+          userId,
+          voucherId: voucher.VoucherId,
+          postId: voucher.PostId,
         }),
       });
       if (!response.ok) {
@@ -57,6 +61,7 @@ const Payment = () => {
     setLoading(true);
 
     const token = localStorage.getItem('access_token');
+    console.log('hrrr', token);
     if (!token) {
       setError('Please login to continue');
       setTimeout(() => navigate('/login'), 2000);
@@ -101,7 +106,10 @@ const Payment = () => {
         setSuccess('Please complete the payment using your bank account.');
       } else if (paymentMethod === 'momo') {
         console.log(voucher.Price);
-        const qrCodeUrl = await getMomoQRCodeUrl(voucher.Price*1000, 1, token);
+        const userId = JSON.parse(atob(token.split('.')[1])).userId;
+        console.log('caccc', userId);
+        console.log('voucher', voucher);
+        const qrCodeUrl = await getMomoQRCodeUrl(voucher.Price*1000, userId, voucher, token);
         console.log(qrCodeUrl);
         if (qrCodeUrl) {
           window.open(qrCodeUrl, '_blank'); // Open QR code URL in new tab

@@ -1,6 +1,4 @@
-CALL fn_login('chien', 'af4663c41acb498f8170533283749444610b8225baeff5e9ab55039f4ca63ad9');
-delete from `User` where Username='chien';
-SELECT * FROM `User`;
+
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_login; $$
@@ -37,3 +35,6 @@ END$$
 
 DELIMITER ;
 
+CALL fn_login('chien', 'af4663c41acb498f8170533283749444610b8225baeff5e9ab55039f4ca63ad9');
+delete from `User` where Username='chien';
+SELECT * FROM `User`;

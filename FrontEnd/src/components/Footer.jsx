@@ -49,7 +49,7 @@ const Footer = ({ language }) => {
   const text = getText();
 
   return (
-    <footer className="bg-white py-8 px-4 text-gray-800 border-t-4 border-blue-500">
+    <footer className="bg-pink-100 py-8 px-4 text-gray-800 border-t-4 border-blue-500">
       <div className="max-w-7xl mx-auto">
         {/* Phần trên: Subscription, Tuyển dụng, Hỗ trợ */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">

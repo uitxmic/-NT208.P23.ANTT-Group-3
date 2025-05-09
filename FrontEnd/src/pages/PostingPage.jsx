@@ -12,7 +12,8 @@ const PostingList = () => {
   const fetchVouchers = async () => {
     const token = localStorage.getItem('access_token');
     if (!token) {
-      navigate('/login');
+      setError('Vui lòng đăng nhập để tiếp tục');
+      setLoading(false);
       return;
     }
 
@@ -30,8 +31,19 @@ const PostingList = () => {
       }
 
       const data = await response.json();
+      console.log(data.result);
       if (Array.isArray(data)) {
-        setVouchers(data);
+        const flattenedVouchers = data
+          .filter(item => item.result && Array.isArray(item.result))
+          .flatMap(item => item.result);
+
+        if (flattenedVouchers.length > 0) {
+          setVouchers(flattenedVouchers);
+        } else {
+          setVouchers([]);
+          setError('Không có voucher nào khả dụng');
+        }
+        
       } else {
         setVouchers([]);
         setError(data.message || 'No vouchers available');
@@ -120,8 +132,8 @@ const PostingList = () => {
                       </div>
                       <div
                         className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${!voucher.Active
-                            ? 'bg-green-100 text-white-700'
-                            : 'bg-red-100 text-white-700'
+                          ? 'bg-green-100 text-white-700'
+                          : 'bg-red-100 text-white-700'
                           }`}
                       >
                         {!voucher.Active ? 'Đang bán' : 'Không hoạt động'}

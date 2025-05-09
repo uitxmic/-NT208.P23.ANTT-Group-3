@@ -13,7 +13,8 @@ class MomoPaymentController {
         this.secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
         this.requestId = this.partnerCode + new Date().getTime();
         this.orderId = this.requestId;
-        this.redirectUrl = "http://localhost:3000/payment/momo/redirect";
+        this.redirectUrlBalance = "http://localhost:3000/payment/momo/redirect/balance";
+        this.redirectUrlVoucher = "http://localhost:3000/payment/momo/redirect/voucher";
         this.ipnUrl = " http://127.0.0.1:3000/payment/momo/ipn";
         this.orderInfo = "pay with MoMo";
         this.requestType = "captureWallet";
@@ -75,6 +76,36 @@ class MomoPaymentController {
         return requestBody;
     }
 
+        createPaymentRequestForVoucher(amount, orderInfo, extraData = "") {
+
+
+        const requestId = this.partnerCode + new Date().getTime();
+        const orderId = requestId;
+
+        const params = {
+            accessKey: this.accessKey,
+            amount: amount,
+            extraData: extraData,
+            ipnUrl: this.ipnUrl,
+            orderId: orderId,
+            orderInfo: orderInfo,
+            partnerCode: this.partnerCode,
+            redirectUrl: this.redirectUrlVoucher,
+            requestId: requestId,
+            requestType: "captureWallet"
+        };
+
+        const signature = this.generateSignature(params);
+
+        const requestBody = {
+            ...params,
+            signature: signature,
+            lang: 'en'
+        };
+
+        return requestBody;
+    }
+
     async sendPaymentRequest(requestBody) {
         const options = {
             method: 'POST',
@@ -91,6 +122,30 @@ class MomoPaymentController {
             return response.data;
         } catch (error) {
             console.error("Error sending payment request:", error);
+            throw error;
+        }
+    }
+
+    async UpdateVoucherId(userId, voucherId, postId) {
+        try {
+            if (!this.connection) {
+                console.error('Database connection not initialized');
+                throw new Error('Database connection not initialized');
+            }
+            console.log('Updating voucher ID:', { userId, voucherId, postId });
+
+            const query = 'CALL fn_update_voucher_id_after_buying(?, ?, ?)';
+            const [result] = await this.connection.query(query, [userId, voucherId, postId]);
+
+            if (result.affectedRows === 0) {
+                console.error(`User ${userId} not found`);
+                throw new Error(`User ${userId} not found`);
+            }
+
+            console.log(`Updated voucher ID for user ${userId}, voucher ID: ${voucherId}`);
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating voucher ID:', error.message, error.stack);
             throw error;
         }
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTachometerAlt, FaBox } from 'react-icons/fa';
+import { FaTachometerAlt, FaBox, FaNewspaper } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
@@ -28,6 +28,11 @@ const Sidebar = () => {
             <FaBox className="mr-2" /> Vouchers Manager
           </Link>
         </li>
+        <li className="mb-4">
+          <Link to="/news" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+            <FaNewspaper className="mr-2" /> News Manager
+          </Link>
+          </li> 
       </ul>
     </div>
   );

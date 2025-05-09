@@ -10,6 +10,8 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -96,6 +98,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
           type="text"
           placeholder="Search"
           className="w-full p-2 pl-10 border border-blue-200 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+          onFocus={() => setIsFilterOpen(true)} // Mở modal khi focus vào input
         />
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
       </div>
@@ -136,20 +139,15 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
               </span>
             </div>
 
-            {/* Avatar và Username với Dropdown */}
+
             <div
               className="relative group"
               onMouseEnter={() => setIsDropdownOpen(true)}
               onMouseLeave={handleMouseLeaveParent}
             >
               <div className="flex items-center space-x-2 cursor-pointer">
-                <img
-                  src={userInfo?.Avatar || 'https://via.placeholder.com/40'}
-                  alt="User Avatar"
-                  className="w-10 h-10 rounded-full shadow-sm"
-                />
                 <span className="text-blue-700 font-medium">
-                  {userInfo?.Username || 'User'}
+                  {userInfo?.Username || 'Người dùng'}
                 </span>
               </div>
 

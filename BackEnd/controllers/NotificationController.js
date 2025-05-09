@@ -29,7 +29,7 @@ class NotificationController
         try 
         {
             const [results] = await this.connection.query('CALL fn_get_20_lastest_notifications()');
-            res.status(200).json(results[0]); // Chỉ trả về kết quả SELECT
+            res.json(results[0]); // Chỉ trả về kết quả SELECT
         } 
         catch (error) {
             console.error('Query error:', error);
@@ -58,3 +58,4 @@ class NotificationController
 }
 
 module.exports = new NotificationController;
+

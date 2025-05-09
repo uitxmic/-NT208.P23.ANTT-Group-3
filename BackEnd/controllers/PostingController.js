@@ -27,7 +27,7 @@ class PostingController
     // [POST] /posting/createPosting
     CreatePosting = async (req, res) =>
     {
-        const { VoucherId, Postname, Content } = req.body;
+        const { VoucherId, Postname, Content, VouImg, Price, Quantity } = req.body;
         const token = req.headers['authorization'];
 
         if (!token)
@@ -46,7 +46,7 @@ class PostingController
             const decoded = jwt.verify(token, secretKey);
             const UserId = decoded.userId;
 
-            const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content]);
+            const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content, VouImg, Price, Quantity]);
 
             res.json(results[0]);
 

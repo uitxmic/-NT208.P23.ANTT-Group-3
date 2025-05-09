@@ -6,6 +6,8 @@ const notificationRouter = require('./notification');
 const googlecloud = require('./googlecloud');
 const momoPayment = require('./payment');
 const authMiddleware = require('../middlewares/authMiddleware');
+const searchRouter = require('./search');
+const newsRouter = require('./news');
 
 function routes(app) {
     app.get('/test', (req, res) => {
@@ -31,6 +33,10 @@ function routes(app) {
         app.use(authMiddleware);
         res.render('dashboard');
     });
-}
 
+    app.use('/search', searchRouter);
+
+    app.use('/news', newsRouter);
+
+}
 module.exports = routes;

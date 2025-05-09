@@ -7,7 +7,7 @@ const getUserIdFromToken = (token) => {
   try {
     const decoded = jwtDecode(token); // Use jwtDecode (default export)
     console.log('Decoded token:', decoded); // Debug: Log the decoded token
-    return decoded.UserId;
+    return decoded.userId;
   } catch (error) {
     console.error('Invalid token:', error);
     return null;
@@ -27,13 +27,11 @@ const PostManager = () => {
   const [voucher, setVoucher] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState('');
 
-  // Token hardcode
-  //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjMsIlVzZXJuYW1lIjoidXNlcjMiLCJFbWFpbCI6ImJvYjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM1OTczNTksImV4cCI6MTc0MzYyMjU1OX0.nLB2-FrONWoNgjwxU59lezFy50fT253DGxMjZuv-NMs";
-
   // Hàm lấy VoucherId từ UserId
   const fetchVoucher = async () => {
     try {
       const UserId = getUserIdFromToken(token);
+      console.log('Fetching voucher for UserId:', UserId); // Debug
       const response = await fetch(`http://localhost:3000/voucher/getVoucherByUserId/${UserId}`, {
         method: 'GET',
         headers: {
@@ -123,7 +121,10 @@ const PostManager = () => {
       VoucherId: 1,
       VoucherId: selectedVoucherId,
       Postname: postname,
-      Content: description
+      Content: description,
+      VouImg: image ? image.name : null,
+      Price: 0,
+      Quantity: 0,
     };
     if (image) {
       formData.append('image', image);

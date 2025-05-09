@@ -4,19 +4,20 @@ DROP PROCEDURE IF EXISTS fn_get_all_valid_User_vouchers;$$
 CREATE PROCEDURE fn_get_all_valid_User_vouchers(IN p_UserId INT)
 BEGIN
    SELECT 
-        VoucherId,
+        V.VoucherId,
         VoucherName,
+        VoucherCode,
         Label,
-        UserId,
-        VoucherImage,
-        ExpirationDay,
-        Price
-    FROM Voucher
+        V.UserId,
+        VouImg,
+        ExpirationDay
+    FROM Voucher V JOIN Post P
+    ON V.VoucherId = P.PostId
     WHERE ExpirationDay >= CURDATE()
-    AND UserId = p_UserId
+    AND V.UserId = p_UserId
     ORDER BY ExpirationDay ASC;
 END $$
 
 DELIMITER ;
 
-CALL fn_get_all_valid_User_vouchers(3);
+CALL fn_get_all_valid_User_vouchers(22);

@@ -73,9 +73,6 @@ class PostingController
             const decoded = jwt.verify(token, secretKey);
             const RequestUserId = decoded.userId;
 
-            console.log('RequestUserId:', RequestUserId);
-            console.log('UserId:', UserId);
-
             if (RequestUserId != UserId)
             {
 

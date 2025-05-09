@@ -174,9 +174,9 @@ const Footer = ({ language }) => {
           <div className="mb-4 md:mb-0">
             <p className="mb-2">{text.copyright}</p>
             <div className="flex space-x-2 justify-center md:justify-start">
-              <img src="/path-to-visa-logo.png" alt="Visa" className="h-6" />
-              <img src="/path-to-mastercard-logo.png" alt="MasterCard" className="h-6" />
-              <img src="/path-to-jcb-logo.png" alt="JCB" className="h-6" />
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJgM8gqqd2SheNICowBUdQvqvdbOLEucY9lw&s" alt="Visa" className="h-6" />
+              <img src="https://logohistory.net/wp-content/uploads/2023/05/Mastercard-Logo-2016.png" alt="MasterCard" className="h-6" />
+              <img src="https://icon2.cleanpng.com/20180816/zbz/a237bfa5f0bc15bec6ec41b3115bbab0.webp" alt="JCB" className="h-6" />
             </div>
           </div>
           <div className="flex space-x-4">

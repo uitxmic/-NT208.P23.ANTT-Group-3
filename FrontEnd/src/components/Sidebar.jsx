@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaTachometerAlt, FaBox, FaNewspaper } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = ({ language }) => {
   const [show, setShow] = useState(false);
+  const location = useLocation(); // Lấy đường dẫn hiện tại
 
   // Dịch ngôn ngữ
   const getText = () => {
@@ -30,30 +31,55 @@ const Sidebar = ({ language }) => {
 
   return (
     <div className="w-64 h-full bg-white shadow-lg p-4">
-      <div className="text-2xl font-bold text-blue-600 mb-8">{text.title}</div>
+      <div className="text-2xl font-bold text-blue-600 mb-8"></div>
       <ul>
         <li className="mb-4">
-          <Link to="/dashboard" className="flex items-center p-2 bg-blue-500 text-white rounded-lg">
+          <Link
+            to="/dashboard"
+            className={`flex items-center p-2 rounded-lg ${
+              location.pathname === '/dashboard' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             <FaTachometerAlt className="mr-2" /> {text.dashboard}
           </Link>
         </li>
         <li className="mb-4">
-          <Link to="/posting-manager" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          <Link
+            to="/posting-manager"
+            className={`flex items-center p-2 rounded-lg ${
+              location.pathname === '/posting-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             <FaBox className="mr-2" /> {text.postingManager}
           </Link>
         </li>
         <li className="mb-4">
-          <Link to="/shop-vouchers" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          <Link
+            to="/shop-vouchers"
+            className={`flex items-center p-2 rounded-lg ${
+              location.pathname === '/shop-vouchers' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             <FaBox className="mr-2" /> {text.shopVouchers}
           </Link>
         </li>
         <li className="mb-4">
-          <Link to="/user-vouchers" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          <Link
+            to="/user-vouchers"
+            className={`flex items-center p-2 rounded-lg ${
+              location.pathname === '/user-vouchers' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             <FaBox className="mr-2" /> {text.userVouchers}
           </Link>
         </li>
         <li className="mb-4">
-          <Link to="/news" className="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          <Link
+            to="/news"
+            className={`flex items-center p-2 rounded-lg ${
+              location.pathname === '/news' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
             <FaNewspaper className="mr-2" /> {text.newsManager}
           </Link>
         </li>

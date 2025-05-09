@@ -200,7 +200,7 @@ const Navbar = ({
             <div className="flex items-center space-x-1 bg-pink-200 text-blue-700 px-4 py-2 rounded-full shadow-md">
               <span className="text-sm font-medium">{text.balanceLabel}</span>
               <span className="text-sm font-semibold">
-                ${balance !== null ? balance : '0'}
+                {balance !== null ? balance : '0'}.000 ₫
               </span>
             </div>
 

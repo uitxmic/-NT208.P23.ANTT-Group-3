@@ -14,6 +14,10 @@ BEGIN
     UPDATE Voucher
     SET UserId = v_userId
     WHERE VoucherId = v_voucherId and VoucherCode = p_voucher_code;
+    
+    UPDATE Post
+    SET Quantity = Quantity - 1
+    WHERE VoucherId = v_voucherId AND PostId = v_postId;
 END $$
 
 DELIMITER ;

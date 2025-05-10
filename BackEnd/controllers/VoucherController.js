@@ -34,7 +34,7 @@ class VoucherController {
     }
 
     // function to get voucher called by momopayment
-    async GetVoucherById(voucherId, voucherCode) {
+    async GetVoucherById(voucherId) {
         try {
             const [results] = await this.connection.query('CALL fn_get_voucher_by_id(?)', [voucherId]);
             return results[0];

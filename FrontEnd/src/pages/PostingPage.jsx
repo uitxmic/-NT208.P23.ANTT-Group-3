@@ -43,7 +43,7 @@ const PostingList = () => {
           setVouchers([]);
           setError('Không có voucher nào khả dụng');
         }
-        
+
       } else {
         setVouchers([]);
         setError(data.message || 'No vouchers available');
@@ -145,15 +145,23 @@ const PostingList = () => {
                       <div className="flex flex-col sm:flex-row gap-4">
                         <button
                           onClick={() => handleBuyVoucher(voucher)}
-                          className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                          className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${voucher.Quantity === 0
+                              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'}
+  `}
                           aria-label={`Mua voucher ${voucher.PostName}`}
+                          disabled={voucher.Quantity === 0}
                         >
                           Mua Voucher
                         </button>
                         <button
                           onClick={() => handleAddToCart(voucher)}
-                          className="w-full py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200"
+                          className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${voucher.Quantity === 0
+                              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'}
+  `}
                           aria-label={`Thêm voucher ${voucher.PostName} vào giỏ hàng`}
+                          disabled={voucher.Quantity === 0}
                         >
                           Thêm vào giỏ hàng
                         </button>

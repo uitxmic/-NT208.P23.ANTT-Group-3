@@ -199,7 +199,6 @@ class PostingController
 
         try 
         {
-            console.log('PostId:', PostId);
             const [results] = await this.connection.query(`CALL fn_active_post(?)`, [PostId]);
 
             res.json(results[0]);

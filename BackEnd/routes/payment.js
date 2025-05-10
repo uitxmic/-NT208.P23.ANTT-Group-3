@@ -42,7 +42,7 @@ router.get('/momo/redirect/voucher', async (req, res) => {
             // Giao dịch thành công, Balance đã được cập nhật qua IPN
             console.log(`Payment successful for order ${orderId}`);
             // Chuyển hướng đến UserProfile
-            return res.redirect('http://localhost:5173/profile');
+            return res.redirect('http://localhost:5173/user-vouchers');
         } else {
             console.error(`Payment failed for order ${orderId}, resultCode: ${resultCode}`);
             return res.status(400).json({ error: 'Payment failed' });

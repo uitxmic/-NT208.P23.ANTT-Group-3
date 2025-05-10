@@ -12,7 +12,7 @@ BEGIN
         VouImg,
         ExpirationDay
     FROM Voucher V JOIN Post P
-    ON V.VoucherId = P.PostId
+    ON V.VoucherId = P.VoucherId
     WHERE ExpirationDay >= CURDATE()
     AND V.UserId = p_UserId
     ORDER BY ExpirationDay ASC;

@@ -2,6 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FaSearch, FaBell, FaBars } from 'react-icons/fa';
 import UserBalance from './UserBalance';
+import SearchFilterModal from './SearchFilterModal';
 
 const Navbar = ({
   toggleSidebar,
@@ -129,10 +130,25 @@ const Navbar = ({
         <input
           type="text"
           placeholder={text.searchPlaceholder}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-2 pl-10 border border-blue-200 rounded-full bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
           onFocus={() => setIsFilterOpen(true)} // Mở modal khi focus vào input
         />
+
+        
+
+        {/* Biểu tượng tìm kiếm */}
+        
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
+        {
+        //render modal search filter khi bộ lọc được mở
+        isFilterOpen && (<SearchFilterModal
+          searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onClose={() => setIsFilterOpen(false)}
+        />)
+        }
       </div>
 
       {/* Phần bên phải */}

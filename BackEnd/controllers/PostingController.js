@@ -178,10 +178,19 @@ class PostingController
         }
     }
 
-    // [PUT] /posting/activePosting
+    // [PATCH] /posting/activePosting
     ActivePosting = async (req, res) =>
     {
         const { PostId } = req.body;
+        const token = req.headers['authorization'];
+
+        const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
+
+        if (!token || userRoleId !== 1)
+        {
+            return res.status(401).json({ error: 'You are not admin and do not have right to do this' });
+        }
+
 
         if (!PostId)
         {
@@ -190,6 +199,7 @@ class PostingController
 
         try 
         {
+            console.log('PostId:', PostId);
             const [results] = await this.connection.query(`CALL fn_active_post(?)`, [PostId]);
 
             res.json(results[0]);

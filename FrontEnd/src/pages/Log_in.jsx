@@ -32,12 +32,20 @@ const Log_in = () => {
       }
 
       const data = await response.json();
-      if (data.state === 'success') {
-        localStorage.setItem('access_token', data.access_token);
-        navigate('/');
-      } else {
-        setError(text.invalidCredentials);
+      if (!data) {
+        throw new Error('Đăng nhập thất bại', text.invalidCredentials);
       }
+
+      localStorage.setItem('access_token', data.access_token);
+
+      const userRoleId = JSON.parse(atob(data.access_token.split('.')[1])).userRoleId;
+      console.log(userRoleId);
+
+      if (userRoleId === 1) {
+        navigate('/admin');
+      }
+      else
+        navigate('/');
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || text.errorMessage);

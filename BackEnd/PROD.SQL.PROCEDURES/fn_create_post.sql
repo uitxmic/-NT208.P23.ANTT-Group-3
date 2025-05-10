@@ -30,7 +30,7 @@ BEGIN
         in_Price,
         CURRENT_DATE(),
         DATE_ADD(CURRENT_DATE(), INTERVAL 7 DAY),
-        TRUE,
+        FALSE,
         FALSE,
         in_Quantity
     );

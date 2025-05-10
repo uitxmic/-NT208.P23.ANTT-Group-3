@@ -2,14 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { jwtDecode } from 'jwt-decode';
 
-// Ensure Inter font is loaded (if not already in project)
-const loadFonts = () => {
-  const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
-  link.rel = 'stylesheet';
-  document.head.appendChild(link);
-};
-loadFonts();
 
 const getUserIdFromToken = (token) => {
   try {
@@ -141,7 +133,7 @@ const PostManager = () => {
   return (
     <Layout>
       <div className="flex flex-col min-h-screen font-inter" style={{ paddingTop: '4rem' }}>
-        <div className="flex flex-1 flex-col lg:flex-row p-4 lg:p-6 gap-6">
+        <div className="flex flex-1 flex-col lg:flex-row p-4 lg:p-6 gap-6 items-start h-full">
           {/* Left Column: Voucher and Post Lists */}
           <div className="lg:w-2/3 space-y-6">
             <h1 className="text-2xl font-bold text-gray-900">Quản lý bài đăng</h1>
@@ -211,7 +203,7 @@ const PostManager = () => {
           </div>
 
           {/* Right Column: Form and Notifications */}
-          <div className="lg:w-1/3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+          <div className="lg:w-1/3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-4 h-full">
             {/* Notifications */}
             {success && (
               <div className="mb-4 p-2 bg-green-100 text-green-700 rounded text-sm text-center">

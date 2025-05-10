@@ -242,6 +242,27 @@ class PostingController
         }
     }
 
+    // [GET] /posting/getAllPostingsForAdmin
+    GetAllPostingsForAdmin = async (req, res) =>
+    {
+        try 
+        {
+            const token = req.headers['authorization'];
+            const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
+
+            if (!token && userRoleId !== 1)
+            {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            const [results] = await this.connection.query(`CALL fn_get_all_post_for_admin()`);
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error getting all postings for admin:', err);
+            return res.status(500).json({ error: 'Error getting all postings for admin' });
+        }
+    }
 
 }
 

@@ -19,6 +19,7 @@ router.use('/deactivePosting', postingController.DeactivePosting);
 router.use('/activePosting', postingController.ActivePosting);
 router.use('/getActivePostings', postingController.GetActivePostings);
 router.use('/getDeactivePostings', postingController.GetDeactivePostings);
+router.use('/getAllPostingsForAdmin', postingController.GetAllPostingsForAdmin);
 
 
 module.exports = router;

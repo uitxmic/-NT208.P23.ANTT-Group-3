@@ -12,7 +12,8 @@ import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
-
+import Admin from "../pages/Admin";
+import VoucherManagement from "../pages/VoucherManager";
 
 function AppRoutes() {
   return (
@@ -35,6 +36,8 @@ function AppRoutes() {
                 <Route path="/deposit" element={<Deposit />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsDetail />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/voucher-manager" element={<VoucherManagement />} />
                 {/* Thêm các route khác ở đây */}
               </Routes>
           </ErrorBoundary>

@@ -7,29 +7,24 @@ CREATE PROCEDURE fn_search_vouchers_with_filters(
     IN category_filter VARCHAR(100),
     IN min_price DECIMAL(10, 2),
     IN max_price DECIMAL(10, 2),
-    IN sort_by VARCHAR(20),
-    IN is_verified BOOLEAN,
-    IN min_feedback DECIMAL(2, 1),
-    IN min_sold INT,
-    IN expire_in_days INT
+    IN sort_by VARCHAR(20)
 )
 BEGIN
+    IF search_term IS NULL OR search_term = '' THEN
+        SET search_term = '%';
+    END IF;
     SELECT 
         v.*,
-        u.Username,
-        u.AvgRate,
-        u.IsVerified
+        u.Username
     FROM Voucher v
     JOIN User u ON v.UserId = u.UserId
     WHERE 
         (v.VoucherName LIKE CONCAT('%', search_term, '%') OR v.Label LIKE CONCAT('%', search_term, '%'))
         AND (category_filter IS NULL OR v.Category = category_filter)
         AND (v.Price BETWEEN min_price AND max_price)
-        AND (u.IsVerified = is_verified OR is_verified IS NULL)
-        AND (u.AvgRate >= min_feedback OR min_feedback IS NULL)
-        AND (v.Sold >= min_sold OR min_sold IS NULL)
         AND (DATEDIFF(v.Expire, CURDATE()) <= expire_in_days OR expire_in_days IS NULL)
         AND v.Expire >= CURDATE()
+        -- AND v.IsOnSale is TRUE
     ORDER BY 
         CASE 
             WHEN sort_by = 'price_asc' THEN v.Price

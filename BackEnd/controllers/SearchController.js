@@ -9,11 +9,14 @@ class SearchController {
 
     async initConnection() {
         try {
-            this.connection = await mysql.createConnection({
+            this.pool = await mysql.createConnection({
                 host: process.env.DB_HOST,
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
+                database: process.env.DB_NAME,
+                waitForConnections: true,
+                connectionLimit: 10,
+                queueLimit: 0,
             });
         } catch (err) {
             console.error('Database connection error:', err);
@@ -22,21 +25,17 @@ class SearchController {
 
     // [GET] /search/vouchers
     SearchVouchers = async (req, res) => {
-        const { searchTerm, category, minPrice, maxPrice, sortBy, isVerified, minFeedback, minSold, expireInDays } = req.query;
+        const { searchTerm, category, minPrice, maxPrice, sortBy, } = req.query;
 
         try {
             const [results] = await this.connection.query(
-                'CALL fn_search_vouchers_with_filters(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                'CALL fn_search_vouchers_with_filters(?, ?, ?, ?, ?)',
                 [
                     searchTerm || '',
                     category || null,
                     minPrice || 0,
                     maxPrice || 999999,
                     sortBy || 'price_asc',
-                    isVerified || null,
-                    minFeedback || null,
-                    minSold || null,
-                    expireInDays || null
                 ]
             );
             res.json(results[0]);
@@ -52,7 +51,7 @@ class SearchController {
 
         try {
             const [results] = await this.connection.query(
-                'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?)',
+                'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?, ?)',
                 [
                     searchTerm || '',
                     minInteractions || '0',

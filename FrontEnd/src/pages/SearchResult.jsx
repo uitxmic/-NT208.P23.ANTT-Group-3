@@ -29,18 +29,25 @@ const PostCard = ({ post }) => (
     </div>
 );
 
-const UserCard = ({ user }) => (
+const UserCard = ({ user }) => {
+
+    const formatAvgRate = (rate) => {
+        if (rate === null || rate === undefined) return 'Chưa có';
+        const numRate = parseFloat(rate);
+        return isNaN(numRate) ? 'Chưa có' : numRate.toFixed(1);
+    };
+    return (
     <div className="border p-4 rounded-lg shadow hover:shadow-md transition-shadow">
         <h3 className="text-xl font-semibold text-purple-600">{user.Username}</h3>
         <p className="text-gray-700">Họ tên: {user.Fullname || 'Chưa cập nhật'}</p>
         <p className="text-gray-600">Email: {user.Email}</p>
-        <p className="text-sm text-gray-500">Đánh giá trung bình: {user.AvgRate ? user.AvgRate.toFixed(1) : 'Chưa có'}</p>
-        <p className="text-sm text-gray-500">Vai trò: {user.RoleID === 1 ? 'Admin' : (user.RoleID === 2 ? 'User' : 'Seller')}</p>
+        <p className="text-sm text-gray-500">Đánh giá trung bình: {formatAvgRate(user.AvgRate)}</p>
+        <p className="text-sm text-gray-500">Vai trò: {user.RoleID === 1 ? 'Admin' : (user.UserRoleId === 2 ? 'User' : 'Seller')}</p>
         {/* Thêm Link đến trang hồ sơ người dùng nếu có */}
         <Link to={`/profile/${user.UserId}`} className="text-purple-500 hover:underline mt-2 inline-block">Xem hồ sơ</Link>
     </div>
-);
-
+    );
+};
 
 const SearchResult = () => {
     const { type } = useParams(); // 'vouchers', 'posts', 'users'
@@ -72,12 +79,7 @@ const SearchResult = () => {
                     data = await SearchAPI.searchPosts(queryParams);
                 } else if (type === 'users') {
                      setPageTitle(`Kết quả tìm kiếm Người dùng ${queryParams.searchTerm ? `cho "${queryParams.searchTerm}"` : ''}`);
-                    // Quyết định gọi searchUsers hay searchUsersWithFilters dựa trên params
-                    if (queryParams.minFeedback || queryParams.minSold || queryParams.sortBy) {
-                        data = await SearchAPI.searchUsersWithFilters(queryParams);
-                    } else {
-                        data = await SearchAPI.searchUsers(queryParams);
-                    }
+                    data = await SearchAPI.searchUsers(queryParams);
                 } else {
                     throw new Error('Loại tìm kiếm không hợp lệ.');
                 }

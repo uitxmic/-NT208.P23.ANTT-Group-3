@@ -11,8 +11,8 @@ const postSortOptions = [
   { value: "date_asc", label: "Cũ nhất" },
 ];
 const userSortOptions = [
-  { value: "feedback_asc", label: "tăng dần" },
-  { value: "feedback_desc", label: "giảm dần" },
+  { value: "feedback_asc", label: "Điểm đánh giá tăng dần" },
+  { value: "feedback_desc", label: "Điểm đánh giá giảm dần" },
   { value: "sold_asc", label: "Số lượng bán tăng dần" },
   { value: "sold_desc", label: "Số lượng bán giảm dần" },
 ];
@@ -285,16 +285,16 @@ export const SearchAPI = {
     }
   },
   
-  searchUsersWithFilters: async (params) => {
-    try {
-      const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/users/filters?${queryParams}`);
-      return await response.json();
-    } catch (error) {
-      console.error("Error searching users with filters:", error);
-      throw error;
-    }
-  }
+  // searchUsersWithFilters: async (params) => {
+  //   try {
+  //     const queryParams = new URLSearchParams(params).toString();
+  //     const response = await fetch(`http://localhost:3000/search/users/filters?${queryParams}`);
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error("Error searching users with filters:", error);
+  //     throw error;
+  //   }
+  // }
 };
 
 export default SearchFilterModal;

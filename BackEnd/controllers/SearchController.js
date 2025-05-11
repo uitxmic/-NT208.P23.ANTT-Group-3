@@ -73,24 +73,24 @@ class SearchController {
         }
     };
 
-    // [GET] /search/users
-    SearchUsers = async (req, res) => {
-        const { searchTerm, role_id } = req.query;
+    // // [GET] /search/users
+    // SearchUsers = async (req, res) => {
+    //     const { searchTerm, role_id } = req.query;
     
-        try {
-            const [results] = await this.pool.query(
-                'CALL fn_search_users(?, ?)',
-                [searchTerm || '', role_id]
-            );
-            res.json(results[0]);
-        } catch (error) {
-            console.error('Error searching users:', error);
-            res.status(500).json({ error: 'Error searching users' });
-        }
-    };
+    //     try {
+    //         const [results] = await this.pool.query(
+    //             'CALL fn_search_users(?, ?)',
+    //             [searchTerm || '', role_id]
+    //         );
+    //         res.json(results[0]);
+    //     } catch (error) {
+    //         console.error('Error searching users:', error);
+    //         res.status(500).json({ error: 'Error searching users' });
+    //     }
+    // };
 
     // [GET] /search/users apply filters
-    SearchUsersWithFilters = async(req,res) =>{
+    SearchUsers = async(req,res) =>{
         const{ searchTerm, minFeedback, minSold, sortBy} = req.query;
         
         const validSortOptions = ['feedback_asc', 'feedback_desc', 'sold_asc', 'sold_desc'];

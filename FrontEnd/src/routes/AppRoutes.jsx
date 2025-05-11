@@ -12,6 +12,7 @@ import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
+import SearchResult  from "../pages/SearchResult";
 
 
 function AppRoutes() {
@@ -35,6 +36,7 @@ function AppRoutes() {
                 <Route path="/deposit" element={<Deposit />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsDetail />} />
+                <Route path="/search/:type" element={<SearchResult />} />
                 {/* Thêm các route khác ở đây */}
               </Routes>
           </ErrorBoundary>

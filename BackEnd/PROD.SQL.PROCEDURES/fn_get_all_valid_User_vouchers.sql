@@ -7,7 +7,7 @@ BEGIN
         V.VoucherId,
         VoucherName,
         VoucherCode,
-        Label,
+        Category,
         V.UserId,
         VouImg,
         ExpirationDay

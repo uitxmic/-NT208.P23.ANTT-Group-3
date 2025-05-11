@@ -21,7 +21,7 @@ BEGIN
         p.Expire,
         p.IsActive,
         v.VoucherName,
-        v.Label,
+        v.Category,
         v.VoucherImage,
         u.Username,
         CASE 

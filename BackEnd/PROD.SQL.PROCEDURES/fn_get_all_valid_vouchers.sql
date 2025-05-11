@@ -6,7 +6,7 @@ BEGIN
    SELECT 
         VoucherId,
         VoucherName,
-        Label,
+        Category,
         UserId,
         VoucherImage,
         ExpirationDay,

@@ -103,7 +103,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
             <option value="users">Người dùng</option>
           </select>
         </div>
-        {/* Phần còn lại của component giữ nguyên */}
+
         {type === "vouchers" && (
           <>
             <div className="flex gap-2">

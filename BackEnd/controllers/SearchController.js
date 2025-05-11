@@ -1,4 +1,5 @@
 const mysql = require('mysql2/promise');
+const { parse } = require('path');
 const { start } = require('repl');
 require('dotenv').config();
 
@@ -9,7 +10,7 @@ class SearchController {
 
     async initConnection() {
         try {
-            this.pool = await mysql.createConnection({
+            this.pool = await mysql.createPool({
                 host: process.env.DB_HOST,
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
@@ -18,6 +19,8 @@ class SearchController {
                 connectionLimit: 10,
                 queueLimit: 0,
             });
+            // console[test] = await this.pool.query('SELECT 1');
+            console.log('Database pool connection success.');
         } catch (err) {
             console.error('Database connection error:', err);
         }
@@ -25,17 +28,18 @@ class SearchController {
 
     // [GET] /search/vouchers
     SearchVouchers = async (req, res) => {
-        const { searchTerm, category, minPrice, maxPrice, sortBy, } = req.query;
+        const { searchTerm, category,min_price, max_price, sortBy, expiredDays } = req.query;
 
         try {
-            const [results] = await this.connection.query(
-                'CALL fn_search_vouchers_with_filters(?, ?, ?, ?, ?)',
+            const [results] = await this.pool.query(
+                'CALL fn_search_vouchers_with_filters(?, ?, ?, ?, ?, ?)',
                 [
                     searchTerm || '',
                     category || null,
-                    minPrice || 0,
-                    maxPrice || 999999,
+                    min_price || 0,
+                    max_price || 99999,
                     sortBy || 'price_asc',
+                    expiredDays || null
                 ]
             );
             res.json(results[0]);
@@ -50,7 +54,7 @@ class SearchController {
         const { searchTerm, minInteractions, minDaysPosted, maxDaysPosted, sortBy, startDate, endDate } = req.query;
 
         try {
-            const [results] = await this.connection.query(
+            const [results] = await this.pool.query(
                 'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?, ?)',
                 [
                     searchTerm || '',
@@ -74,7 +78,7 @@ class SearchController {
         const { searchTerm, role_id } = req.query;
     
         try {
-            const [results] = await this.connection.query(
+            const [results] = await this.pool.query(
                 'CALL fn_search_users(?, ?)',
                 [searchTerm || '', role_id]
             );
@@ -95,7 +99,7 @@ class SearchController {
         }
 
         try{
-            const[results] = await this.connection.query(
+            const[results] = await this.pool.query(
                 'CALL fn_search_users_with_filters(?, ?, ?, ?)',
                 [
                 searchTerm || '', 

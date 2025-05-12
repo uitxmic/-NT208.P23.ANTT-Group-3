@@ -45,7 +45,7 @@ const Log_in = () => {
         navigate('/admin');
       }
       else
-        navigate('/');
+        navigate('/dashboard');
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || text.errorMessage);

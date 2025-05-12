@@ -31,7 +31,6 @@ routes(app);
 const port = process.env.PORT || 3000;
 const hostname = process.env.HOSTNAME;
 
-
 // Ensure routes is a function
 if (typeof routes === 'function') {
   routes(app);

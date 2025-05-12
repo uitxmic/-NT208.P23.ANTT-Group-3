@@ -12,8 +12,7 @@ const corsOptions = {
 };
 
 const express = require('express');
-const sessionMiddleware = require("./middlewares/init.redis"); // Import session middleware
-const e = require('express');
+const sessionMiddleware = require("./middlewares/init.redis");
 const app = express();
 
 app.use(cookieParser());

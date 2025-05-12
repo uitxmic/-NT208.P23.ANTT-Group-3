@@ -2,7 +2,7 @@ const mysql = require('mysql2/promise');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const { Cookie } = require('express-session');
+const cookie = require('cookie');
 
 class UsersController
 {
@@ -119,14 +119,10 @@ class UsersController
 
                 // Lưu thông tin người dùng vào session
                 req.session.user = {
-                    UserId: results[0][0].UserId,
-                    Username: Username,
-                    Email: results[0][0].Email
+                    UserId: results[0][0].UserId ||'',
+                    Username: Username ||'',
+                    Email: results[0][0].Email ||''
                 };
-
-                console.log("Session ID:", req.sessionID);
-                console.log("Session data:", req.session.user);
-                // Lưu thông tin người dùng vào Redis
 
                 // Tạo access token
                 const access_token = jwt.sign({
@@ -136,8 +132,6 @@ class UsersController
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
 
-                res.cookie('key', 123);
-
                 res.cookie('session_id', req.sessionID, {
                     maxAge: 1000 * 60 * 60, // 1 hour
                     httpOnly: true,
@@ -145,11 +139,14 @@ class UsersController
                     sameSite: 'Strict' // Only send cookie in the same site
                 });
 
-                res.json({state:"success", access_token: access_token});
-
                 console.log("Access token:", access_token);
-
-                return;
+                res.cookie("session_id", "123456", {
+                    maxAge: 1000 * 60 * 60, // 1 giờ
+                    httpOnly: true, // Cookie không thể truy cập từ JavaScript phía client
+                    secure: process.env.NODE_ENV === "production", // Chỉ gửi cookie qua HTTPS trong môi trường production
+                    sameSite: "Strict", // Cookie chỉ được gửi trong cùng một site
+                });
+                res.send("Cookie đã được thiết lập!");
             }
             else{
                 return res.status(401).json({ error: 'Username or Password is incorrect' });

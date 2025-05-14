@@ -6,7 +6,7 @@ BEGIN
    SELECT 
         V.VoucherId,
         V.VoucherName,
-        V.Label,
+        Category,
         V.UserId,
         V.ExpirationDay,
         GROUP_CONCAT(DISTINCT VoucherCode) AS VoucherCode,
@@ -16,7 +16,7 @@ BEGIN
     WHERE V.ExpirationDay >= CURDATE()
       AND V.UserId = p_UserId
     GROUP BY 
-        V.VoucherId, V.VoucherName, V.Label, V.UserId, V.ExpirationDay
+        V.VoucherId, V.VoucherName, Category, V.UserId, V.ExpirationDay
     ORDER BY V.ExpirationDay ASC;
 END $$
 

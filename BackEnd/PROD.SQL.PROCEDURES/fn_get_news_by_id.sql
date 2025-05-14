@@ -20,7 +20,7 @@ BEGIN
         p.Expire,
         p.IsActive,
         v.VoucherName,
-        v.Label,
+        v.Category,
         -- v.VoucherImage,
         -- v.Description AS VoucherDescription,
         v.Price,

@@ -5,7 +5,7 @@ CREATE PROCEDURE fn_show_post_info_by_id(IN user_id INT)
 BEGIN
    SELECT 
         PostId, P.VoucherId, P.UserId, Postname, Content, Date,
-        VoucherName, Label, VouImg, Price,
+        VoucherName, Category, VouImg, Price,
         IsActive, IsVerified, 
         CASE 
             WHEN IsActive = 0 AND IsVerified = 0 THEN 'Pending'   -- màu vàng
@@ -17,7 +17,7 @@ BEGIN
     FROM Post P 
     JOIN Voucher V ON P.VoucherId = V.VoucherId
     WHERE P.UserId = user_id
-    GROUP BY PostId, P.VoucherId, P.UserId, Postname, Content, Date, VoucherName, Label, VouImg, Price, IsActive, IsVerified, Expire
+    GROUP BY PostId, P.VoucherId, P.UserId, Postname, Content, Date, VoucherName, Category, VouImg, Price, IsActive, IsVerified, Expire
     ORDER BY IsActive DESC;
 END $$
 

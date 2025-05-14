@@ -21,8 +21,8 @@ BEGIN
         p.Expire,
         p.IsActive,
         v.VoucherName,
-        v.Label,
-        v.VoucherImage,
+        v.Category,
+        p.VouImg,
         u.Username,
         CASE 
             WHEN p.Expire < CURDATE() THEN 'Expired'
@@ -36,3 +36,5 @@ BEGIN
 END$$
 
 DELIMITER ; 
+
+CALL fn_get_all_news();

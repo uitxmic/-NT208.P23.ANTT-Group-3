@@ -117,7 +117,7 @@ const UserVoucherList = () => {
                       <span className="font-semibold">Code:</span> {voucher.VoucherCode}
                     </p>
                     <p className="text-gray-600 text-sm">
-                      <span className="font-semibold">Danh mục:</span> {voucher.Label}
+                      <span className="font-semibold">Danh mục:</span> {voucher.Category}
                     </p>
                     <p className="text-gray-500 text-xs mt-1">
                       Hết hạn: {new Date(voucher.ExpirationDay).toLocaleDateString('vi-VN')}

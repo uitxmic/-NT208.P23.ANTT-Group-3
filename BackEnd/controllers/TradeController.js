@@ -103,6 +103,36 @@ class TradeController {
       return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   }
+
+  // [GET] /trade/getTransactionForAdmin
+  GetTransactionForAdmin = async (req, res) => {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
+    if (userRoleId != 1) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    try {
+      var secretKey = process.env.JWT_SECRET;
+      var decode = jwt.verify(token, secretKey);
+      var UserRoleId = decode.userRoleId;
+      if (UserRoleId != 1) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+
+      const [results] = await this.connection.query('CALL fn_get_all_transaction_for_admin()');
+      res.json(results[0]); // Chỉ trả về kết quả SELECT
+    } catch (error) {
+      console.error('Query error:', error);
+      res.status(500).json({ error: 'Database query error', details: error.message });
+    }
+
+  }
 }
 
 module.exports = new TradeController;

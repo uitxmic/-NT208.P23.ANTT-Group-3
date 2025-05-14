@@ -12,4 +12,6 @@ router.use('/paymentbybalance', tradeController.PaymentByBalance);
 
 router.use('/createTransaction', tradeController.CreateTransaction);
 
+router.use('/getTransactionForAdmin', tradeController.GetTransactionForAdmin);
+
 module.exports = router;

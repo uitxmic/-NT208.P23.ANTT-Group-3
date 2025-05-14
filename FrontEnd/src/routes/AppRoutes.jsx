@@ -27,7 +27,7 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
               <Routes>
-                <Route path="/dashboard" element={<Home />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/posting-manager" element={<PostManager />} />
                 <Route path="/shop-vouchers" element={<PostingPage />} />
                 <Route path="/user-vouchers" element={<UserVoucherList />} />

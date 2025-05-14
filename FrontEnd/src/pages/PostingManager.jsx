@@ -186,11 +186,22 @@ const PostManager = () => {
                       <p className="text-xs text-gray-600 mb-1 line-clamp-2">{post.Content}</p>
                       <p className="text-xs text-blue-500">{post.Label}</p>
                       <p
-                        className={`text-xs font-semibold ${
-                          post.IsActive ? 'text-green-500' : 'text-red-500'
-                        }`}
+                        className={`text-xs font-semibold ${post.IsActive === 1 && post.IsVerified === 1
+                            ? 'text-green-500' // Active
+                            : post.IsActive === 0 && post.IsVerified === 1
+                              ? 'text-red-500' // Inactive
+                              : post.IsActive === 0 && post.IsVerified === 0
+                                ? 'text-yellow-500' // Pending
+                                : 'text-gray-500' // Default case, if any
+                          }`}
                       >
-                        {post.Status}
+                        {post.IsActive === 1 && post.IsVerified === 1
+                          ? 'Active'
+                          : post.IsActive === 0 && post.IsVerified === 1
+                            ? 'Inactive'
+                            : post.IsActive === 0 && post.IsVerified === 0
+                              ? 'Pending'
+                              : post.Status} {/* Fallback to post.Status or a default string */}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         Ngày đăng: {new Date(post.Date).toLocaleDateString()}
@@ -344,9 +355,8 @@ const PostManager = () => {
 
                 <button
                   type="submit"
-                  className={`w-full p-2 rounded text-white text-sm font-medium transition duration-300 ${
-                    loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                  }`}
+                  className={`w-full p-2 rounded text-white text-sm font-medium transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                    }`}
                   disabled={loading}
                 >
                   {loading ? 'Đang đăng...' : 'Đăng bài'}

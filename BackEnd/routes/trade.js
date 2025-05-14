@@ -10,4 +10,6 @@ router.use('/20lastestposts', tradeController.Get20LastestPosts);
 
 router.use('/paymentbybalance', tradeController.PaymentByBalance);
 
+router.use('/createTransaction', tradeController.CreateTransaction);
+
 module.exports = router;

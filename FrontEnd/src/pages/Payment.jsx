@@ -24,8 +24,7 @@ const Payment = () => {
 
   async function getMomoQRCodeUrl(amount, userId, voucher, token) {
     try {
-      console.log('kkkkkk');
-      console.log(token);
+
       const response = await fetch('http://localhost:3000/payment/create-payment-voucher', {
         method: 'POST',
         headers: {
@@ -33,8 +32,9 @@ const Payment = () => {
           'Authorization': token,
         },
         body: JSON.stringify({
-          amount,
-          userId,
+          amount: amount,
+          userIdBuyer: userId,
+          userIdSeller: voucher.UserId,
           voucherId: voucher.VoucherId,
           postId: voucher.PostId,
         }),
@@ -78,38 +78,37 @@ const Payment = () => {
           throw new Error('Insufficient balance');
         }
 
-        const response = await fetch('http://127.0.0.1:3000/trade/paymentbybalance', {
+        const response = await fetch('http://localhost:3000/trade/createTransaction', {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             VoucherId: voucher.VoucherId,
-            paymentMethod: 'balance',
+            PostId: voucher.PostId,
+            Amount: voucher.Price,
+            UserIdSeller: voucher.UserId,
           }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to process payment');
+          throw new Error(errorData.error);
         }
 
         const data = await response.json();
         if (data.message === 'Success') {
-          setSuccess('Payment successful! Voucher purchased.');
-          setTimeout(() => navigate('/shop-vouchers'), 2000);
+          setSuccess('Thanh toán thành công, giao dịch của bạn đang được xử lý.');
+          setTimeout(() => navigate('/user-vouchers'), 2000);
         } else {
           throw new Error(data.error || 'Payment failed');
         }
       } else if (paymentMethod === 'bank') {
         setSuccess('Please complete the payment using your bank account.');
       } else if (paymentMethod === 'momo') {
-        console.log(voucher.Price);
         const userId = JSON.parse(atob(token.split('.')[1])).userId;
-        console.log('caccc', userId);
-        console.log('voucher', voucher);
-        const qrCodeUrl = await getMomoQRCodeUrl(voucher.Price*1000, userId, voucher, token);
+        const qrCodeUrl = await getMomoQRCodeUrl(voucher.Price * 1000, userId, voucher, token);
         console.log(qrCodeUrl);
         if (qrCodeUrl) {
           window.open(qrCodeUrl, '_blank'); // Open QR code URL in new tab

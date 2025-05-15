@@ -31,7 +31,9 @@ const Deposit = () => {
             const userId = decoded.userId; // Giả định token chứa userId
             console.log(userId); // Log userId để kiểm tra
 
-            const response = await fetch('http://localhost:3000/payment/create-payment', {
+
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+            const response = await fetch(`${API_BASE_URL}payment/create-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

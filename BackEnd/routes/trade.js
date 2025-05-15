@@ -14,4 +14,6 @@ router.use('/createTransaction', tradeController.CreateTransaction);
 
 router.use('/getTransactionForAdmin', tradeController.GetTransactionForAdmin);
 
+router.use('/completeTransaction', tradeController.CompleteTransaction);
+
 module.exports = router;

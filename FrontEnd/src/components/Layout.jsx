@@ -17,7 +17,16 @@ const Layout = ({ children }) => {
 
   // Lấy thông tin người dùng từ localStorage
   const token = localStorage.getItem('access_token');
-  const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
+  let userRoleId = null;
+  if (token) {
+    try {
+      userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+    }
+  } else {
+    console.warn('No access token found in localStorage.');
+  }
   console.log(userRoleId);
 
   // Tính chiều cao tối đa của trang cho Sidebar

@@ -53,12 +53,13 @@ const TransactionManagerAdmin = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/trade/completeTransaction/${transactionId}`, {
+            const response = await fetch(`http://localhost:3000/trade/completeTransaction`, {
                 method: 'PATCH',
                 headers: {
                     Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ TransactionId: transactionId }),
             });
 
             if (!response.ok) {

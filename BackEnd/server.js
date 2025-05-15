@@ -5,7 +5,7 @@ require('dotenv').config();
 const cors = require('cors');
 
 const corsOptions = {
-  origin: ['http://localhost:5173'],
+  origin: ['http://localhost:5173', 'https://ripe-phones-play.loca.lt'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };

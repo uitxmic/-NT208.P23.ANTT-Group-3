@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { FaShoppingCart, FaGift, FaWallet, FaCog } from 'react-icons/fa'; // Import icons
 
 const Notification = () => {
     const [selectedType, setSelectedType] = useState(null);
@@ -8,10 +9,10 @@ const Notification = () => {
     const [error, setError] = useState('');
 
     const categories = [
-        { type: 'orders', label: 'Đơn hàng', route: '/notification/orders' },
-        { type: 'promotion', label: 'Khuyến mãi', route: '/notification/promotion' },
-        { type: 'wallet', label: 'Ví', route: '/notification/wallet' },
-        { type: 'system', label: 'Hệ thống', route: '/notification/system' },
+        { type: 'orders', label: 'Đơn hàng', route: '/notification/orders', color: 'blue', icon: FaShoppingCart },
+        { type: 'promotion', label: 'Khuyến mãi', route: '/notification/promotion', color: 'red', icon: FaGift },
+        { type: 'wallet', label: 'Ví', route: '/notification/wallet', color: 'green', icon: FaWallet },
+        { type: 'system', label: 'Hệ thống', route: '/notification/system', color: 'purple', icon: FaCog },
     ];
 
     const fetchNotifications = async (route) => {
@@ -59,18 +60,23 @@ const Notification = () => {
 
                     {/* 4 lựa chọn */}
                     <div className="flex justify-center space-x-4 mb-8">
-                        {categories.map((category) => (
-                            <button
-                                key={category.type}
-                                onClick={() => handleCategoryClick(category)}
-                                className={`px-6 py-3 rounded-lg shadow-md text-white font-semibold transition-all duration-200 ${selectedType === category.type
-                                        ? 'bg-blue-600'
-                                        : 'bg-blue-400 hover:bg-blue-500'
-                                    }`}
-                            >
-                                {category.label}
-                            </button>
-                        ))}
+                        {categories.map((category) => {
+                            const Icon = category.icon; // Lấy component icon từ category
+                            return (
+                                <button
+                                    key={category.type}
+                                    onClick={() => handleCategoryClick(category)}
+                                    className={`flex items-center space-x-2 px-6 py-3 rounded-lg shadow-md font-semibold transition-all duration-200 
+                    ${selectedType === category.type
+                                            ? `bg-${category.color}-500 text-white`
+                                            : `border-2 border-${category.color}-500 text-${category.color}-500 hover:bg-${category.color}-500 hover:text-white`
+                                        }`}
+                                >
+                                    <Icon className="text-lg" />
+                                    <span>{category.label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
 
                     {/* Thông báo lỗi */}

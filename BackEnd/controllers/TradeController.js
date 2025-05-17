@@ -25,7 +25,7 @@ class TradeController {
   Get20LastestPosts = async (req, res) => {
     try {
       const [results] = await this.connection.query('CALL fn_get_20_lastest_posts()');
-      res.json(results[0]); // Chỉ trả về kết quả SELECT
+      res.json(results[0]);
     }
     catch (error) {
       console.error('Query error:', error);

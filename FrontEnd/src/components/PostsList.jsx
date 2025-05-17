@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const PostsList = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     // Gọi API để lấy 20 bài đăng gần đây nhất
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/posting/get20LastestPostings');
-                setPosts(response.data); // Giả định API trả về mảng bài đăng
+                const data = response.data;
+                if (Array.isArray(data) && data.length > 0 && data[0].result) {
+                    setPosts(data[0].result);
+                } else {
+                    setPosts([]);
+                    setError('Không có bài đăng nào từ API');
+                }
                 setLoading(false);
             } catch (err) {
                 setError('Không thể tải bài đăng. Vui lòng thử lại sau.');
@@ -45,8 +53,9 @@ const PostsList = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {posts.map((post) => (
                     <div
-                        key={post.id}
-                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                        key={post.PostId}
+                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                        onClick={() => navigate(`/postdetail/${post.PostId}`)}
                     >
                         {/* Hình ảnh bài đăng */}
                         {post.VouImg ? (
@@ -72,15 +81,12 @@ const PostsList = () => {
                                 {new Intl.NumberFormat('vi-VN', {
                                     style: 'currency',
                                     currency: 'VND',
-                                }).format(post.Price*1000)}
+                                }).format(post.Price * 1000)}
                             </p>
                             <p className="text-gray-500 text-xs mt-2">
                                 Đăng ngày:{' '}
                                 {new Date(post.Date).toLocaleDateString('vi-VN')}
                             </p>
-                            <button className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors">
-                                Xem chi tiết
-                            </button>
                         </div>
                     </div>
                 ))}

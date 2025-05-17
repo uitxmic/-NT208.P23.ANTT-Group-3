@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './NavigaBar';
 import Sidebar from './Sidebar';
+import AdminSidebar from './AdminSidebar';
 import Footer from './Footer'; // Import Footer
 import ErrorBoundary from './ErrorBoundary';
 
@@ -13,6 +14,20 @@ const Layout = ({ children }) => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  // Lấy thông tin người dùng từ localStorage
+  const token = localStorage.getItem('access_token');
+  let userRoleId = null;
+  if (token) {
+    try {
+      userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+    }
+  } else {
+    console.warn('No access token found in localStorage.');
+  }
+  console.log(userRoleId);
 
   // Tính chiều cao tối đa của trang cho Sidebar
   useEffect(() => {
@@ -44,13 +59,16 @@ const Layout = ({ children }) => {
     <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div
-        className={`fixed top-16 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-16 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
         style={{ height: sidebarHeight }} // Áp dụng chiều cao động
       >
         <ErrorBoundary>
-          <Sidebar language={language} />
+          {userRoleId === 1 ? (
+            <AdminSidebar language={language} />
+          ) : (
+            <Sidebar language={language} />
+          )}
         </ErrorBoundary>
       </div>
 
@@ -68,9 +86,8 @@ const Layout = ({ children }) => {
 
         {/* Nội dung chính của trang */}
         <div
-          className={`flex-1 transition-all duration-300 bg-gray-100 ${
-            isSidebarOpen ? 'ml-64' : 'ml-0'
-          }`}
+          className={`flex-1 transition-all duration-300 bg-gray-100 ${isSidebarOpen ? 'ml-64' : 'ml-0'
+            }`}
         >
           <div className="p-6">{children}</div>
         </div>

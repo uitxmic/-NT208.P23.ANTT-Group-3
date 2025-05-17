@@ -8,12 +8,13 @@ import UserVoucherList from "../pages/Valid_user's_voucher";
 import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
 import Deposit from "../components/Deposit";
-import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
+import Notification from "../pages/Notification"; // Uncomment if needed
 import Admin from "../pages/Admin";
 import VoucherManagement from "../pages/VoucherManager";
+import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
 import CartPage from "../pages/cart";
 
 function AppRoutes() {
@@ -27,6 +28,22 @@ function AppRoutes() {
         path="/*"
         element={
           <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/posting-manager" element={<PostManager />} />
+              <Route path="/shop-vouchers" element={<PostingPage />} />
+              <Route path="/user-vouchers" element={<UserVoucherList />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/deposit" element={<Deposit />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:id" element={<NewsDetail />} />
+              <Route path="/notification" element={<Notification />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/voucher-manager" element={<VoucherManagement />} />
+              <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
+              {/* Thêm các route khác ở đây */}
+            </Routes>
               <Routes>
                 <Route path="/dashboard" element={<Home />} />
                 <Route path="/posting-manager" element={<PostManager />} />

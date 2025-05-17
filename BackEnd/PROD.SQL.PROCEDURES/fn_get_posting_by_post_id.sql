@@ -5,7 +5,7 @@ CREATE PROCEDURE fn_get_posting_by_post_id(IN post_id INT)
 BEGIN
    SELECT 
         PostId, P.VoucherId, P.UserId, Postname, Content, Date,
-        VoucherName, Label, VouImg,
+        VoucherName, Category, VouImg,
         IsActive,
         CASE 
             WHEN Expire < CURDATE() THEN 'Expired'

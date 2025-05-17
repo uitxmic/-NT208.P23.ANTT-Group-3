@@ -19,7 +19,7 @@ BEGIN
     FROM Voucher v
     JOIN User u ON v.UserId = u.UserId
     WHERE 
-        (v.VoucherName LIKE CONCAT('%', search_term, '%') OR v.Label LIKE CONCAT('%', search_term, '%'))
+        (v.VoucherName LIKE CONCAT('%', search_term, '%') OR v.Category LIKE CONCAT('%', search_term, '%'))
         AND (category_filter IS NULL OR v.Category = category_filter)
         AND (v.Price BETWEEN min_price AND max_price)
         AND (DATEDIFF(v.Expire, CURDATE()) <= expire_in_days OR expire_in_days IS NULL)

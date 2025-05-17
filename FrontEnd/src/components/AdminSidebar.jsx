@@ -14,7 +14,7 @@ const AdminSidebar = ({ language }) => {
           postManager: 'Quản lý bài đăng',
           voucherManager: 'Quản lý voucher',
           userManager: 'Quản lý người dùng',
-          revenueManager: 'Quản lý doanh thu',
+          revenueManager: 'Quản lý giao dịch',
         }
       : {
           title: 'Admin DashStack',
@@ -74,9 +74,9 @@ const AdminSidebar = ({ language }) => {
         </li>
         <li className="mb-4">
           <Link
-            to="/admin/revenue-manager"
+            to="/admin/transaction-manager"
             className={`flex items-center p-2 rounded-lg ${
-              location.pathname === '/admin/revenue-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+              location.pathname === '/admin/transaction-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
             <FaChartLine className="mr-2" /> {text.revenueManager}

@@ -20,7 +20,7 @@ class VoucherController {
             const jwt = require('jsonwebtoken');
 
             const user = {
-                userId: 2,
+                userId: 22,
                 Username: 'user2',
                 role: 'user'
             };

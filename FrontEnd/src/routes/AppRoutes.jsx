@@ -14,6 +14,7 @@ import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
 import Admin from "../pages/Admin";
 import VoucherManagement from "../pages/VoucherManager";
+import CartPage from "../pages/cart";
 
 function AppRoutes() {
   return (
@@ -38,6 +39,7 @@ function AppRoutes() {
                 <Route path="/news/:id" element={<NewsDetail />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/voucher-manager" element={<VoucherManagement />} />
+                <Route path="/cart" element={<CartPage />} />
                 {/* Thêm các route khác ở đây */}
               </Routes>
           </ErrorBoundary>

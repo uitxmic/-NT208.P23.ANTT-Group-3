@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FaSearch, FaBell, FaBars } from 'react-icons/fa';
+import { FaSearch, FaBell, FaBars, FaShoppingCart } from 'react-icons/fa';
 import UserBalance from './UserBalance';
 import SearchFilterModal from './SearchFilterModal';
 
@@ -20,6 +20,7 @@ const Navbar = ({
   const [timeoutId, setTimeoutId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0); // State cho số lượng item trong giỏ hàng
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -51,6 +52,47 @@ const Navbar = ({
     };
 
     fetchUserInfo();
+  }, [isLoggedIn]);
+
+  // Fetch cart item count
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (!isLoggedIn) {
+        setCartItemCount(0); // Reset khi không đăng nhập
+        return;
+      }
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('http://127.0.0.1:3000/cart/getCart', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCartItemCount(data.length || 0); // data là một mảng các cart items
+        } else {
+          // Có thể log lỗi hoặc set count về 0 nếu không lấy được
+          console.error('Không thể lấy số lượng giỏ hàng');
+          setCartItemCount(0);
+        }
+      } catch (err) {
+        console.error('Lỗi khi lấy số lượng giỏ hàng:', err);
+        setCartItemCount(0);
+      }
+    };
+
+    fetchCartCount();
+    // Thêm một listener để cập nhật số lượng giỏ hàng khi có thay đổi từ các trang khác
+    // Ví dụ: sử dụng custom event
+    const handleCartUpdate = () => fetchCartCount();
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
   }, [isLoggedIn]);
 
   const handleLogout = () => {
@@ -136,8 +178,6 @@ const Navbar = ({
           onFocus={() => setIsFilterOpen(true)} // Mở modal khi focus vào input
         />
 
-        
-
         {/* Biểu tượng tìm kiếm */}
         
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
@@ -160,6 +200,16 @@ const Navbar = ({
             6
           </span>
         </div>
+
+        {/* Biểu tượng giỏ hàng */}
+        <Link to="/cart" className="relative group">
+          <FaShoppingCart className="h-6 w-6 text-blue-600 group-hover:text-blue-800 transition-colors duration-200" />
+          {cartItemCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-md">
+              {cartItemCount}
+            </span>
+          )}
+        </Link>
 
         {/* Lựa chọn ngôn ngữ */}
         <div className="relative">

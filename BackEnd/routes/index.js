@@ -7,6 +7,7 @@ const googlecloud = require('./googlecloud');
 const momoPayment = require('./payment');
 const searchRouter = require('./search');
 const newsRouter = require('./news');
+const cartRouter = require('./cart');
 
 function routes(app) {
     app.get('/test', (req, res) => {
@@ -31,6 +32,8 @@ function routes(app) {
     app.use('/search', searchRouter);
 
     app.use('/news', newsRouter);
+
+    app.use('/cart', cartRouter);
 
 }
 module.exports = routes;

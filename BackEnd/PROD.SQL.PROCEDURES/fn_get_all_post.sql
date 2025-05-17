@@ -26,7 +26,7 @@ BEGIN
       )
    ) AS result
    FROM Post P
-   WHERE P.IsVerified IS TRUE
+   WHERE P.IsVerified IS TRUE AND P.Quantity > 0
    GROUP BY P.VoucherId, P.PostId, P.UserId, P.PostName, P.VouImg, P.Content, P.Price, P.Date, P.Expire, P.Quantity, P.UpVote, P.UpDown, P.IsActive
    ORDER BY P.IsActive DESC;
 END $$

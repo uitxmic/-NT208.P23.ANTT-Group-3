@@ -7,7 +7,7 @@ const postingController = require('../controllers/PostingController');
 // public api
 router.use('/get20LastestPostings', postingController.Get20LastestPostings);
 
-router.use(authMiddleware);
+//router.use(authMiddleware);
 
 // private api
 router.use('/createPosting', postingController.CreatePosting);

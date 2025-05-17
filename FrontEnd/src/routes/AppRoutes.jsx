@@ -15,6 +15,7 @@ import Notification from "../pages/Notification"; // Uncomment if needed
 import Admin from "../pages/Admin";
 import VoucherManagement from "../pages/VoucherManager";
 import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
+import CartPage from "../pages/cart";
 
 function AppRoutes() {
   return (
@@ -43,6 +44,21 @@ function AppRoutes() {
               <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
+              <Routes>
+                <Route path="/dashboard" element={<Home />} />
+                <Route path="/posting-manager" element={<PostManager />} />
+                <Route path="/shop-vouchers" element={<PostingPage />} />
+                <Route path="/user-vouchers" element={<UserVoucherList />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/deposit" element={<Deposit />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:id" element={<NewsDetail />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/voucher-manager" element={<VoucherManagement />} />
+                <Route path="/cart" element={<CartPage />} />
+                {/* Thêm các route khác ở đây */}
+              </Routes>
           </ErrorBoundary>
         }
       />

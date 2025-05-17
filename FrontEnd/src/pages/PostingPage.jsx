@@ -60,6 +60,44 @@ const PostingList = () => {
     navigate('/payment', { state: { voucher } });
   };
 
+  // Handle Add to Cart button click
+  const handleAddToCart = async (voucher) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setError('Vui lòng đăng nhập để tiếp tục');
+      setLoading(false);
+      return;
+    }
+
+    if (!voucher || typeof voucher.PostId === 'undefined') {
+      setError('Không thể thêm voucher không hợp lệ vào giỏ hàng.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:3000/cart/addToCart', { // Đảm bảo URL API này là chính xác
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Thêm "Bearer " trước token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ PostId: voucher.PostId }), // Gửi PostId của voucher
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Không thể thêm vào giỏ hàng.');
+      }
+
+      alert('Đã thêm voucher vào giỏ hàng thành công!');
+
+    } catch (err) {
+      setError(err.message || 'Lỗi khi thêm vào giỏ hàng.');
+      alert(`Lỗi: ${err.message || 'Không thể thêm vào giỏ hàng.'}`);
+    }
+  };
+
   useEffect(() => {
     fetchVouchers();
   }, []);

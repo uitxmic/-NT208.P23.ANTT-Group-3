@@ -45,7 +45,6 @@ class GoogleCloudController {
       });
       
       const payload = ticket.getPayload();
-      const userId = payload['sub'];
       const email = payload['email'];
       const name = payload['name'];
 
@@ -59,14 +58,18 @@ class GoogleCloudController {
           name,         
           "123",            
           email,        
-          "123",           
-          2,           
-          0,             
+          "0123456789",      
         ];
         console.log('SQL Parameters:', params); // Log tham số
-        await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?, ?, ?)', params);
+        console.log("kekekkeke");
+        await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?)', params);
       }
-  
+      
+      const [userRows] = await this.connection.query('CALL fn_get_user_by_email(?)', [email]);
+      const user = userRows[0][0];
+      const userId = user.UserId;
+      console.log('User ID:', userId);
+
 
       // Tạo access token và trả về cho client
       const accessToken = this.GenerateAccessToken({ userId, email });

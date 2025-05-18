@@ -24,8 +24,8 @@ const Payment = () => {
 
   async function getMomoQRCodeUrl(amount, userId, voucher, token) {
     try {
-
-      const response = await fetch('http://localhost:3000/payment/create-payment-voucher', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/payment/create-payment-voucher`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,8 +77,8 @@ const Payment = () => {
         if (balance < voucher.Price) {
           throw new Error('Insufficient balance');
         }
-
-        const response = await fetch('http://localhost:3000/trade/createTransaction', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/trade/createTransaction`, {
           method: 'POST',
           headers: {
             Authorization: `${token}`,

@@ -41,7 +41,8 @@ const PostManager = () => {
   const fetchVoucher = async () => {
     try {
       const UserId = getUserIdFromToken(token);
-      const response = await fetch(`http://localhost:3000/voucher/getVoucherByUserId/${UserId}`, {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/voucher/getVoucherByUserId/${UserId}`, {
         method: 'GET',
         headers: { Authorization: `${token}` },
       });
@@ -60,7 +61,8 @@ const PostManager = () => {
         setError('Invalid token. UserId not found.');
         return;
       }
-      const response = await fetch(`http://localhost:3000/posting/getPostingsByUserId/${UserId}`, {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/posting/getPostingsByUserId/${UserId}`, {
         method: 'GET',
         headers: { Authorization: `${token}` },
       });
@@ -101,7 +103,8 @@ const PostManager = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/posting/createPosting', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/posting/createPosting`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

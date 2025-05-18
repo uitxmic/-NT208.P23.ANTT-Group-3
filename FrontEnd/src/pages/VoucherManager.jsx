@@ -49,7 +49,8 @@ const VoucherManagement = () => {
     const handleActivateVoucher = async (postId) => {
         const token = localStorage.getItem('access_token');
         try {
-            const response = await fetch(`http://localhost:3000/posting/activePosting`, {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/posting/activePosting`, {
                 method: 'PATCH',
                 headers: {
                     Authorization: `${token}`,

@@ -15,7 +15,8 @@ const PostDetail = () => {
     useEffect(() => {
         const fetchPostDetail = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/posting/getPostingByPostId/${postId}`);
+                const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+                const response = await axios.get(`${API_BASE_URL}/posting/getPostingByPostId/${postId}`);
                 const data = response.data;
                 if (Array.isArray(data) && data.length > 0 && data[0].result) {
                     setPost(data[0].result[0]);

@@ -12,7 +12,8 @@ const PostsList = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/posting/get20LastestPostings');
+                const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+                const response = await axios.get(`${API_BASE_URL}/posting/get20LastestPostings`);
                 const data = response.data;
                 if (Array.isArray(data) && data.length > 0 && data[0].result) {
                     setPosts(data[0].result);

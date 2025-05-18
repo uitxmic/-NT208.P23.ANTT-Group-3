@@ -56,8 +56,9 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
   // Tạo các hàm gọi API trực tiếp (để sử dụng trong các component khác nếu cần)
   const searchVouchers = async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/vouchers?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/search/vouchers?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching vouchers:", error);
@@ -67,8 +68,9 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
 
   const searchPosts = async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/posts?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/search/posts?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching posts:", error);
@@ -78,13 +80,14 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
 
   const searchUsers = async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
       // Sử dụng endpoint có filter nếu params có minFeedback hoặc minSold
       const endpoint = params.minFeedback || params.minSold || params.sortBy 
         ? "search/users/filters" 
         : "search/users";
       
-      const response = await fetch(`http://localhost:3000/${endpoint}?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/${endpoint}?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching users:", error);
@@ -254,8 +257,9 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
 export const SearchAPI = {
   searchVouchers: async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/vouchers?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/search/vouchers?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching vouchers:", error);
@@ -265,8 +269,9 @@ export const SearchAPI = {
   
   searchPosts: async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/posts?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/search/posts?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching posts:", error);
@@ -276,8 +281,9 @@ export const SearchAPI = {
   
   searchUsers: async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/users?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/search/users?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching users:", error);
@@ -287,8 +293,9 @@ export const SearchAPI = {
   
   searchUsersWithFilters: async (params) => {
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:3000/search/users/filters?${queryParams}`);
+      const response = await fetch(`${API_BASE_URL}/search/users/filters?${queryParams}`);
       return await response.json();
     } catch (error) {
       console.error("Error searching users with filters:", error);

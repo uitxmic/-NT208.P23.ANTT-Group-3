@@ -17,7 +17,8 @@ const TransactionManagerAdmin = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/trade/getTransactionForAdmin', {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/trade/getTransactionForAdmin`, {
                 method: 'GET',
                 headers: {
                     Authorization: `${token}`,
@@ -53,7 +54,8 @@ const TransactionManagerAdmin = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/trade/completeTransaction`, {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/trade/completeTransaction`, {
                 method: 'PATCH',
                 headers: {
                     Authorization: `${token}`,

@@ -89,7 +89,7 @@ const VoucherManagement = () => {
             <div className="min-h-screen bg-gray-50 py-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
-                        QUẢN LÝ VOUCHER
+                        QUẢN LÝ BÀI ĐĂNG
                     </h1>
 
                     {/* Error Message */}
@@ -101,12 +101,12 @@ const VoucherManagement = () => {
 
                     {/* Loading State */}
                     {loading ? (
-                        <p className="text-center text-gray-600 text-lg">Đang tải danh sách Voucher...</p>
+                        <p className="text-center text-gray-600 text-lg">Đang tải danh sách các bài đăng...</p>
                     ) : (
                         <div className="space-y-12">
                             {/* Pending Vouchers */}
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Voucher đang chờ duyệt</h2>
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đang chờ duyệt</h2>
                                 {pendingVouchers.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {pendingVouchers.map((voucher) => (
@@ -119,13 +119,13 @@ const VoucherManagement = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-center text-gray-600 text-lg">Không có voucher đang chờ duyệt.</p>
+                                    <p className="text-center text-gray-600 text-lg">Không có bài đăng đang chờ duyệt.</p>
                                 )}
                             </div>
 
                             {/* Active Vouchers */}
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Voucher đang hoạt động</h2>
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đang hoạt động</h2>
                                 {activeVouchers.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {activeVouchers.map((voucher) => (
@@ -137,13 +137,13 @@ const VoucherManagement = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-center text-gray-600 text-lg">Không có voucher đang hoạt động.</p>
+                                    <p className="text-center text-gray-600 text-lg">Không có bài đăng đang hoạt động.</p>
                                 )}
                             </div>
 
                             {/* Expired Vouchers */}
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Voucher đã hết hạn</h2>
+                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đã hết hạn</h2>
                                 {expiredVouchers.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                         {expiredVouchers.map((voucher) => (
@@ -155,7 +155,7 @@ const VoucherManagement = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-center text-gray-600 text-lg">Không có voucher đã hết hạn.</p>
+                                    <p className="text-center text-gray-600 text-lg">Không có bài đăng đã hết hạn.</p>
                                 )}
                             </div>
                         </div>

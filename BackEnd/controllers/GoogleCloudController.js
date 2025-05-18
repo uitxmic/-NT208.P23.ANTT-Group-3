@@ -57,16 +57,16 @@ class GoogleCloudController {
           name,         
           name,         
           "123",            
-          email,        
-          "0123456789",      
+          email   
         ];
         console.log('SQL Parameters:', params); // Log tham số
         console.log("kekekkeke");
-        await this.connection.query('CALL fn_create_user(?, ?, ?, ?, ?)', params);
+        await this.connection.query('CALL fn_create_user_for_google(?, ?, ?, ?)', params);
       }
       
       const [userRows] = await this.connection.query('CALL fn_get_user_by_email(?)', [email]);
       const user = userRows[0][0];
+      console.log('User found:', user);
       const userId = user.UserId;
       console.log('User ID:', userId);
 

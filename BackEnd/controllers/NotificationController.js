@@ -52,7 +52,9 @@ class NotificationController {
     getNotificationById = async (req, res) => {
         try {
             const { notiId } = req.params;
+            console.log('Received notiId:', notiId);
             const parsedNotiId = parseInt(notiId, 10);
+            console.log('Fetching notification with ID:', parsedNotiId);
             if (isNaN(parsedNotiId)) {
                 return res.status(400).json({ error: 'Invalid notiId, must be a number' });
             }

@@ -225,7 +225,7 @@ const Navbar = ({
         />
 
         {/* Biểu tượng tìm kiếm */}
-        
+
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
         {isFilterOpen && (
           <SearchFilterModal
@@ -259,7 +259,16 @@ const Navbar = ({
                     <div
                       key={notif.noti_id}
                       className={`block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 transition-all duration-200 ${notif.is_read ? 'opacity-50' : ''}`}
-                      onClick={() => !notif.is_read && markAsRead(notif.noti_id)}
+                      onClick={() => {
+                        if (notif.noti_type === 'order') {
+                          navigate(`/notification/${notif.noti_id}`);
+                          setIsNotificationDropdownOpen(false);
+                        }
+                        else if (!notif.is_read) {
+                          markAsRead(notif.noti_id);
+                        }
+                      }
+                      }
                     >
                       <div className="flex items-start space-x-2">
                         {notif.image_url && (

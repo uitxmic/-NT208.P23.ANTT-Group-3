@@ -22,4 +22,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_all_valid_User_vouchers(22);
+CALL fn_get_all_valid_User_vouchers(26);

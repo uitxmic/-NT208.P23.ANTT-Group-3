@@ -6,7 +6,7 @@ const notificationController = require('../controllers/NotificationController');
 
 
 // Sửa thành router.get()
-router.get('/getNotibyId/:Notild', notificationController.getNotificationById);
+router.get('/getNotiById/:notiId', notificationController.getNotificationById);
 router.get('/get5latestnoti', notificationController.get5LatestNotifications); // Sửa tên endpoint
 router.get('/orders', notificationController.getAllOrderNotifications);
 router.get('/system', notificationController.getAllSystemNotifications);

@@ -13,8 +13,9 @@ import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
 import Notification from "../pages/Notification"; // Uncomment if needed
+import NotifDetail  from "../pages/NotifDetail";
 import Admin from "../pages/Admin";
-import VoucherManagement from "../pages/VoucherManager";
+import AdminPostingManager from "../pages/PostingAdminManager";
 import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
 import CartPage from "../pages/cart";
 
@@ -41,26 +42,12 @@ function AppRoutes() {
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/notification" element={<Notification />} />
+              <Route path="/notification/:notifId" element={<NotifDetail />} />
               <Route path="/admin" element={<Admin />} />
-              <Route path="/admin/voucher-manager" element={<VoucherManagement />} />
+              <Route path="/admin/voucher-manager" element={<AdminPostingManager />} />
               <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
-              <Routes>
-                <Route path="/dashboard" element={<Home />} />
-                <Route path="/posting-manager" element={<PostManager />} />
-                <Route path="/shop-vouchers" element={<PostingPage />} />
-                <Route path="/user-vouchers" element={<UserVoucherList />} />
-                <Route path="/payment" element={<Payment />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/deposit" element={<Deposit />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/news/:id" element={<NewsDetail />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/voucher-manager" element={<VoucherManagement />} />
-                <Route path="/cart" element={<CartPage />} />
-                {/* Thêm các route khác ở đây */}
-              </Routes>
           </ErrorBoundary>
         }
       />

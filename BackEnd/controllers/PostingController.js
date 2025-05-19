@@ -80,6 +80,7 @@ class PostingController {
 
     // [GET] /posting/getAllPostings 
     GetAllPostings = async (req, res) => {
+        const { page, limit } = req.query;
         const token = req.headers['authorization'];
 
         if (!token) {
@@ -87,7 +88,7 @@ class PostingController {
         }
 
         try {
-            const [results] = await this.connection.query(`CALL fn_get_all_post()`);
+            const [results] = await this.connection.query(`CALL fn_get_all_post(?, ?)`, [page, limit]);
 
             res.json(results[0]);
 

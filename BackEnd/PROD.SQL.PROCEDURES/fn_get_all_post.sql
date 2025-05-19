@@ -1,8 +1,14 @@
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_get_all_post;$$
-CREATE PROCEDURE fn_get_all_post()
+CREATE PROCEDURE fn_get_all_post(
+	IN p_page INT,
+    IN p_page_size INT
+	)
 BEGIN
+	DECLARE p_offset INT;
+    SET p_offset = (p_page - 1) * p_page_size;
+
    SELECT JSON_ARRAYAGG(
       JSON_OBJECT(
          'PostId', P.PostId,
@@ -28,9 +34,10 @@ BEGIN
    FROM Post P
    WHERE P.IsVerified IS TRUE AND P.IsActive IS TRUE AND P.Quantity > 0
    GROUP BY P.VoucherId, P.PostId, P.UserId, P.PostName, P.VouImg, P.Content, P.Price, P.Date, P.Expire, P.Quantity, P.UpVote, P.UpDown, P.IsActive
-   ORDER BY P.IsActive DESC;
+   ORDER BY P.Date DESC
+   LIMIT p_page_size OFFSET p_offset;
 END $$
 
 DELIMITER ;
 
-CALL fn_get_all_post();
+CALL fn_get_all_post(1,5);

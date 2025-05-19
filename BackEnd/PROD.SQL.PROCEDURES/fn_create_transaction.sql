@@ -56,6 +56,11 @@ BEGIN
     
     
     SELECT 'Transaction Created' AS Message, LAST_INSERT_ID() AS Id;
+    
+    INSERT INTO Noti (user_id, noti_type, noti_title, noti_content, image_url, created_at, updated_at, is_read, is_deleted, transaction_id) 
+    VALUES
+    (in_UserIdBuyer, 'order', 'Đơn hàng đã giao', 'Đơn hàng của bạn đã được giao thành công.', 'https://i.pinimg.com/736x/d3/42/10/d34210a2c783df91cc86df3b7fc5ec64.jpg',
+    NOW(), NOW(), 0, 0, Id);
 END $$
 
 DELIMITER ;

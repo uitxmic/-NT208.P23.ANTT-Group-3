@@ -8,4 +8,4 @@ BEGIN
 END$$
 DELIMITER ;
 
-CALL fn_get_voucher_by_id(1);
+CALL fn_get_voucher_by_id(3);

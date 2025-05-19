@@ -68,7 +68,7 @@ class TradeController {
 
   // [POST] /trade/createTransaction
   CreateTransaction = async (req, res) => {
-    const { VoucherId, PostId, Amount, UserIdSeller } = req.body;
+    const { VoucherId, PostId, Amount, Quantity, UserIdSeller } = req.body;
     const token = req.headers['authorization'];
 
     if (!token) {
@@ -88,7 +88,7 @@ class TradeController {
       console.log('Amount:', Amount);
       console.log('UserIdSeller:', UserIdSeller);
 
-      const [result] = await this.connection.query('CALL fn_create_transaction(?, ?, ?, ?, ?)', [VoucherId, PostId, Amount, UserIdBuyer, UserIdSeller]);
+      const [result] = await this.connection.query('CALL fn_create_transaction(?, ?, ?, ?, ?, ?)', [VoucherId, PostId, Amount, Quantity, UserIdBuyer, UserIdSeller]);
       console.log('Result:', result);
       const message = result[0][0]?.Message;
       console.log('Message:', result[0][1]?.Message);

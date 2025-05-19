@@ -91,7 +91,8 @@ const Navbar = ({
       }
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch('http://127.0.0.1:3000/cart/getCart', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/cart/getCart`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -146,7 +147,8 @@ const Navbar = ({
   const markAsRead = async (notificationId) => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://127.0.0.1:3000/notification/markAsRead/${notificationId}`, {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/notification/markAsRead/${notificationId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

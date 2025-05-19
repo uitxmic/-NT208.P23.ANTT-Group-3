@@ -164,7 +164,7 @@ class TradeController {
       const Id = results[0][0]?.Id;
       console.log('Id:', Id);
       console.log('Message:', message);
-      if (Id === 1)
+      if (Id !== -1)
         return res.status(200).json({ message: 'Success' });
       else
         return res.status(400).json({ error: message.error });

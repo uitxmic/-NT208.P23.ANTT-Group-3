@@ -46,6 +46,7 @@ function AppRoutes() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/voucher-manager" element={<AdminPostingManager />} />
               <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
+              <Route path="/cart" element={<CartPage />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
           </ErrorBoundary>

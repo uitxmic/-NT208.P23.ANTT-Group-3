@@ -42,7 +42,6 @@ function CartPage() {
 
   // Cập nhật số lượng hoặc xóa sản phẩm
   const handleUpdate = async (itemId, quantity) => {
-    console.log("Gửi lên:", { ItemId: itemId, Quantity: quantity });
     try {
       const response = await fetch("http://127.0.0.1:3000/cart/updateCart", {
         method: "POST",
@@ -87,13 +86,24 @@ function CartPage() {
   const calculateTotalPrice = () => {
     return cartItems
       .filter(item => selectedItems.has(item.ItemId))
-      .reduce((total, item) => total + (item.Price * item.Quantity), 0);
+      .reduce((total, item) => total + (item.Price * 1000 * item.Quantity), 0);
   };
 
   const itemsToPurchase = cartItems.filter(item => selectedItems.has(item.ItemId));
 
   const handleBuyNow = () => {
-    navigate('/payment', { state: { items: itemsToPurchase, total: calculateTotalPrice() } });
+    const items = itemsToPurchase.map(item => ({
+      voucherId: item.VoucherId,
+      postId: item.PostId,
+      amount: item.Price * 1000,
+      quantity: item.Quantity,
+      userIdSeller: item.UserId,
+      postName: item.PostName,
+      vouImg: item.VouImg
+    }));
+    console.log("Items to purchase:", items);
+
+    navigate('/payment', { state: { items } });
   };
 
 
@@ -101,7 +111,7 @@ function CartPage() {
     <ErrorBoundary>
       <Layout>
         <div className="flex flex-col min-h-screen bg-pink-50">
-          <div className="flex flex-1" style={{ marginTop: '4rem', paddingBottom: itemsToPurchase.length > 0 ? '8rem' : '0' }}> {/* Thêm paddingBottom nếu có mục được chọn */}
+          <div className="flex flex-1" style={{ marginTop: '4rem', paddingBottom: itemsToPurchase.length > 0 ? '8rem' : '0' }}>
             <main className="flex-1 p-6">
               <h2 className="text-2xl font-bold mb-4">Giỏ hàng của bạn</h2>
               {loading ? (
@@ -148,7 +158,9 @@ function CartPage() {
                               />
                               <div>
                                 <div className="font-semibold">{item.PostName}</div>
-                                <div className="text-sm text-gray-500">{item.Price?.toLocaleString()} ₫</div>
+                                <div className="text-sm text-gray-500">
+                                  {(item.Price * 1000)?.toLocaleString()} ₫
+                                </div>
                               </div>
                             </div>
                           </td>

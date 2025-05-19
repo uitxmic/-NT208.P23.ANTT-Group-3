@@ -23,7 +23,7 @@ proc: BEGIN
     INTO p_amount;
     
 	UPDATE Transaction
-    SET `Status` = 1
+    SET `Status` = 4
     WHERE TransactionId = v_transaction_id;
     
 	UPDATE `User`

@@ -70,7 +70,7 @@ const PostDetail = () => {
 
     // Handle Buy Voucher button click
     const handleBuyVoucher = (post) => {
-        navigate('/payment', { state: { voucher: post } });
+        navigate('/payment', { state: { voucher: post, quantity } });
     };
 
     // Handle Add to Cart button click

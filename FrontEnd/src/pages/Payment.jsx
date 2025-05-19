@@ -14,6 +14,7 @@ const Payment = () => {
   const [momoQRCodeUrl, setMomoQRCodeUrl] = useState(null);
 
   const voucher = state?.voucher;
+  const quantity = state?.quantity || 1;
 
   useEffect(() => {
     if (!voucher) {
@@ -88,6 +89,7 @@ const Payment = () => {
             VoucherId: voucher.VoucherId,
             PostId: voucher.PostId,
             Amount: voucher.Price,
+            Quantity: quantity,
             UserIdSeller: voucher.UserId,
           }),
         });
@@ -156,6 +158,8 @@ const Payment = () => {
                     <h3 className="text-xl font-semibold">{voucher?.PostName}</h3>
                     <p className="text-gray-600">{voucher?.Label}</p>
                     <p className="text-orange-600 font-bold mt-2">Giá: {voucher.Price}.000 ₫</p>
+                    <p className="text-orange-600 font-bold mt-2">Số lượng: {quantity}</p>
+                    <p className="text-orange-600 font-bold mt-2">Tổng: {voucher.Price * quantity}.000 ₫</p>
                     <p className="text-gray-500 text-sm">
                       Ngày hết hạn: {voucher?.Expire ? new Date(voucher.Expire).toLocaleDateString() : 'N/A'}
                     </p>

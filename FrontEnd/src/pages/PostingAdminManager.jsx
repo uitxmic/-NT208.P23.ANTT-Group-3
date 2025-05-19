@@ -19,7 +19,8 @@ const VoucherManagement = () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:3000/posting/getAllPostingsForAdmin', {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/posting/getAllPostingsForAdmin`, {
                 method: 'GET',
                 headers: {
                     Authorization: `${token}`,
@@ -73,6 +74,32 @@ const VoucherManagement = () => {
             setError(err.message || 'Đã xảy ra lỗi khi kích hoạt voucher');
         }
     };
+
+    const handleDeactivateVoucher = async (postId) => {
+        const token = localStorage.getItem('access_token');
+        try {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/posting/deactivePosting`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ PostId: postId }),
+            });
+            if (!response.ok) {
+                throw new Error('Không thể vô hiệu hóa voucher');
+            }
+            if (response.status === 200) {
+                toast.success('Voucher đã được vô hiệu hóa thành công');
+            }
+            // Refresh vouchers after deactivation
+            fetchVouchers();
+        } catch (err) {
+            setError(err.message || 'Đã xảy ra lỗi khi vô hiệu hóa voucher');
+        }
+    };
+
 
     useEffect(() => {
         fetchVouchers();
@@ -132,6 +159,7 @@ const VoucherManagement = () => {
                                             <VoucherCard
                                                 key={voucher.PostId}
                                                 voucher={voucher}
+                                                onActivate={handleDeactivateVoucher}
                                                 status="Active"
                                             />
                                         ))}
@@ -224,7 +252,18 @@ const VoucherCard = ({ voucher, onActivate, status }) => {
                         className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
                         aria-label={`Kích hoạt voucher ${voucher.PostName}`}
                     >
-                        Kích hoạt Voucher
+                        Kích hoạt Bài đăng
+                    </button>
+                </div>
+            )}
+            {status === 'Active' && (
+                <div className="px-6 pb-6">
+                    <button
+                        onClick={() => onActivate(voucher.PostId)}
+                        className="w-full py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition-colors duration-200"
+                        aria-label={`Kích hoạt voucher ${voucher.PostName}`}
+                    >
+                        Vô hiệu hóa bài đăng
                     </button>
                 </div>
             )}

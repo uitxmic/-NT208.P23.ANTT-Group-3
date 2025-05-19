@@ -66,13 +66,15 @@ class GoogleCloudController {
       
       const [userRows] = await this.connection.query('CALL fn_get_user_by_email(?)', [email]);
       const user = userRows[0][0];
+      const userRoleId = user.UserRoleId;
+      console.log('User role ID:', userRoleId);
       console.log('User found:', user);
       const userId = user.UserId;
       console.log('User ID:', userId);
 
 
       // Tạo access token và trả về cho client
-      const accessToken = this.GenerateAccessToken({ userId, email });
+      const accessToken = this.GenerateAccessToken({ userId, email, userRoleId });
       res.json({ state: 'success', access_token: accessToken });
     } catch (error) {
       console.error('Google login error:', error);

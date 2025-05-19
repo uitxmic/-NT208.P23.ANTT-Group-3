@@ -135,7 +135,7 @@ class PostingController {
         }
     }
 
-    // [PUT] /posting/deactivePosting
+    // [PATCH] /posting/deactivePosting
     DeactivePosting = async (req, res) => {
         const { PostId } = req.body;
 

@@ -1,3 +1,4 @@
+
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_create_transaction; $$
@@ -30,7 +31,7 @@ BEGIN
         
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
     
-        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         SELECT 'Created Failed' AS Message, -1 AS Id;
     END;
@@ -134,4 +135,5 @@ BEGIN
 END $$
 
 DELIMITER ;
+call fn_create_transaction (4,15,68,3,29,8 )
 

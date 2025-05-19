@@ -86,6 +86,7 @@ class TradeController {
       console.log('VoucherId:', VoucherId);
       console.log('PostId:', PostId);
       console.log('Amount:', Amount);
+      console.log('Quantity:', Quantity);
       console.log('UserIdSeller:', UserIdSeller);
 
       const [result] = await this.connection.query('CALL fn_create_transaction(?, ?, ?, ?, ?, ?)', [VoucherId, PostId, Amount, Quantity, UserIdBuyer, UserIdSeller]);

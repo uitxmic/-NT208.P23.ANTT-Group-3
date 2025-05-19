@@ -27,7 +27,6 @@ const Layout = ({ children }) => {
   } else {
     console.warn('No access token found in localStorage.');
   }
-  console.log(userRoleId);
 
   // Tính chiều cao tối đa của trang cho Sidebar
   useEffect(() => {

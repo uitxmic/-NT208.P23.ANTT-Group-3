@@ -18,4 +18,6 @@ router.use('/completeTransaction', tradeController.CompleteTransaction);
 
 router.use('/acceptRefund', tradeController.AcceptRefund);
 
+router.use('/rejectRefund', tradeController.RejectRefund);   
+
 module.exports = router;

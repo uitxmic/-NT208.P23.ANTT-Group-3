@@ -35,8 +35,8 @@ const Sidebar = ({ language }) => {
       <ul>
         <li className="mb-4">
           <Link
-            to="/dashboard"
-            className={`flex items-center p-2 rounded-lg ${location.pathname === '/dashboard' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+            to="/"
+            className={`flex items-center p-2 rounded-lg ${location.pathname === '/' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
           >
             <FaTachometerAlt className="mr-2" /> {text.dashboard}

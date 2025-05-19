@@ -45,11 +45,15 @@ const Sign_up = () => {
       }
 
       const data = await response.json();
+      console.log('Response data:', data);
       if (data[0] && data[0].Message === 'User Created') {
         navigate('/login');
       } else if (data[0] && data[0].Message === 'Created Failed') {
         setError(data[0].ErrorDetail || 'Registration failed');
-      } else {
+      } else if (data[0].Id == -1) {
+        setError(data[0].Message);
+      }
+      else {
         setError('Registration failed');
       }
     } catch (error) {
@@ -278,9 +282,8 @@ const Sign_up = () => {
 
             <button
               type="submit"
-              className={`w-full p-3 rounded-lg text-white transition duration-300 ${
-                loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-              }`}
+              className={`w-full p-3 rounded-lg text-white transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                }`}
               disabled={loading}
             >
               {loading ? 'Signing up...' : text.button}

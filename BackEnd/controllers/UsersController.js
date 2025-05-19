@@ -85,6 +85,7 @@ class UsersController {
             console.error('Error creating user:', error);
             return res.status(500).json({ error: 'Error creating user' });
         }
+        
     };
 
     //[GET] /users/login

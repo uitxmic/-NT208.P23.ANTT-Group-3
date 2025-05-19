@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 
-const PostingList = () => {
+const PostingPage = () => {
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -55,49 +55,6 @@ const PostingList = () => {
     }
   };
 
-  // Handle Buy Voucher button click
-  const handleBuyVoucher = (voucher) => {
-    navigate('/payment', { state: { voucher } });
-  };
-
-  // Handle Add to Cart button click
-  const handleAddToCart = async (voucher) => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      setError('Vui lòng đăng nhập để tiếp tục');
-      setLoading(false);
-      return;
-    }
-
-    if (!voucher || typeof voucher.PostId === 'undefined') {
-      setError('Không thể thêm voucher không hợp lệ vào giỏ hàng.');
-      return;
-    }
-
-    try {
-      const response = await fetch('http://127.0.0.1:3000/cart/addToCart', { // Đảm bảo URL API này là chính xác
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Thêm "Bearer " trước token
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ PostId: voucher.PostId }), // Gửi PostId của voucher
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Không thể thêm vào giỏ hàng.');
-      }
-
-      alert('Đã thêm voucher vào giỏ hàng thành công!');
-
-    } catch (err) {
-      setError(err.message || 'Lỗi khi thêm vào giỏ hàng.');
-      alert(`Lỗi: ${err.message || 'Không thể thêm vào giỏ hàng.'}`);
-    }
-  };
-
   useEffect(() => {
     fetchVouchers();
   }, []);
@@ -126,7 +83,8 @@ const PostingList = () => {
                 vouchers.map((voucher) => (
                   <div
                     key={voucher.PostId}
-                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden transform hover:-translate-y-1"
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                    onClick={() => navigate(`/postdetail/${voucher.PostId}`)}
                   >
                     {/* Voucher Image */}
                     <div className="relative">
@@ -177,34 +135,6 @@ const PostingList = () => {
                         {!voucher.Active ? 'Đang bán' : 'Không hoạt động'}
                       </div>
                     </div>
-
-                    {/* Buy Button */}
-                    <div className="px-6 pb-6">
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                          onClick={() => handleBuyVoucher(voucher)}
-                          className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${voucher.Quantity === 0
-                              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                              : 'bg-blue-600 text-white hover:bg-blue-700'}
-  `}
-                          aria-label={`Mua voucher ${voucher.PostName}`}
-                          disabled={voucher.Quantity === 0}
-                        >
-                          Mua Voucher
-                        </button>
-                        <button
-                          onClick={() => handleAddToCart(voucher)}
-                          className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${voucher.Quantity === 0
-                              ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                              : 'bg-green-600 text-white hover:bg-green-700'}
-  `}
-                          aria-label={`Thêm voucher ${voucher.PostName} vào giỏ hàng`}
-                          disabled={voucher.Quantity === 0}
-                        >
-                          Thêm vào giỏ hàng
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 ))
               ) : (
@@ -220,4 +150,4 @@ const PostingList = () => {
   );
 };
 
-export default PostingList;
+export default PostingPage;

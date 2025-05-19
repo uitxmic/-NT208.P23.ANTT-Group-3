@@ -62,7 +62,7 @@ const PostsList = () => {
                         {post.VouImg ? (
                             <img
                                 src={post.VouImg}
-                                alt={post.Postname}
+                                alt={post.PostName}
                                 className="w-full h-48 object-cover"
                             />
                         ) : (
@@ -73,7 +73,7 @@ const PostsList = () => {
                         {/* Nội dung bài đăng */}
                         <div className="p-4">
                             <h3 className="text-lg font-semibold text-gray-800 truncate">
-                                {post.Postname}
+                                {post.PostName}
                             </h3>
                             <p className="text-gray-600 text-sm mt-1 line-clamp-2">
                                 {post.Content}

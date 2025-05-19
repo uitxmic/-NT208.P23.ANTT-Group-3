@@ -68,6 +68,49 @@ const PostDetail = () => {
         return <div className="text-center py-10">Không tìm thấy bài đăng.</div>;
     }
 
+    // Handle Buy Voucher button click
+    const handleBuyVoucher = (post) => {
+        navigate('/payment', { state: { voucher: post } });
+    };
+
+    // Handle Add to Cart button click
+    const handleAddToCart = async (post) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            setError('Vui lòng đăng nhập để tiếp tục');
+            setLoading(false);
+            return;
+        }
+
+        if (!post || typeof post.PostId === 'undefined') {
+            setError('Không thể thêm voucher không hợp lệ vào giỏ hàng.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:3000/cart/addToCart', { // Đảm bảo URL API này là chính xác
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Thêm "Bearer " trước token
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ PostId: post.PostId }), // Gửi PostId của voucher
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Không thể thêm vào giỏ hàng.');
+            }
+
+            alert('Đã thêm voucher vào giỏ hàng thành công!');
+
+        } catch (err) {
+            setError(err.message || 'Lỗi khi thêm vào giỏ hàng.');
+            alert(`Lỗi: ${err.message || 'Không thể thêm vào giỏ hàng.'}`);
+        }
+    };
+
     const postDate = new Date(post.Date);
     const isValidDate = !isNaN(postDate.getTime());
 
@@ -146,16 +189,31 @@ const PostDetail = () => {
                                 }).format(quantity * post.Price * 1000)}
                             </span>
                         </p>
-                        <button
-                            onClick={handleBuyNow}
-                            className={`w-full py-3 rounded-md text-white font-semibold transition-colors ${post.Quantity === 0 || post.Status !== 'Active'
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-orange-500 hover:bg-orange-600'
-                                }`}
-                            disabled={post.Quantity === 0 || post.Status !== 'Active'}
-                        >
-                            Mua ngay
-                        </button>
+                        {/* Action Buttons */}
+                        <div className="px-6 pb-6">
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <button
+                                    onClick={() => handleBuyVoucher(post)}
+                                    className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                                    aria-label={`Mua voucher ${post.PostName}`}
+                                    disabled={post.Quantity === 0}
+                                >
+                                    Mua Voucher
+                                </button>
+                                <button
+                                    onClick={() => handleAddToCart(post)}
+                                    className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                        : 'bg-green-600 text-white hover:bg-green-700'}`}
+                                    aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
+                                    disabled={post.Quantity === 0}
+                                >
+                                    Thêm vào giỏ hàng
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -126,8 +126,48 @@ const TransactionManagerAdmin = () => {
             console.error('Lỗi khi hoàn thành giao dịch:', err);
             toast.error(err.message);
         }
-    }
+    };
 
+    const handleRejectRefund = async (transactionId) => {   
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            toast.error('Bạn không có quyền thực hiện hành động này.');
+            return;
+        }
+        try {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/trade/rejectRefund`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ TransactionId: transactionId }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Không thể từ chối hoàn tiền.');
+            }
+            if (response.status === 200) {
+                toast.success(`Giao dịch ${transactionId} đã được từ chối hoàn tiền!`);
+            }
+            if (response.status === 400) {
+                const errorData = await response.json();
+                toast.error(`Lỗi: ${errorData.error}`);
+            }
+            // Update the transaction status locally
+            setTransactions(transactions.map(transaction =>
+                transaction.TransactionId === transactionId
+                    ? { ...transaction, Status: 3 }
+                    : transaction
+            ));
+            toast.success(`Giao dịch ${transactionId} đã được từ chối hoàn tiền!`);
+        } catch (err) {
+            console.error('Lỗi khi từ chối hoàn tiền:', err);
+            toast.error(err.message);
+        }
+    };
+    
     useEffect(() => {
         fetchTransactions();
     }, []);

@@ -83,13 +83,58 @@ const TransactionManagerAdmin = () => {
         }
     };
 
+    const handleAcceptRefund = async (transactionId) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            toast.error('Bạn không có quyền thực hiện hành động này.');
+            return;
+        }
+        try {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/trade/acceptRefund`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ TransactionId: transactionId }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Không thể chấp nhận hoàn tiền.');
+            }
+
+            if (response.status === 200) {
+                toast.success(`Giao dịch ${transactionId} đã được chấp nhận hoàn tiền!`);
+            }
+
+            if (response.status === 400) {
+                const errorData = await response.json();
+                toast.error(`Lỗi: ${errorData.error}`);
+            }
+
+            // Update the transaction status locally
+            setTransactions(transactions.map(transaction =>
+                transaction.TransactionId === transactionId
+                    ? { ...transaction, Status: 4 }
+                    : transaction
+            ));
+
+            toast.success(`Giao dịch ${transactionId} đã được hoàn thành!`);
+        } catch (err) {
+            console.error('Lỗi khi hoàn thành giao dịch:', err);
+            toast.error(err.message);
+        }
+    }
+
     useEffect(() => {
         fetchTransactions();
     }, []);
 
     return (
         <Layout>
-            <div className="container mx-auto p-4" style={{ paddingTop: '60px' }}> 
+            <div className="container mx-auto p-4" style={{ paddingTop: '60px' }}>
                 <h1 className="text-2xl font-bold mb-4 text-center">Quản Lý Giao Dịch Admin</h1>
                 {loading ? (
                     <div className="text-center text-gray-600">Đang tải dữ liệu...</div>
@@ -126,6 +171,7 @@ const TransactionManagerAdmin = () => {
                                             {transaction.Status === 1 && <span className="text-green-500">Đã hoàn thành</span>}
                                             {transaction.Status === 2 && <span className="text-blue-500">Yêu cầu hoàn tiền</span>}
                                             {transaction.Status === 3 && <span className="text-red-500">Từ chối hoàn tiền</span>}
+                                            {transaction.Status === 4 && <span className="text-red-500">Đã hoàn tiền</span>}
                                         </td>
                                         <td className="py-2 px-4 border-b text-sm text-gray-900">{transaction.Postname}</td>
                                         <td className="py-2 px-4 border-b text-sm text-gray-900">
@@ -161,6 +207,9 @@ const TransactionManagerAdmin = () => {
                                             )}
                                             {transaction.Status === 3 && (
                                                 <span className="text-gray-500">Đã từ chối hoàn tiền</span>
+                                            )}
+                                            {transaction.Status === 4 && (
+                                                <span className="text-gray-500">Đã hoàn tiền</span>
                                             )}
                                         </td>
                                     </tr>

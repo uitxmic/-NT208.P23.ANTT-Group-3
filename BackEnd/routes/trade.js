@@ -16,4 +16,6 @@ router.use('/getTransactionForAdmin', tradeController.GetTransactionForAdmin);
 
 router.use('/completeTransaction', tradeController.CompleteTransaction);
 
+router.use('/acceptRefund', tradeController.AcceptRefund);
+
 module.exports = router;

@@ -16,9 +16,19 @@ BEGIN
     SET `Status` = 1
     WHERE TransactionId = v_transaction_id;
     
+	UPDATE `User`
+    SET AccountBalance = AccountBalance - p_amount
+    WHERE UserId = 1;
+    
     UPDATE `User`
     SET AccountBalance = AccountBalance + p_amount
     WHERE UserId = p_user_id_seller;
+    
+    INSERT INTO Noti (user_id, noti_type, noti_title, noti_content, image_url, 
+						created_at, updated_at, is_read, is_deleted) VALUES
+	(p_user_id_seller, 'order', 'Đơn hàng đã hoàn tất', 'Đơn hàng của bạn đã hoàn tất, kiểm tra số dư ngay', 
+    'https://i.pinimg.com/736x/d3/42/10/d34210a2c783df91cc86df3b7fc5ec64.jpg', 
+    NOW(), NOW(), 0, 0);
     
     SELECT 'Updated Successfully' AS Message, p_user_id_seller AS Id;
 END $$

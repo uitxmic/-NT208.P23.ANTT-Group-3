@@ -19,6 +19,7 @@ BEGIN
          'Content', P.Content,
          'Price', P.Price,
          'Date', P.Date,
+         'Category', (SELECT V.Category FROM Voucher V WHERE V.VoucherId = P.VoucherId GROUP BY V.Category),
          'Expire', P.Expire,
          'Quantity', P.Quantity,
          'UpVote', P.UpVote,
@@ -40,4 +41,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_all_post(1,5);
+CALL fn_get_all_post(1,100);

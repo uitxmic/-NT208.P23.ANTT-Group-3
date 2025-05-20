@@ -174,7 +174,11 @@ const Payment = () => {
 
                 {balance !== null ? (
                   <p className="text-gray-600 mb-4">
-                    Số dư tài khoản của bạn: <span className="font-semibold">{balance}.000 ₫</span>
+                    Số dư tài khoản của bạn: <span className="text-sm font-semibold">{balance != null
+                      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                        balance * 1000
+                      )
+                      : '0 ₫'}</span>
                   </p>
                 ) : (
                   <p className="text-gray-600 mb-4">Loading balance...</p>

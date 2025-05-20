@@ -44,9 +44,9 @@ const AdminSidebar = ({ language }) => {
         </li>
         <li className="mb-4">
           <Link
-            to="/admin/post-manager"
+            to="/admin/posting-manager"
             className={`flex items-center p-2 rounded-lg ${
-              location.pathname === '/admin/post-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+              location.pathname === '/admin/posting-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
             <FaBox className="mr-2" /> {text.postManager}

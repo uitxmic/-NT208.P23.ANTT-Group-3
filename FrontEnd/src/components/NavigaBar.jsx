@@ -31,11 +31,12 @@ const Navbar = ({
 
       try {
         const token = localStorage.getItem('access_token');
+        console.log(token);
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
         });

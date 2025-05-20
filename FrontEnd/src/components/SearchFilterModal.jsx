@@ -6,7 +6,7 @@ const voucherSortOptions = [
   { value: "price_desc", label: "Giá giảm dần" },
 ];
 const postSortOptions = [
-  { value: "interactions_desc", label: "Tương tác nhiều nhất" },
+  // { value: "interactions_desc", label: "Tương tác nhiều nhất" },
   { value: "date_desc", label: "Mới nhất" },
   { value: "date_asc", label: "Cũ nhất" },
 ];
@@ -148,7 +148,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
         )}
         {type === "posts" && (
           <>
-            <label className="font-semibold mr-2">Số lượt tương tác:</label>
+            {/* <label className="font-semibold mr-2">Số lượt tương tác:</label>
             <input
               type="number"
               name="minInteractions"
@@ -156,7 +156,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
               value={fields.minInteractions || ""}
               onChange={handleChange}
               className="border p-2 rounded"
-            />
+            /> */}
             <div className="flex gap-2">
               <label className="font-semibold mr-2">Đăng trong vòng (số ngày kể từ hiện tại):</label>
               <input

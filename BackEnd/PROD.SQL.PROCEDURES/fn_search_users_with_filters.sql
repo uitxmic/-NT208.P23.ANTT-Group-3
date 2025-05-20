@@ -30,7 +30,7 @@ BEGIN
             WHEN sort_by = 'feedback_asc' THEN AvgRate
             WHEN sort_by = 'sold_desc' THEN -SoldAmount
             WHEN sort_by = 'sold_asc' THEN SoldAmount
-            ELSE UserId -- Mặc định sắp xếp theo UserId nếu sort_by không hợp lệ
+            ELSE UserId
         END;
 END$$
 

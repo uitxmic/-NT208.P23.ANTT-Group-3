@@ -55,10 +55,9 @@ class SearchController {
 
         try {
             const [results] = await this.pool.query(
-                'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?, ?)',
+                'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?)',
                 [
                     searchTerm || '',
-                    minInteractions || '0',
                     minDaysPosted || null,
                     maxDaysPosted || null,
                     sortBy || 'date_asc',

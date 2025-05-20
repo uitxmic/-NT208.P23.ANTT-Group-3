@@ -8,11 +8,12 @@ const UserManager = () => {
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState('UserId'); // Mặc định sắp xếp theo UserId
     const [sortOrder, setSortOrder] = useState('DESC'); // Mặc định giảm dần
+    const [searchTerm, setSearchTerm] = useState('');
 
     const fetchUsers = async () => {
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/users/getUsers?sortBy=${sortBy}&sortOrder=${sortOrder}`, {
+            const response = await fetch(`${API_BASE_URL}/users/getUsers?sortBy=${sortBy}&sortOrder=${sortOrder}&searchTerm=${encodeURIComponent(searchTerm)}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `${localStorage.getItem('access_token')}`
@@ -36,31 +37,6 @@ const UserManager = () => {
         }
     };
 
-    const handleFindUser = async (UserFullname) => {
-        try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/users/getUserById?UserFullname=${UserFullname}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `${localStorage.getItem('access_token')}`
-                }
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setUsers(data);
-            } else {
-                setUsers([]);
-                toast.error('Không thể tìm thấy người dùng');
-            }
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            toast.error('Failed to fetch users');
-        }
-    };
-
     const handleSort = (column) => {
         if (sortBy === column) {
             // Nếu cột đã được chọn, đảo ngược thứ tự
@@ -72,14 +48,30 @@ const UserManager = () => {
         }
     };
 
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
     useEffect(() => {
         fetchUsers();
-    }, [sortBy, sortOrder]); // Gọi lại fetchUsers khi sortBy hoặc sortOrder thay đổi
-
+    }, [sortBy, sortOrder, searchTerm]); // Thêm searchTerm vào dependency array để gọi lại hàm khi nó thay đổi
     return (
         <Layout>
             <div className="container mx-auto p-4" style={{ paddingTop: '64px' }}>
                 <h1 className="text-2xl font-bold mb-4">Quản lý người dùng trong hệ thống</h1>
+                <div className="mb-4 flex gap-4">
+                    <div>
+                        <label htmlFor="searchTerm" className="mr-2">Tìm kiếm:</label>
+                        <input
+                            id="searchTerm"
+                            type="text"
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            placeholder="Nhập Fullname hoặc Username"
+                            className="border p-2 rounded"
+                        />
+                    </div>
+                </div>
                 {loading ? (
                     <p>Loading...</p>
                 ) : (
@@ -121,15 +113,15 @@ const UserManager = () => {
                                     <td className="py-2 px-4 border-b">
                                         {user.AccountBalance != null
                                             ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                                                  user.AccountBalance * 1000
-                                              )
+                                                user.AccountBalance * 1000
+                                            )
                                             : '0 ₫'}
                                     </td>
                                     <td className="py-2 px-4 border-b">
                                         {user.SoldAmount != null
                                             ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                                                  user.SoldAmount * 1000
-                                              )
+                                                user.SoldAmount * 1000
+                                            )
                                             : '0 ₫'}
                                     </td>
                                 </tr>

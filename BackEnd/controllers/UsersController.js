@@ -32,7 +32,7 @@ class UsersController {
     // [Get] /users/getUsers
     GetAllUser = async (req, res) => {
         try {
-            const { sortBy = 'UserId', sortOrder = 'DESC' } = req.query;
+            const { sortBy = 'UserId', sortOrder = 'DESC', searchTerm = '' } = req.query;
             const token = req.headers.authorization;
             if (!token) {
                 return res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -44,7 +44,7 @@ class UsersController {
                 return res.status(403).json({ message: "Forbidden: You do not have permission to access this resource" });
             }
 
-            const [results] = await this.connection.query('CALL fn_get_all_user_for_admin(?, ?)', [sortBy, sortOrder]);
+            const [results] = await this.connection.query('CALL fn_get_all_user_for_admin(?, ?, ?)', [sortBy, sortOrder, searchTerm]);
             res.json(results[0]); // Chỉ trả về kết quả SELECT
         }
         catch (error) {

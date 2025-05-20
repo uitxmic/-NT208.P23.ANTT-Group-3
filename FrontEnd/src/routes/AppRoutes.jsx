@@ -43,6 +43,7 @@ function AppRoutes() {
                 <Route path="/deposit" element={<Deposit />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsDetail />} />
+                <Route path="/search/:type" element={<SearchResult />} />
                 {/* Thêm các route khác ở đây */}
               </Routes>
           </ErrorBoundary>

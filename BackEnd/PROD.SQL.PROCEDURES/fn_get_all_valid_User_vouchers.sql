@@ -5,7 +5,8 @@ CREATE PROCEDURE fn_get_all_valid_User_vouchers(IN p_UserId INT)
 BEGIN
    SELECT 
         V.VoucherId,
-        V.VoucherName,
+        VoucherName,
+        VoucherCode,
         Category,
         V.UserId,
         V.ExpirationDay,

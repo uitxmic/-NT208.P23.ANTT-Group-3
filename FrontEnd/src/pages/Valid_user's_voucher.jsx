@@ -103,7 +103,8 @@ const UserVoucherList = () => {
 
                   <div
                     key={voucher.VoucherId}
-                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                    onClick={() => navigate(`/voucher-detail/${voucher.VoucherId}`)}
                   >
                     {/* Hình ảnh voucher */}
                     <img
@@ -113,9 +114,6 @@ const UserVoucherList = () => {
                     />
                     {/* Thông tin voucher */}
                     <h2 className="text-xl font-bold text-blue-800 truncate">Tên voucher: {voucher.VoucherName}</h2>
-                    <p className="text-gray-600 text-sm mt-1">
-                      <span className="font-semibold">Code:</span> {voucher.VoucherCode}
-                    </p>
                     <p className="text-gray-600 text-sm">
                       <span className="font-semibold">Danh mục:</span> {voucher.Category}
                     </p>

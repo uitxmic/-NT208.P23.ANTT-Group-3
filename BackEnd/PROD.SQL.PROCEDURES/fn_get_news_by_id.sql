@@ -20,10 +20,10 @@ BEGIN
         p.Expire,
         p.IsActive,
         v.VoucherName,
-        v.Category,
-        -- v.VoucherImage,
+        Category,
+        VouImg,
         -- v.Description AS VoucherDescription,
-        v.Price,
+        Price,
         u.Username,
         u.Fullname,
         CASE 

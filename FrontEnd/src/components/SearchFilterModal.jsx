@@ -6,13 +6,13 @@ const voucherSortOptions = [
   { value: "price_desc", label: "Giá giảm dần" },
 ];
 const postSortOptions = [
-  { value: "interactions_desc", label: "Tương tác nhiều nhất" },
+  // { value: "interactions_desc", label: "Tương tác nhiều nhất" },
   { value: "date_desc", label: "Mới nhất" },
   { value: "date_asc", label: "Cũ nhất" },
 ];
 const userSortOptions = [
-  { value: "feedback_asc", label: "tăng dần" },
-  { value: "feedback_desc", label: "giảm dần" },
+  { value: "feedback_asc", label: "Điểm đánh giá tăng dần" },
+  { value: "feedback_desc", label: "Điểm đánh giá giảm dần" },
   { value: "sold_asc", label: "Số lượng bán tăng dần" },
   { value: "sold_desc", label: "Số lượng bán giảm dần" },
 ];
@@ -106,7 +106,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
             <option value="users">Người dùng</option>
           </select>
         </div>
-        {/* Phần còn lại của component giữ nguyên */}
+
         {type === "vouchers" && (
           <>
             <div className="flex gap-2">
@@ -151,7 +151,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
         )}
         {type === "posts" && (
           <>
-            <label className="font-semibold mr-2">Số lượt tương tác:</label>
+            {/* <label className="font-semibold mr-2">Số lượt tương tác:</label>
             <input
               type="number"
               name="minInteractions"
@@ -159,7 +159,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
               value={fields.minInteractions || ""}
               onChange={handleChange}
               className="border p-2 rounded"
-            />
+            /> */}
             <div className="flex gap-2">
               <label className="font-semibold mr-2">Đăng trong vòng (số ngày kể từ hiện tại):</label>
               <input
@@ -291,17 +291,16 @@ export const SearchAPI = {
     }
   },
   
-  searchUsersWithFilters: async (params) => {
-    try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const queryParams = new URLSearchParams(params).toString();
-      const response = await fetch(`${API_BASE_URL}/search/users/filters?${queryParams}`);
-      return await response.json();
-    } catch (error) {
-      console.error("Error searching users with filters:", error);
-      throw error;
-    }
-  }
+  // searchUsersWithFilters: async (params) => {
+  //   try {
+  //     const queryParams = new URLSearchParams(params).toString();
+  //     const response = await fetch(`http://localhost:3000/search/users/filters?${queryParams}`);
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error("Error searching users with filters:", error);
+  //     throw error;
+  //   }
+  // }
 };
 
 export default SearchFilterModal;

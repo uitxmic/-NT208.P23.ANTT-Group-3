@@ -46,12 +46,6 @@ const PostDetail = () => {
         }
     };
 
-    const handleBuyNow = () => {
-        if (post) {
-            alert(`Bạn đã chọn mua ${quantity} voucher của bài đăng "${post.PostName}" với tổng giá ${quantity * post.Price * 1000} VND.`);
-        }
-    };
-
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">

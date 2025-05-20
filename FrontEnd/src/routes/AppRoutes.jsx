@@ -44,7 +44,7 @@ function AppRoutes() {
               <Route path="/deposit" element={<Deposit />} />
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
-              <Route path="/search" element={<SearchResult />} />
+              <Route path="/search/:type" element={<SearchResult />} />
               <Route path="/notification" element={<Notification />} />
               <Route path="/notification/:id" element={<NotifDetail />} />
               <Route path="/admin" element={<Admin />} />

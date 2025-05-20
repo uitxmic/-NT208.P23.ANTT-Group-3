@@ -7,7 +7,7 @@ const postingController = require('../controllers/PostingController');
 // public api
 router.use('/get20LastestPostings', postingController.Get20LastestPostings);
 
-router.use(authMiddleware);
+//router.use(authMiddleware);
 
 // private api
 router.use('/createPosting', postingController.CreatePosting);
@@ -16,9 +16,10 @@ router.use('/getAllPostings', postingController.GetAllPostings);
 router.use('/getPostingByPostId/:PostId', postingController.GetPostingByPostId);
 router.use('/updatePosting', postingController.UpdatePosting);
 router.use('/deactivePosting', postingController.DeactivePosting);
-router.use('/activePosting', postingController.ActivePosting);
+router.patch('/activePosting', postingController.ActivePosting);
 router.use('/getActivePostings', postingController.GetActivePostings);
 router.use('/getDeactivePostings', postingController.GetDeactivePostings);
+router.use('/getAllPostingsForAdmin', postingController.GetAllPostingsForAdmin);
 
 
 module.exports = router;

@@ -2,14 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { jwtDecode } from 'jwt-decode';
 
-// Ensure Inter font is loaded (if not already in project)
-const loadFonts = () => {
-  const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
-  link.rel = 'stylesheet';
-  document.head.appendChild(link);
-};
-loadFonts();
 
 const getUserIdFromToken = (token) => {
   try {
@@ -49,7 +41,8 @@ const PostManager = () => {
   const fetchVoucher = async () => {
     try {
       const UserId = getUserIdFromToken(token);
-      const response = await fetch(`http://localhost:3000/voucher/getVoucherByUserId/${UserId}`, {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/voucher/getVoucherByUserId/${UserId}`, {
         method: 'GET',
         headers: { Authorization: `${token}` },
       });
@@ -68,7 +61,8 @@ const PostManager = () => {
         setError('Invalid token. UserId not found.');
         return;
       }
-      const response = await fetch(`http://localhost:3000/posting/getPostingsByUserId/${UserId}`, {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/posting/getPostingsByUserId/${UserId}`, {
         method: 'GET',
         headers: { Authorization: `${token}` },
       });
@@ -109,7 +103,8 @@ const PostManager = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/posting/createPosting', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/posting/createPosting`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +136,7 @@ const PostManager = () => {
   return (
     <Layout>
       <div className="flex flex-col min-h-screen font-inter" style={{ paddingTop: '4rem' }}>
-        <div className="flex flex-1 flex-col lg:flex-row p-4 lg:p-6 gap-6">
+        <div className="flex flex-1 flex-col lg:flex-row p-4 lg:p-6 gap-6 items-start h-full">
           {/* Left Column: Voucher and Post Lists */}
           <div className="lg:w-2/3 space-y-6">
             <h1 className="text-2xl font-bold text-gray-900">Quản lý bài đăng</h1>
@@ -194,11 +189,22 @@ const PostManager = () => {
                       <p className="text-xs text-gray-600 mb-1 line-clamp-2">{post.Content}</p>
                       <p className="text-xs text-blue-500">{post.Label}</p>
                       <p
-                        className={`text-xs font-semibold ${
-                          post.IsActive ? 'text-green-500' : 'text-red-500'
-                        }`}
+                        className={`text-xs font-semibold ${post.IsActive === 1 && post.IsVerified === 1
+                            ? 'text-green-500' // Active
+                            : post.IsActive === 0 && post.IsVerified === 1
+                              ? 'text-red-500' // Inactive
+                              : post.IsActive === 0 && post.IsVerified === 0
+                                ? 'text-yellow-500' // Pending
+                                : 'text-gray-500' // Default case, if any
+                          }`}
                       >
-                        {post.Status}
+                        {post.IsActive === 1 && post.IsVerified === 1
+                          ? 'Active'
+                          : post.IsActive === 0 && post.IsVerified === 1
+                            ? 'Inactive'
+                            : post.IsActive === 0 && post.IsVerified === 0
+                              ? 'Pending'
+                              : post.Status} {/* Fallback to post.Status or a default string */}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         Ngày đăng: {new Date(post.Date).toLocaleDateString()}
@@ -211,7 +217,7 @@ const PostManager = () => {
           </div>
 
           {/* Right Column: Form and Notifications */}
-          <div className="lg:w-1/3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+          <div className="lg:w-1/3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-4 h-full">
             {/* Notifications */}
             {success && (
               <div className="mb-4 p-2 bg-green-100 text-green-700 rounded text-sm text-center">
@@ -352,9 +358,8 @@ const PostManager = () => {
 
                 <button
                   type="submit"
-                  className={`w-full p-2 rounded text-white text-sm font-medium transition duration-300 ${
-                    loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                  }`}
+                  className={`w-full p-2 rounded text-white text-sm font-medium transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                    }`}
                   disabled={loading}
                 >
                   {loading ? 'Đang đăng...' : 'Đăng bài'}

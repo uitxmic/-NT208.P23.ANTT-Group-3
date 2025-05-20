@@ -20,7 +20,7 @@ class VoucherController {
             const jwt = require('jsonwebtoken');
 
             const user = {
-                userId: 2,
+                userId: 22,
                 Username: 'user2',
                 role: 'user'
             };
@@ -34,7 +34,7 @@ class VoucherController {
     }
 
     // function to get voucher called by momopayment
-    async GetVoucherById(voucherId, voucherCode) {
+    async GetVoucherById(voucherId) {
         try {
             const [results] = await this.connection.query('CALL fn_get_voucher_by_id(?)', [voucherId]);
             return results[0];
@@ -151,6 +151,47 @@ class VoucherController {
             }
 
             return res.status(200).json({ message: "Success", data: result[0] });
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    };
+
+    GetDetailUserVoucher = async (req, res) => {
+        try {
+            const token = req.headers.authorization?.split(" ")[1];
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized: No token provided" });
+            }
+
+            const { voucherid } = req.params;
+
+            console.log('Received voucherId:', voucherid);
+
+            // Kiểm tra voucherid có tồn tại và là số
+            if (!voucherid || isNaN(voucherid)) {
+                return res.status(400).json({ error: "Invalid voucherId, must be a number" });
+            }
+
+            const parsedVoucherId = parseInt(voucherid, 10);
+            console.log('Fetching voucher with ID:', parsedVoucherId);
+
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+
+            // Truyền userId và voucherId vào stored procedure
+            const [result] = await this.connection.execute(
+                "CALL fn_get_detail_user_voucher(?, ?)",
+                [userId, parsedVoucherId]
+            );
+
+            if (!result || !result[0] || result[0].length === 0) {
+                return res.status(200).json({ message: "No voucher details found", data: [] });
+            }
+
+            return res.status(200).json({ message: "Success", data: result[0] });
+
         } catch (error) {
             console.error('Query error:', error);
             return res.status(500).json({ message: "Internal Server Error", error: error.message });

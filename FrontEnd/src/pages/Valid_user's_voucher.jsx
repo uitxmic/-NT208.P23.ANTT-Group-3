@@ -32,7 +32,21 @@ const UserVoucherList = () => {
       const data = await response.json();
       // API trả về { message: "...", data: [...] }, nên lấy data
       if (data.message === 'Success') {
-        setVouchers(data.data); // Lấy danh sách voucher từ data
+        const processedVouchers = data.data.map(voucher => {
+          let firstImageUrl = 'https://via.placeholder.com/150';
+          if (voucher.VouImg) {
+            const urls = voucher.VouImg.split(',').map(url => url.trim()).filter(url => url);
+            if (urls.length > 0) {
+              firstImageUrl = urls[0];
+            }
+          }
+          return {
+            ...voucher,
+            _displayImgUrl: firstImageUrl, // Store the single URL to display
+          };
+        });
+        setVouchers(processedVouchers);
+        setVouchers(processedVouchers);
       } else {
         setVouchers([]); // Nếu không có voucher, đặt mảng rỗng
         setError(data.message || 'No vouchers available');
@@ -47,6 +61,18 @@ const UserVoucherList = () => {
   useEffect(() => {
     fetchVouchers();
   }, []);
+
+  const handleImageError = (voucherId) => {
+    setVouchers(prevVouchers =>
+      prevVouchers.map(v => {
+        if (v.VoucherId === voucherId) {
+          // Increment index to try next image
+          return { ...v, _currentImgIndex: v._currentImgIndex + 1 };
+        }
+        return v;
+      })
+    );
+  };
 
   return (
     <Layout>
@@ -74,23 +100,22 @@ const UserVoucherList = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {vouchers.length > 0 ? (
                 vouchers.map((voucher) => (
+
                   <div
                     key={voucher.VoucherId}
-                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                    onClick={() => navigate(`/voucher-detail/${voucher.VoucherId}`)}
                   >
                     {/* Hình ảnh voucher */}
                     <img
-                      src={voucher.VouImg || 'https://via.placeholder.com/150'}
+                      src={voucher._displayImgUrl || 'https://via.placeholder.com/150'}
                       alt={voucher.VoucherName}
                       className="w-full h-48 object-cover rounded-lg mb-4"
                     />
                     {/* Thông tin voucher */}
                     <h2 className="text-xl font-bold text-blue-800 truncate">Tên voucher: {voucher.VoucherName}</h2>
-                    <p className="text-gray-600 text-sm mt-1">
-                      <span className="font-semibold">Code:</span> {voucher.VoucherCode}
-                    </p>
                     <p className="text-gray-600 text-sm">
-                      <span className="font-semibold">Danh mục:</span> {voucher.Label}
+                      <span className="font-semibold">Danh mục:</span> {voucher.Category}
                     </p>
                     <p className="text-gray-500 text-xs mt-1">
                       Hết hạn: {new Date(voucher.ExpirationDay).toLocaleDateString('vi-VN')}

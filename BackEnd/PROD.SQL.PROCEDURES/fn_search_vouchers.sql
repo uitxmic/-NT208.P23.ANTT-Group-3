@@ -12,7 +12,7 @@ BEGIN
     SELECT *
     FROM Voucher
     WHERE 
-        (VoucherName LIKE CONCAT('%', search_term, '%') OR Label LIKE CONCAT('%', search_term, '%'))
+        (VoucherName LIKE CONCAT('%', search_term, '%') OR Category LIKE CONCAT('%', search_term, '%'))
         AND (Price BETWEEN min_price AND max_price)
         AND (IsActive = is_active OR is_active IS NULL);
 END$$

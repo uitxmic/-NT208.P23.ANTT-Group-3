@@ -181,7 +181,7 @@ const Footer = ({ language }) => {
           </div>
           <div className="flex space-x-4">
             <img
-              src="http://online.gov.vn/Content/EndUser/LogoCCDVSaleNoti/logoCCDV.png"
+              src="https://cdn.dangkywebsitevoibocongthuong.com/wp-content/uploads/2018/06/logo.png"
               alt="Đã đăng ký"
               className="h-8"
             />

@@ -1,4 +1,3 @@
-
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS fn_login; $$
@@ -11,6 +10,7 @@ BEGIN
     DECLARE sql_error TEXT;
     DECLARE Id int;
     DECLARE Mail varchar(40);
+    DECLARE p_user_role_id INT;
 
     DECLARE EXIT HANDLER FOR SQLEXCEPTION 
     BEGIN
@@ -25,16 +25,18 @@ BEGIN
     SELECT Email into Mail FROM `User` 
     WHERE Username = User_name and PasswordHash=Hashed_password
     Limit 1;
+    
+    SELECT UserRoleId INTO p_user_role_id FROM `User` 
+	WHERE Username = User_name and PasswordHash=Hashed_password
+    Limit 1;
 
 	IF Id is not null then
-		SELECT 'Login Successful' AS Message, Id AS UserId, Mail as Email ;
+		SELECT 'Login Successful' AS Message, Id AS UserId, Mail as Email, p_user_role_id AS UserRoleId;
 	ELSE
-		SELECT 'Login Failed' AS Message, NULL AS UserId, NULL AS Email;
+		SELECT 'Login Failed' AS Message, NULL AS UserId, NULL AS Email, NULL AS UserRoleId;
 	END IF;
 END$$
 
 DELIMITER ;
 
-CALL fn_login('chien', 'af4663c41acb498f8170533283749444610b8225baeff5e9ab55039f4ca63ad9');
-delete from `User` where Username='chien';
-SELECT * FROM `User`;
+CALL fn_login('alo', 'b6b4377acb039899003d81ca5979c3c7daf566815916859c567390e143314183');

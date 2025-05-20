@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const newsController = require('../controllers/NewsController');
 
-// Get all news
-router.get('/', newsController.GetAllNews);
-
 // Get news by ID
 router.get('/:PostId', newsController.GetNewsById);
 
@@ -19,5 +16,8 @@ router.put('/deactivate', newsController.DeactivateNews);
 
 // Activate news
 router.put('/activate', newsController.ActivateNews);
+
+// Get all news
+router.get('/', newsController.GetAllNews);
 
 module.exports = router; 

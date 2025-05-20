@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 
-const PostingList = () => {
+const PostingPage = () => {
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(5);
 
   // Fetch vouchers from API
-  const fetchVouchers = async () => {
+  const fetchVouchers = async (page, limitValue) => {
     const token = localStorage.getItem('access_token');
     if (!token) {
       setError('Vui lòng đăng nhập để tiếp tục');
@@ -18,11 +20,11 @@ const PostingList = () => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:3000/posting/getAllPostings', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/posting/getAllPostings?page=${page}&limit=${limitValue}`, {
         method: 'GET',
         headers: {
           Authorization: `${token}`,
-          'Content-Type': 'application/json',
         },
       });
 
@@ -43,7 +45,7 @@ const PostingList = () => {
           setVouchers([]);
           setError('Không có voucher nào khả dụng');
         }
-        
+
       } else {
         setVouchers([]);
         setError(data.message || 'No vouchers available');
@@ -55,14 +57,21 @@ const PostingList = () => {
     }
   };
 
-  // Handle Buy Voucher button click
-  const handleBuyVoucher = (voucher) => {
-    navigate('/payment', { state: { voucher } });
+  const handleNextPage = () => {
+    // We don't know totalPages, so we allow to go next.
+    // If the next page is empty, fetchVouchers will handle it.
+    setCurrentPage(prevPage => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
   };
 
   useEffect(() => {
-    fetchVouchers();
-  }, []);
+    fetchVouchers(currentPage, limit);
+  }, [currentPage, limit]); 
 
   return (
     <Layout>
@@ -88,7 +97,8 @@ const PostingList = () => {
                 vouchers.map((voucher) => (
                   <div
                     key={voucher.PostId}
-                    className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden transform hover:-translate-y-1"
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                    onClick={() => navigate(`/postdetail/${voucher.PostId}`)}
                   >
                     {/* Voucher Image */}
                     <div className="relative">
@@ -139,26 +149,6 @@ const PostingList = () => {
                         {!voucher.Active ? 'Đang bán' : 'Không hoạt động'}
                       </div>
                     </div>
-
-                    {/* Buy Button */}
-                    <div className="px-6 pb-6">
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                          onClick={() => handleBuyVoucher(voucher)}
-                          className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                          aria-label={`Mua voucher ${voucher.PostName}`}
-                        >
-                          Mua Voucher
-                        </button>
-                        <button
-                          onClick={() => handleAddToCart(voucher)}
-                          className="w-full py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200"
-                          aria-label={`Thêm voucher ${voucher.PostName} vào giỏ hàng`}
-                        >
-                          Thêm vào giỏ hàng
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 ))
               ) : (
@@ -168,10 +158,37 @@ const PostingList = () => {
               )}
             </div>
           )}
+          {/* Pagination Controls */}
+          {/* Show pagination if not loading AND ( (vouchers exist) OR (we are on page > 1, so "Prev" should be available) ) */}
+          {/* And hide if there's an auth error */}
+          {!loading && (vouchers.length > 0 || currentPage > 1) && !error.includes('Vui lòng đăng nhập') && (
+            <div className="mt-10 flex justify-center items-center space-x-4">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1 || loading}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                Trang Trước
+              </button>
+              <span className="text-gray-700 font-medium px-3 py-2 bg-gray-100 rounded-md">
+                Trang {currentPage}
+              </span>
+              <button
+                onClick={handleNextPage}
+                // Disable "Next" if loading, or if the current page has 0 vouchers (and it's not the first page loading attempt)
+                // This implies if an empty page is loaded (not page 1), we can't go further.
+                disabled={loading || (vouchers.length === 0 && currentPage > 1)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                Trang Kế
+              </button>
+            </div>
+
+          )}
         </div>
       </div>
     </Layout>
   );
 };
 
-export default PostingList;
+export default PostingPage;

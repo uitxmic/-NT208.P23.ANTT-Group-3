@@ -60,7 +60,7 @@ class MomoPaymentController {
             orderId: orderId,
             orderInfo: orderInfo,
             partnerCode: this.partnerCode,
-            redirectUrl: this.redirectUrl,
+            redirectUrl: this.redirectUrlBalance,
             requestId: requestId,
             requestType: "captureWallet"
         };
@@ -126,23 +126,23 @@ class MomoPaymentController {
         }
     }
 
-    async UpdateVoucherId(userId, voucherId, postId) {
+    async UpdateVoucherId(userIdBuyer, userIdSeller, voucherId, postId) {
         try {
             if (!this.connection) {
                 console.error('Database connection not initialized');
                 throw new Error('Database connection not initialized');
             }
-            console.log('Updating voucher ID:', { userId, voucherId, postId });
+            console.log('Updating voucher ID:', { userIdBuyer, voucherId, postId });
 
-            const query = 'CALL fn_update_voucher_id_after_buying(?, ?, ?)';
-            const [result] = await this.connection.query(query, [userId, voucherId, postId]);
+            const query = 'CALL fn_update_voucher_id_after_buying(?, ?, ?, ?)';
+            const [result] = await this.connection.query(query, [userIdBuyer, userIdSeller, voucherId, postId]);
 
             if (result.affectedRows === 0) {
-                console.error(`User ${userId} not found`);
-                throw new Error(`User ${userId} not found`);
+                console.error(`User ${userIdBuyer} not found`);
+                throw new Error(`User ${userIdBuyer} not found`);
             }
 
-            console.log(`Updated voucher ID for user ${userId}, voucher ID: ${voucherId}`);
+            console.log(`Updated voucher ID for user ${userIdBuyer}, voucher ID: ${voucherId}`);
             return { success: true };
         } catch (error) {
             console.error('Error updating voucher ID:', error.message, error.stack);

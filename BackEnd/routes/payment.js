@@ -33,16 +33,16 @@ router.get('/momo/redirect/voucher', async (req, res) => {
         const { resultCode, amount, extraData, orderId } = req.query;
         const money = amount/1000;
 
-        const { userId, voucherId, postId } = JSON.parse(extraData);
-        console.log('Parsed extraData:', { userId, voucherId, postId });
+        const { userIdBuyer, userIdSeller, voucherId, postId } = JSON.parse(extraData);
+        console.log('Parsed extraData:', { userIdBuyer, voucherId, postId });
 
-        await MomoPaymentController.UpdateVoucherId(userId, voucherId, postId);
+        await MomoPaymentController.UpdateVoucherId(userIdBuyer, userIdSeller, voucherId, postId);
 
         if (resultCode === '0') {
             // Giao dịch thành công, Balance đã được cập nhật qua IPN
             console.log(`Payment successful for order ${orderId}`);
             // Chuyển hướng đến UserProfile
-            return res.redirect('http://localhost:5173/profile');
+            return res.redirect('http://localhost:5173/user-vouchers');
         } else {
             console.error(`Payment failed for order ${orderId}, resultCode: ${resultCode}`);
             return res.status(400).json({ error: 'Payment failed' });
@@ -77,9 +77,9 @@ router.post('/create-payment', async (req, res) => {
 });
 
 router.post('/create-payment-voucher', async (req, res) => {
-    const { amount, userId, voucherId, postId } = req.body;
+    const { amount, userIdBuyer, userIdSeller, voucherId, postId } = req.body;
 
-    if (!amount || !userId || !voucherId) {
+    if (!amount || !userIdBuyer || !userIdSeller || !voucherId || !postId)  {
         return res.status(400).json({ error: 'Missing amount, userId, or voucherId' });
     }
 
@@ -91,7 +91,7 @@ router.post('/create-payment-voucher', async (req, res) => {
         }
 
         const voucherName = voucher[0].VoucherName;
-        const extraData = JSON.stringify({ voucherId, postId, userId });
+        const extraData = JSON.stringify({ voucherId, postId, userIdBuyer, userIdSeller });
 
         const requestBody = MomoPaymentController.createPaymentRequestForVoucher(
             amount,

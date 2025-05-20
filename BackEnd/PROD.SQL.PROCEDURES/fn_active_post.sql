@@ -13,8 +13,13 @@ BEGIN
     END;
     
     UPDATE Post
-    SET IsActive = True
+    SET IsActive = True,
+    IsVerified = TRUE
     WHERE PostId = in_PostId;
+    SELECT 'Updated Successfully' AS Message, 1 AS Id;
+    
 END$$
 
 DELIMITER ;
+
+CALL fn_active_post(1);

@@ -8,6 +8,14 @@ const tradeController = require('../controllers/TradeController');
 
 router.use('/20lastestposts', tradeController.Get20LastestPosts);
 
-router.use('/paymentbybalance', tradeController.PaymentByBalance);
+router.use('/createTransaction', tradeController.CreateTransaction);
+
+router.use('/getTransactionForAdmin', tradeController.GetTransactionForAdmin);
+
+router.use('/completeTransaction', tradeController.CompleteTransaction);
+
+router.use('/acceptRefund', tradeController.AcceptRefund);
+
+router.use('/rejectRefund', tradeController.RejectRefund);
 
 module.exports = router;

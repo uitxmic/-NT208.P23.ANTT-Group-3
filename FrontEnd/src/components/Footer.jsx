@@ -49,7 +49,7 @@ const Footer = ({ language }) => {
   const text = getText();
 
   return (
-    <footer className="bg-white py-8 px-4 text-gray-800 border-t-4 border-blue-500">
+    <footer className="bg-pink-100 py-8 px-4 text-gray-800 border-t-4 border-blue-500">
       <div className="max-w-7xl mx-auto">
         {/* Phần trên: Subscription, Tuyển dụng, Hỗ trợ */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -174,14 +174,14 @@ const Footer = ({ language }) => {
           <div className="mb-4 md:mb-0">
             <p className="mb-2">{text.copyright}</p>
             <div className="flex space-x-2 justify-center md:justify-start">
-              <img src="/path-to-visa-logo.png" alt="Visa" className="h-6" />
-              <img src="/path-to-mastercard-logo.png" alt="MasterCard" className="h-6" />
-              <img src="/path-to-jcb-logo.png" alt="JCB" className="h-6" />
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJgM8gqqd2SheNICowBUdQvqvdbOLEucY9lw&s" alt="Visa" className="h-6" />
+              <img src="https://logohistory.net/wp-content/uploads/2023/05/Mastercard-Logo-2016.png" alt="MasterCard" className="h-6" />
+              <img src="https://icon2.cleanpng.com/20180816/zbz/a237bfa5f0bc15bec6ec41b3115bbab0.webp" alt="JCB" className="h-6" />
             </div>
           </div>
           <div className="flex space-x-4">
             <img
-              src="http://online.gov.vn/Content/EndUser/LogoCCDVSaleNoti/logoCCDV.png"
+              src="https://cdn.dangkywebsitevoibocongthuong.com/wp-content/uploads/2018/06/logo.png"
               alt="Đã đăng ký"
               className="h-8"
             />

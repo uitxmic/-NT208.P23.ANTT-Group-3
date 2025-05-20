@@ -19,7 +19,8 @@ const Log_in = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/users/login', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,12 +33,20 @@ const Log_in = () => {
       }
 
       const data = await response.json();
-      if (data.state === 'success') {
-        localStorage.setItem('access_token', data.access_token);
-        navigate('/');
-      } else {
-        setError(text.invalidCredentials);
+      if (!data) {
+        throw new Error('Đăng nhập thất bại', text.invalidCredentials);
       }
+
+      localStorage.setItem('access_token', data.access_token);
+
+      const userRoleId = JSON.parse(atob(data.access_token.split('.')[1])).userRoleId;
+      console.log(userRoleId);
+
+      if (userRoleId === 1) {
+        navigate('/admin');
+      }
+      else
+        navigate('/');
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || text.errorMessage);
@@ -52,7 +61,8 @@ const Log_in = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/googlecloud/signInWithGoogle', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/googlecloud/signInWithGoogle`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

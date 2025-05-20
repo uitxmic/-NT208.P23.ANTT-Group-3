@@ -29,7 +29,7 @@ const BannerCarousel = () => {
     },
     // Bạn có thể thêm các slide khác nếu muốn
     {
-      image: '/path-to-another-image.jpg',
+      image: 'https://stc.shopiness.vn/deal/2019/03/04/4/e/0/e/1551666192189_540.png',
       title: 'ƯU ĐÃI KHÁC',
       subtitle: 'GIẢM GIÁ LÊN ĐẾN 50%',
       logo: '/path-to-another-logo.png',
@@ -52,7 +52,7 @@ const BannerCarousel = () => {
       bgColor: 'bg-pink-200',
     },
     {
-      image: '/path-to-phuc-long-drink.jpg',
+      image: 'https://hcm.fstorage.vn/phuclong/2024/10/281766778_5107603582642573_3033569044629085363_n-20241001062220.jpg',
       title: 'THẠNH MÁT ngày hè MUA NGAY',
       brand: 'PHÚC LONG',
       bgColor: 'bg-green-200',
@@ -61,9 +61,9 @@ const BannerCarousel = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Phần carousel chính */}
-        <div className="md:col-span-3">
+        <div className="md:col-span-2">
           <Slider {...settings}>
             {slides.map((slide, index) => (
               <div key={index} className="relative">
@@ -87,7 +87,7 @@ const BannerCarousel = () => {
         </div>
 
         {/* Phần quảng cáo bên phải */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 ">
           {sideAds.map((ad, index) => (
             <div
               key={index}

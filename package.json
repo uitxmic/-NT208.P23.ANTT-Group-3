@@ -9,6 +9,7 @@
     "google-auth-library": "^9.15.1",
     "react-slick": "^0.30.3",
     "redis": "^4.7.0",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "react-toastify": "^11.0.5"
   }
 }

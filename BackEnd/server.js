@@ -1,24 +1,24 @@
-const path = require('node:path'); // Giữ lại nếu dùng trong config path
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const routes = require('./routes/index'); // require routes SAU dotenv
 const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
+const routes = require('./routes/index');
 const cookieParser = require("cookie-parser");
+require('dotenv').config();
 const cors = require('cors');
+
 const corsOptions = {
-  origin: ['http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: ['http://localhost:5173', 'https://ripe-phones-play.loca.lt'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 const express = require('express');
-const sessionMiddleware = require("./middlewares/init.redis");
+const path = require('node:path');
 const app = express();
 
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(sessionMiddleware);
 
 //Template engine
@@ -27,11 +27,13 @@ app.engine('hbs', hbs.engine({
 }));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
+
 routes(app);
 
-const port = process.env.port || 3000;
-const hostname = process.env.hostname || 'localhost';
+const port = process.env.PORT || 3000;
+const hostname = process.env.HOSTNAME;
 
+// Ensure routes is a function
 if (typeof routes === 'function') {
   routes(app);
 } else {

@@ -4,15 +4,23 @@ import Log_in from "../pages/Log_in";
 import Sign_up from "../pages/Sign_up";
 import PostManager from "../pages/PostingManager";
 import PostingPage from "../pages/PostingPage";
+import PostDetail from "../pages/PostDetail";
 import UserVoucherList from "../pages/Valid_user's_voucher";
+import VoucherDetail from "../pages/VoucherDetail";
 import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
 import Deposit from "../components/Deposit";
-import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
+import SearchResult  from "../pages/SearchResult";
 
+import Notification from "../pages/Notification"; // Uncomment if needed
+import NotifDetail from "../pages/NotifDetail";
+import Admin from "../pages/Admin";
+import AdminPostingManager from "../pages/PostingAdminManager";
+import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
+import CartPage from "../pages/cart";
 
 function AppRoutes() {
   return (

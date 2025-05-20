@@ -118,7 +118,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_deactivate_news(?)', [PostId]);
+            const [results] = await this.pool.query('CALL fn_deactivate_news(?)', [PostId]);
             res.json(results[0]);
         } catch (error) {
             console.error('Error deactivating news:', error);
@@ -140,7 +140,7 @@ class NewsController{
         }
 
         try {
-            const [results] = await this.connection.query('CALL fn_activate_news(?)', [PostId]);
+            const [results] = await this.pool.query('CALL fn_activate_news(?)', [PostId]);
             res.json(results[0]);
         } catch (error) {
             console.error('Error activating news:', error);

@@ -8,7 +8,8 @@ const NewsDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/news/${id}`)
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    fetch(`${API_BASE_URL}/news/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setNews(data[0] || null);

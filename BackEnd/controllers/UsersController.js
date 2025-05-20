@@ -4,15 +4,12 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const cookie = require('cookie');
 
-class UsersController
-{
-    constructor()
-    {
+class UsersController {
+    constructor() {
         this.initConnection();
     }
 
-    async initConnection() 
-    {
+    async initConnection() {
         try {
             this.connection = await mysql.createConnection({
                 host: process.env.DB_HOST,
@@ -34,13 +31,11 @@ class UsersController
     }
 
     // [Get] /users/getUsers
-    GetAllUser = async (req, res) =>
-    {
-        try 
-        {
+    GetAllUser = async (req, res) => {
+        try {
             const [results] = await this.connection.query('CALL get_all_users()');
             res.json(results[0]); // Chỉ trả về kết quả SELECT
-        } 
+        }
         catch (error) {
             console.error('Query error:', error);
             res.status(500).json({ error: 'Database query error', details: error.message });
@@ -48,23 +43,21 @@ class UsersController
     }
 
     // /users/getUserById
-    GetUserById = async (req, res) =>
-    {   
+    GetUserById = async (req, res) => {
         const token = req.headers.authorization?.split(" ")[1];
-    
+
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
         }
 
-        try 
-        {
+        try {
             const secretKey = process.env.JWT_SECRET;
             const decoded = jwt.verify(token, secretKey);
             const UserId = decoded.userId;
 
             const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
             res.json(results[0]);
-        } 
+        }
         catch (error) {
             console.error('Query error:', error);
             res.status(500).json({ error: 'Database query error', details: error.message });
@@ -74,7 +67,7 @@ class UsersController
     // [POST] /users/createUser
     CreateUser = async (req, res) => {
         const { Username, Fullname, Password, Email, PhoneNumber } = req.body;
-    
+
         if (!Username || !Fullname || !Password || !Email || !PhoneNumber) {
             return res.status(400).json({
                 error: 'Username, Fullname, Password, Email, and PhoneNumber are required in request body'
@@ -82,7 +75,7 @@ class UsersController
         }
         const hashedPassword = this.hashPassword(Password);
 
-    
+
         try {
             const [results] = await this.connection.query(
                 'CALL fn_create_user(?, ?, ?, ?, ?)',
@@ -93,25 +86,24 @@ class UsersController
             console.error('Error creating user:', error);
             return res.status(500).json({ error: 'Error creating user' });
         }
+        
     };
 
     //[GET] /users/login
-    GetLogin = async (req, res) =>
-    {
+    GetLogin = async (req, res) => {
         res.render('login');
     }
 
     // [POST] /users/login
-    PostLogin = async (req, res) =>
-    {
+    PostLogin = async (req, res) => {
         const { Username, Password } = req.body;
 
-        if (!Username || !Password){
-            return res.status(400).json({error: 'Username and Password are required in request body'});
+        if (!Username || !Password) {
+            return res.status(400).json({ error: 'Username and Password are required in request body' });
         }
         var hashedPassword = this.hashPassword(Password);
 
-        try{
+        try {
             const [results] = await this.connection.query('CALL fn_login(?, ?)', [Username, hashedPassword]);
             if (results[0][0] && results[0][0].Message == "Login Successful"){
 
@@ -128,7 +120,9 @@ class UsersController
                 const access_token = jwt.sign({
                     userId: results[0][0].UserId,
                     username: Username,
-                    email: results[0][0].Email,}, 
+                    email: results[0][0].Email,
+                    userRoleId : results[0][0].UserRoleId,
+                },
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
 
@@ -148,67 +142,66 @@ class UsersController
                 });
                 res.send("Cookie đã được thiết lập!");
             }
-            else{
+            else {
                 return res.status(401).json({ error: 'Username or Password is incorrect' });
             }
-        }catch(error){
+        } catch (error) {
             console.error('Error logging in:', error);
-            return res.status(500).json({error: 'Error logging in'});
+            return res.status(500).json({ error: 'Error logging in' });
         }
     }
 
     // [POST] /users/changePassword
-    ChangePassword = async (req, res) =>
-    {
+    ChangePassword = async (req, res) => {
         const { OldPassword, NewPassword } = req.body;
         const token = req.headers['authorization']?.split(" ")[1];
 
-        if (!token){
-            return res.status(401).json({error: 'Unauthorized'});
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized' });
         }
-        if (!OldPassword || !NewPassword){
-            return res.status(400).json({error: 'UserId, OldPassword, and NewPassword are required in request body'});
+        if (!OldPassword || !NewPassword) {
+            return res.status(400).json({ error: 'UserId, OldPassword, and NewPassword are required in request body' });
         }
         var hashedOldPassword = this.hashPassword(OldPassword);
         var hashedNewPassword = this.hashPassword(NewPassword);
 
-        try{
+        try {
             var secretKey = process.env.JWT_SECRET;
             var decode = jwt.verify(token, secretKey);
             var Username = decode.username;
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
-            if (results[0][0] && results[0][0].Message == "Change Password Successfully"){
+            if (results[0][0] && results[0][0].Message == "Change Password Successfully") {
                 return res.json(results[0][0].Message);
             }
-            else{
+            else {
                 return res.status(401).json({ error: 'UserId or OldPassword is incorrect' });
             }
-        }catch(error){
+        } catch (error) {
             console.error('Error changing password:', error);
-            return res.status(500).json({error: 'Error changing password'});
+            return res.status(500).json({ error: 'Error changing password' });
         }
     }
 
     // [GET] /users/getUserBalance
     GetUserBalance = async (req, res) => {
         const token = req.headers.authorization?.split(" ")[1];
-    
+
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
         }
-    
+
         try {
             const secretKey = process.env.JWT_SECRET;
             const decoded = jwt.verify(token, secretKey);
             const userId = decoded.userId;
-    
+
             const [result] = await this.connection.execute("CALL fn_get_user_balance(?)", [userId]);
-    
+
             if (!result[0] || result[0].length === 0) {
                 return res.status(404).json({ message: "User not found" });
             }
-    
+
             return res.status(200).json({ message: "Success", balance: result[0][0].AccountBalance });
         } catch (error) {
             console.error('Query error:', error);

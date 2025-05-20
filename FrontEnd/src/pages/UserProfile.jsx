@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Deposit from '../components/Deposit';
 import { jwtDecode } from 'jwt-decode';
-import Layout from '../components/Layout';  
+import Layout from '../components/Layout';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -57,10 +57,10 @@ const Profile = () => {
 
     fetchProfile();
   }, [navigate]);
-                 
+
   if (loading) {
     return (
-      <Layout>        
+      <Layout>
         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
       </Layout>
     );
@@ -69,25 +69,25 @@ const Profile = () => {
   if (error) {
     return (
       <Layout>
-      <div className="text-red-500 text-center">
-        {error}
-        <button
-          onClick={() => navigate('/login')}
-          className="ml-2 text-blue-500 underline"
-        >
-          Đăng nhập lại
-        </button>
-      </div>
+        <div className="text-red-500 text-center">
+          {error}
+          <button
+            onClick={() => navigate('/login')}
+            className="ml-2 text-blue-500 underline"
+          >
+            Đăng nhập lại
+          </button>
+        </div>
       </Layout>
     );
   }
 
   return (
     <Layout>
-<div className="bg-white rounded-lg shadow-md p-6 mb-8 mt-20">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8 mt-20">
         <div className="flex items-center">
           <img
-            src={user?.Avatar || 'https://via.placeholder.com/100'} // Sửa thành user.Avatar
+            src={user?.Avatar || 'https://www.tenforums.com/attachments/user-accounts-family-safety/322690d1615743307-user-account-image-log-user.png'} // Sửa thành user.Avatar
             alt="Avatar"
             className="w-24 h-24 rounded-full mr-6"
           />
@@ -98,8 +98,8 @@ const Profile = () => {
               Số dư:{' '}
               {user?.AccountBalance != null
                 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                    user.AccountBalance * 1000
-                  )
+                  user.AccountBalance * 1000
+                )
                 : '0 ₫'}
             </p>
             <p className="text-gray-600">Số điện thoại: {user?.PhoneNumber || 'Chưa cập nhật'}</p>
@@ -113,11 +113,11 @@ const Profile = () => {
                 Chỉnh sửa hồ sơ
               </button>
               <button
-                                className="mt-4 bg-gradient-to-r from-pink-400 to-yellow-300 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-white transition duration-200"
-                                onClick={() => navigate('/deposit')}
-                            >
-                                Nạp tiền vào hệ thống
-                            </button>
+                className="mt-4 bg-gradient-to-r from-pink-400 to-yellow-300 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-white transition duration-200"
+                onClick={() => navigate('/deposit')}
+              >
+                Nạp tiền vào hệ thống
+              </button>
             </div>
           </div>
         </div>

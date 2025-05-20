@@ -43,6 +43,18 @@ function AppRoutes() {
                 <Route path="/deposit" element={<Deposit />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsDetail />} />
+                <Route path="/search" element={<SearchResult />} />
+                <Route path="/notification" element={<Notification />} />
+                <Route path="/notification/:id" element={<NotifDetail />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/posting-manager" element={<AdminPostingManager />} />
+                <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
+                <Route path="/cart" element={<CartPage />} />
+              <Route path="/postdetail/:postId" element={<PostDetail />} />
+                <Route path="/voucher-detail/:id" element={<VoucherDetail />} />
+                <Route path="/deposit" element={<Deposit />} />
+                <Route path="/cart" element={<CartPage />} />
+
                 {/* Thêm các route khác ở đây */}
               </Routes>
           </ErrorBoundary>

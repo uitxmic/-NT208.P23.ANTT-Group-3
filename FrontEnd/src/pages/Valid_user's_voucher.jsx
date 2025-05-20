@@ -79,7 +79,7 @@ const UserVoucherList = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
         {/* Nội dung chính */}
         <div className="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
-          <h1 className="text-4xl font-extrabold text-gray-800 text-center mb-8 tracking-tight">
+          <h1 className="text-4xl mt-5 font-extrabold text-gray-800 text-center mb-8 tracking-tight">
             Các voucher của bạn
           </h1>
 

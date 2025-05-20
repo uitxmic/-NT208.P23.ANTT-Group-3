@@ -82,7 +82,8 @@ const PostDetail = () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:3000/cart/addToCart', { // Đảm bảo URL API này là chính xác
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/cart/addToCart`, { // Đảm bảo URL API này là chính xác
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`, // Thêm "Bearer " trước token

@@ -23,7 +23,8 @@ const Profile = () => {
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:3000/users/getUserById', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

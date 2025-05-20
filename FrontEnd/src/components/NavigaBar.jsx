@@ -31,7 +31,8 @@ const Navbar = ({
 
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch('http://127.0.0.1:3000/users/getUserById', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,7 +58,8 @@ const Navbar = ({
     const fetchNotifications = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch('http://127.0.0.1:3000/notification/get5latestnoti', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/notification/get5latestnoti`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,

@@ -15,7 +15,8 @@ const UserBalance = ({ setBalance }) => {
       }
 
       try {
-        const response = await fetch('http://127.0.0.1:3000/users/userbalance', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/users/userbalance`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const UserBalance = ({ setBalance }) => {
 
         const data = await response.json();
         if (data.message === 'Success') {
-          setBalance(data.balance); 
+          setBalance(data.balance);
         } else {
           throw new Error(data.message || 'Failed to fetch balance');
         }

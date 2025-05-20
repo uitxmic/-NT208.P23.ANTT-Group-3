@@ -55,9 +55,7 @@ class UsersController {
 
     // /users/getUserById
     GetUserById = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-        console.log('sss', token);
-
+        const token = req.headers.authorization;
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
         }

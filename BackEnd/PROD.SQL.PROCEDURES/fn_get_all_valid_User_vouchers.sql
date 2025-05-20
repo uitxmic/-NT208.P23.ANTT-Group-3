@@ -11,7 +11,11 @@ BEGIN
         V.UserId,
         V.ExpirationDay,
         GROUP_CONCAT(DISTINCT VoucherCode) AS VoucherCode,
-        GROUP_CONCAT(DISTINCT P.VouImg) AS VouImg
+        (SELECT P.VouImg 
+         FROM Post P 
+         WHERE P.VoucherId = V.VoucherId 
+         ORDER BY P.PostId DESC 
+         LIMIT 1) AS VouImg
     FROM Voucher V 
     JOIN Post P ON V.VoucherId = P.VoucherId
     WHERE V.ExpirationDay >= CURDATE()
@@ -23,4 +27,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_all_valid_User_vouchers(26);
+CALL fn_get_all_valid_User_vouchers(29);

@@ -1,8 +1,9 @@
+require('dotenv').config();
 const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
 const routes = require('./routes/index');
 const cookieParser = require("cookie-parser");
-require('dotenv').config();
+const sessionMiddleware = require('./middlewares/init.redis.js');
 const cors = require('cors');
 
 const corsOptions = {

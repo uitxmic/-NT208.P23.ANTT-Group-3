@@ -13,9 +13,10 @@ import Deposit from "../components/Deposit";
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
-import SearchResult  from "../pages/SearchResult";
+import SearchResult from "../pages/SearchResult";
+import UserManager from "../pages/UserManager";
 
-import Notification from "../pages/Notification"; // Uncomment if needed
+import Notification from "../pages/Notification";
 import NotifDetail from "../pages/NotifDetail";
 import Admin from "../pages/Admin";
 import AdminPostingManager from "../pages/PostingAdminManager";
@@ -33,30 +34,31 @@ function AppRoutes() {
         path="/*"
         element={
           <ErrorBoundary>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/posting-manager" element={<PostManager />} />
-                <Route path="/shop-vouchers" element={<PostingPage />} />
-                <Route path="/user-vouchers" element={<UserVoucherList />} />
-                <Route path="/payment" element={<Payment />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/deposit" element={<Deposit />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/news/:id" element={<NewsDetail />} />
-                <Route path="/search" element={<SearchResult />} />
-                <Route path="/notification" element={<Notification />} />
-                <Route path="/notification/:id" element={<NotifDetail />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/posting-manager" element={<AdminPostingManager />} />
-                <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
-                <Route path="/cart" element={<CartPage />} />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/posting-manager" element={<PostManager />} />
+              <Route path="/shop-vouchers" element={<PostingPage />} />
+              <Route path="/user-vouchers" element={<UserVoucherList />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/deposit" element={<Deposit />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:id" element={<NewsDetail />} />
+              <Route path="/search" element={<SearchResult />} />
+              <Route path="/notification" element={<Notification />} />
+              <Route path="/notification/:id" element={<NotifDetail />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/posting-manager" element={<AdminPostingManager />} />
+              <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
+              <Route path="/cart" element={<CartPage />} />
               <Route path="/postdetail/:postId" element={<PostDetail />} />
-                <Route path="/voucher-detail/:id" element={<VoucherDetail />} />
-                <Route path="/deposit" element={<Deposit />} />
-                <Route path="/cart" element={<CartPage />} />
+              <Route path="/voucher-detail/:id" element={<VoucherDetail />} />
+              <Route path="/deposit" element={<Deposit />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/admin/user-manager" element={<UserManager />} />
 
-                {/* Thêm các route khác ở đây */}
-              </Routes>
+              {/* Thêm các route khác ở đây */}
+            </Routes>
           </ErrorBoundary>
         }
       />

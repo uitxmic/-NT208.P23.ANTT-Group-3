@@ -32,7 +32,19 @@ class UsersController {
     // [Get] /users/getUsers
     GetAllUser = async (req, res) => {
         try {
-            const [results] = await this.connection.query('CALL get_all_users()');
+            const { sortBy = 'UserId', sortOrder = 'DESC' } = req.query;
+            const token = req.headers.authorization;
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized: No token provided" });
+            }
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userRoleId = decoded.userRoleId;
+            if (userRoleId != 1) {
+                return res.status(403).json({ message: "Forbidden: You do not have permission to access this resource" });
+            }
+
+            const [results] = await this.connection.query('CALL fn_get_all_user_for_admin(?, ?)', [sortBy, sortOrder]);
             res.json(results[0]); // Chỉ trả về kết quả SELECT
         }
         catch (error) {
@@ -44,6 +56,7 @@ class UsersController {
     // /users/getUserById
     GetUserById = async (req, res) => {
         const token = req.headers.authorization?.split(" ")[1];
+        console.log('sss', token);
 
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });

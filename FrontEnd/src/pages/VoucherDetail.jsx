@@ -12,7 +12,7 @@ const VoucherDetail = () => {
     const fetchVoucherDetail = async () => {
         const token = localStorage.getItem('access_token');
         if (!token) {
-            navigate('/login');
+            setError('Vui lòng đăng nhập để tiếp tục.');
             return;
         }
 

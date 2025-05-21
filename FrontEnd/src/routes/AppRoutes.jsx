@@ -54,7 +54,7 @@ function AppRoutes() {
               <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/postdetail/:postId" element={<PostDetail />} />
-              <Route path="/voucher-detail/:id" element={<VoucherDetail />} />
+              <Route path="/voucher-detail/:voucherId" element={<VoucherDetail />} />
               <Route path="/deposit" element={<Deposit />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/admin/user-manager" element={<UserManager />} />\

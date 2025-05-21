@@ -55,9 +55,14 @@ class UsersController {
 
     // /users/getUserById
     GetUserById = async (req, res) => {
-        const token = req.headers.authorization;
+        let token = req.headers.authorization;
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        if (token.startsWith('Bearer ')) {
+            // Remove Bearer from string
+            token = token.slice(7, token.length);
         }
 
         try {
@@ -66,11 +71,21 @@ class UsersController {
             const UserId = decoded.userId;
 
             const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
-            res.json(results[0]);
+            // fn_get_user_by_id is expected to return an array of users, even if it's just one user
+            // So results[0] would be like [{ UserId: 1, Fullname: 'Test User', ... }]
+            if (results[0] && results[0].length > 0) {
+                 // Send the array containing the user object, as the frontend expects data[0]
+                res.json(results[0]);
+            } else {
+                return res.status(404).json({ message: "User not found" });
+            }
         }
         catch (error) {
-            console.error('Query error:', error);
-            res.status(500).json({ error: 'Database query error', details: error.message });
+            console.error('Error in GetUserById:', error);
+            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: "Invalid or expired token", details: error.message });
+            }
+            res.status(500).json({ error: 'Internal server error', details: error.message });
         }
     }
 

@@ -19,13 +19,47 @@ const VoucherCard = ({ voucher }) => (
 );
 
 const PostCard = ({ post }) => (
-    <div className="border p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-        <h3 className="text-xl font-semibold text-green-600">{post.Postname}</h3>
-        {/* Giả sử content là HTML, cần xử lý an toàn */}
-        <div className="text-gray-700 mt-2" dangerouslySetInnerHTML={{ __html: post.Content && post.Content.substring(0, 150) + '...' }} />
-        <p className="text-sm text-gray-500">Người đăng: {post.Username}</p>
-        <p className="text-sm text-gray-500">Ngày đăng: {new Date(post.Date).toLocaleDateString()}</p>
-        <Link to={`/news/${post.PostId}`} className="text-green-500 hover:underline mt-2 inline-block">Đọc thêm</Link>
+    <div className="flex bg-white border border-pink-200 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out mb-6">
+        {/* Left Column: Image */}        <div className="w-1/3 pr-4 flex-shrink-0">
+            <img 
+                src={post.VouImg || 'https://via.placeholder.com/300x200.png?text=Post+Image'} 
+                alt={post.Postname || 'Hình ảnh bài đăng'}
+                className="w-full h-48 object-cover rounded-md shadow-sm"
+            />
+        </div>
+
+        {/* Right Column: Content */}
+        <div className="w-2/3 flex flex-col justify-between">
+            <div>
+                <h3 className="text-xl lg:text-2xl font-semibold text-pink-600 mb-2 hover:text-pink-700 transition-colors">
+                    {post.Postname}
+                </h3>
+                <div 
+                    className="text-gray-700 text-sm lg:text-base mb-3 prose prose-sm max-h-24 overflow-hidden relative leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: post.Content ? post.Content.substring(0, 250) + (post.Content.length > 250 ? '...' : '') : '' }} 
+                />
+            </div>
+            <div>
+                <div className="text-xs text-gray-500 mb-1">
+                    <span>Người đăng: </span>
+                    <span className="font-medium text-pink-500 hover:underline">
+                        {/* Optional: Link to user profile if available */}
+                        {/* <Link to={`/profile/${post.UserId}`}>{post.Username}</Link> */}
+                        {post.Username}
+                    </span>
+                </div>
+                <div className="text-xs text-gray-500 mb-3">
+                    <span>Ngày đăng: </span>
+                    <span className="font-medium">{new Date(post.Date).toLocaleDateString('vi-VN')}</span>
+                </div>
+                <Link 
+                    to={`/postdetail/${post.PostId}`} 
+                    className="inline-block bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300 text-xs lg:text-sm shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75"
+                >
+                    Đọc thêm
+                </Link>
+            </div>
+        </div>
     </div>
 );
 

@@ -27,7 +27,7 @@ const Profile = () => {
         const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
         });

@@ -23,6 +23,7 @@ import AdminPostingManager from "../pages/PostingAdminManager";
 import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
 import CartPage from "../pages/cart";
 import AddVoucher from "../pages/AddVoucher";
+import UpdateProfile from "../pages/UpdateProfile";
 
 function AppRoutes() {
   return (
@@ -48,7 +49,7 @@ function AppRoutes() {
               <Route path="/search" element={<SearchResult />} />
               <Route path="/search/:type" element={<SearchResult />} />
               <Route path="/notification" element={<Notification />} />
-              <Route path="/notification/:id" element={<NotifDetail />} />
+              <Route path="/notification/:notifId" element={<NotifDetail />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/posting-manager" element={<AdminPostingManager />} />
               <Route path="/admin/transaction-manager" element={<TransactionManagerAdmin />} />
@@ -59,6 +60,7 @@ function AppRoutes() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/admin/user-manager" element={<UserManager />} />\
               <Route path="/add-voucher" element={<AddVoucher />} />
+              <Route path="/update-profile" element={<UpdateProfile />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
           </ErrorBoundary>

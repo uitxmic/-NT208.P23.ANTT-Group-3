@@ -192,6 +192,28 @@ class UsersController {
             return res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     };
+
+    // [PATCH] /users/updateUser
+    UpdateUser = async (req, res) => {
+        const { Fullname, Email, PhoneNumber } = req.body;
+        const token = req.headers.authorization;
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+
+            const [results] = await this.connection.query('CALL fn_update_user(?, ?, ?, ?)', [userId, Fullname, Email, PhoneNumber]);
+            res.json(results[0]);
+        } catch (error) {
+            console.error('Query error:', error);
+            res.status(500).json({ error: 'Database query error', details: error.message });
+        }
+    }
 }
 
 module.exports = new UsersController;

@@ -19,4 +19,4 @@ END$$
 
 DELIMITER ;
 
-CALL fn_get_notification_by_id(3);
+CALL fn_get_notification_by_id(2);

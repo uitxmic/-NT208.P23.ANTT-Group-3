@@ -99,6 +99,7 @@ const PostDetail = () => {
             }
 
             alert('Đã thêm voucher vào giỏ hàng thành công!');
+            navigate('/shop-vouchers');
 
         } catch (err) {
             setError(err.message || 'Lỗi khi thêm vào giỏ hàng.');

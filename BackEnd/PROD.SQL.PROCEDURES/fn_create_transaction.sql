@@ -1,24 +1,28 @@
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS fn_create_transaction; $$
+DROP PROCEDURE IF EXISTS fn_create_transaction;
+$$
 CREATE PROCEDURE fn_create_transaction (
     IN in_voucherId INT,
     IN in_postId INT,
     IN in_Amount INT,
     IN in_quantity INT,
     IN in_UserIdBuyer INT,
-    IN in_UserIdSeller INT
+    IN in_UserIdSeller INT,
+    OUT out_message VARCHAR(255),
+    OUT out_id INT
 )
 BEGIN
-	DECLARE p_transaction_id INT;
+    DECLARE p_transaction_id INT;
     DECLARE p_current_quantity INT;
     DECLARE p_balance INT;
     DECLARE done INT DEFAULT 0;
-	DECLARE p_voucher_code VARCHAR(100);
+    DECLARE p_voucher_code VARCHAR(100);
     DECLARE p_voucher_name VARCHAR(100);
-    -- Declare the exit handler first
-    
+    DECLARE v_error_message VARCHAR(255);
+    DECLARE v_voucher_count INT;
+
     DECLARE voucher_cursor CURSOR FOR
         SELECT VoucherCode
         FROM Voucher V 
@@ -29,80 +33,151 @@ BEGIN
           AND V.UserId IS NOT NULL
         LIMIT in_quantity;
         
-	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
     
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-        SELECT 'Created Failed' AS Message, -1 AS Id;
+        GET DIAGNOSTICS CONDITION 1 
+            @sql_error_code = MYSQL_ERRNO, 
+            @sql_error_message = MESSAGE_TEXT;
+        INSERT INTO debug_log (log_message, log_time, procedure_name, sql_error_code, sql_error_message)
+        VALUES ('SQLEXCEPTION occurred', NOW(), 'fn_create_transaction', @sql_error_code, @sql_error_message);
+        ROLLBACK;
+        SET out_message = 'Created Failed';
+        SET out_id = -1;
     END;
-    
+
     START TRANSACTION;
     
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Bắt đầu kiểm tra đầu vào', NOW(), 'fn_create_transaction');
+    
     IF in_quantity <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số lượng phải lớn hơn 0';
+        SET v_error_message = 'Số lượng phải lớn hơn 0';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
     END IF;
     
     IF in_Amount <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số tiền phải lớn hơn 0';
+        SET v_error_message = 'Số tiền phải lớn hơn 0';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
     END IF;
     
-    SELECT AccountBalance INTO p_balance 
-    FROM `User` 
-    WHERE UserId = in_UserIdBuyer;
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Kiểm tra số dư người mua', NOW(), 'fn_create_transaction');
     
-    SELECT VoucherName INTO p_voucher_name
-    FROM `Voucher`
-    WHERE VoucherId=in_voucherId;
+    SELECT AccountBalance INTO p_balance 
+    FROM User 
+    WHERE UserId = in_UserIdBuyer 
+    LIMIT 1 FOR UPDATE;
     
     IF p_balance IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Người mua không tồn tại';
+        SET v_error_message = 'Người mua không tồn tại';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
     END IF;
     
     IF p_balance < in_Amount * in_quantity THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số dư không đủ';
+        SET v_error_message = 'Số dư không đủ';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
     END IF;
-
-    -- Kiểm tra số lượng trong Post
+    
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Kiểm tra tên voucher', NOW(), 'fn_create_transaction');
+    
+    SELECT VoucherName INTO p_voucher_name
+    FROM Voucher
+    WHERE VoucherId = in_voucherId
+    LIMIT 1;
+    
+    IF p_voucher_name IS NULL THEN
+        SET v_error_message = 'Voucher không tồn tại';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+    END IF;
+    
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Kiểm tra số lượng bài đăng', NOW(), 'fn_create_transaction');
+    
     SELECT Quantity INTO p_current_quantity
     FROM Post
-    WHERE VoucherId = in_voucherId AND PostId = in_postId;
-
+    WHERE VoucherId = in_voucherId AND PostId = in_postId
+    LIMIT 1 FOR UPDATE;
+    
     IF p_current_quantity IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Bài đăng không tồn tại';
+        SET v_error_message = 'Bài đăng không tồn tại';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
     END IF;
-
+    
     IF p_current_quantity < in_quantity THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số lượng voucher không đủ';
+        SET v_error_message = 'Số lượng voucher không đủ';
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+    END IF;
+    
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Kiểm tra số lượng VoucherCode', NOW(), 'fn_create_transaction');
+    
+    SELECT COUNT(*) INTO v_voucher_count
+    FROM Voucher V 
+    JOIN Post P ON V.VoucherId = P.VoucherId
+    WHERE P.VoucherId = in_voucherId 
+      AND P.PostId = in_postId 
+      AND V.UserId = in_UserIdSeller
+      AND V.UserId IS NOT NULL
+    FOR UPDATE;
+    
+    IF v_voucher_count < in_quantity THEN
+        SET v_error_message = CONCAT('Không đủ VoucherCode khả dụng. Đã tìm thấy: ', v_voucher_count, ', cần: ', in_quantity);
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (v_error_message, NOW(), 'fn_create_transaction');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
     END IF;
 
-    -- Open cursor
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Mở cursor VoucherCode', NOW(), 'fn_create_transaction');
+    
     OPEN voucher_cursor;
 
-    -- Loop through VoucherCode
     read_loop: LOOP
         FETCH voucher_cursor INTO p_voucher_code;
         IF done THEN
-            LEAVE read_loop;
+            LEAVE read_loop; -- Thoát vòng lặp nếu cursor hết dữ liệu
         END IF;
 
-        -- Insert vào Transaction
-        INSERT INTO `Transaction` (TransactionAmount, UserIdBuyer, UserIdSeller, CreateAt, Status, PostId, VoucherId, VoucherCode)
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (CONCAT('Insert Transaction cho VoucherCode: ', p_voucher_code), NOW(), 'fn_create_transaction');
+
+        INSERT INTO Transaction (TransactionAmount, UserIdBuyer, UserIdSeller, CreateAt, Status, PostId, VoucherId, VoucherCode)
         VALUES (in_Amount, in_UserIdBuyer, in_UserIdSeller, NOW(), 0, in_postId, in_voucherId, p_voucher_code);
 
-        -- Lấy ID của giao dịch vừa tạo
         SET p_transaction_id = LAST_INSERT_ID();
 
-        -- Cập nhật Voucher
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (CONCAT('Update Voucher cho VoucherCode: ', p_voucher_code), NOW(), 'fn_create_transaction');
+
         UPDATE Voucher
         SET UserId = in_UserIdBuyer
         WHERE VoucherId = in_voucherId AND VoucherCode = p_voucher_code;
 
-        -- Tạo thông báo cho mỗi giao dịch
+        INSERT INTO debug_log (log_message, log_time, procedure_name) 
+        VALUES (CONCAT('Insert Noti cho Transaction: ', p_transaction_id), NOW(), 'fn_create_transaction');
+
         INSERT INTO Noti (user_id, noti_type, noti_title, noti_content, image_url, created_at, updated_at, is_read, is_deleted, transaction_id) 
         VALUES (
-			in_UserIdBuyer, 
+            in_UserIdBuyer, 
             'order', 
-            CONCAT('Thanh toán voucher', p_voucher_name), 
+            CONCAT('Thanh toán voucher ', p_voucher_name), 
             'Thanh toán thành công.', 
             'https://i.pinimg.com/736x/d3/42/10/d34210a2c783df91cc86df3b7fc5ec64.jpg',
             NOW(), 
@@ -113,27 +188,39 @@ BEGIN
         );
     END LOOP;
 
-    -- Close cursor
     CLOSE voucher_cursor;
+
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Cập nhật số lượng Post', NOW(), 'fn_create_transaction');
 
     UPDATE Post
     SET Quantity = Quantity - in_quantity
     WHERE VoucherId = in_voucherId AND PostId = in_postId;
 
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Cập nhật số dư Seller', NOW(), 'fn_create_transaction');
+
     UPDATE `User`
     SET AccountBalance = AccountBalance + (in_Amount * in_quantity)
     WHERE UserId = in_UserIdSeller;
+
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Cập nhật số dư Buyer', NOW(), 'fn_create_transaction');
 
     UPDATE `User`
     SET AccountBalance = AccountBalance - (in_Amount * in_quantity)
     WHERE UserId = in_UserIdBuyer;
 
-    -- Commit transaction
+    INSERT INTO debug_log (log_message, log_time, procedure_name) 
+    VALUES ('Commit transaction', NOW(), 'fn_create_transaction');
+
     COMMIT;
 
-    SELECT 'Transaction Created' AS Message, p_transaction_id AS Id;
+    SET out_message = 'Transaction Created';
+    SET out_id = p_transaction_id;
 END $$
 
 DELIMITER ;
-call fn_create_transaction (4,15,68,3,29,8 )
 
+CALL fn_create_transaction(5, 20, 1, 1, 29, 7, @out_message, @out_id);
+select @out_message, @out_id

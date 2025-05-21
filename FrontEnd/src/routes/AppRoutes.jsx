@@ -22,6 +22,7 @@ import Admin from "../pages/Admin";
 import AdminPostingManager from "../pages/PostingAdminManager";
 import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
 import CartPage from "../pages/cart";
+import AddVoucher from "../pages/AddVoucher";
 
 function AppRoutes() {
   return (
@@ -56,8 +57,8 @@ function AppRoutes() {
               <Route path="/voucher-detail/:id" element={<VoucherDetail />} />
               <Route path="/deposit" element={<Deposit />} />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/admin/user-manager" element={<UserManager />} />
-
+              <Route path="/admin/user-manager" element={<UserManager />} />\
+              <Route path="/add-voucher" element={<AddVoucher />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
           </ErrorBoundary>

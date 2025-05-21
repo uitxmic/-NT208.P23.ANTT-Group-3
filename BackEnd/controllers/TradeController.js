@@ -105,6 +105,55 @@ class TradeController {
     }
   }
 
+  CreateCartTransaction = async (req, res) => {
+    const { cartItems } = req.body;
+    const token = req.headers['authorization'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+      return res.status(400).json({ error: 'Cart items are required and must be a non-empty array' });
+    }
+
+    try {
+      const secretKey = process.env.JWT_SECRET;
+      const decode = jwt.verify(token, secretKey);
+      const UserIdBuyer = decode.userId;
+
+      console.log('UserIdBuyer:', UserIdBuyer);
+      console.log('Cart Items:', cartItems);
+
+      const cartData = JSON.stringify(cartItems);
+      try {
+        JSON.parse(cartData); // Kiểm tra JSON hợp lệ
+      } catch (jsonError) {
+        console.error('Invalid JSON:', jsonError);
+        return res.status(400).json({ error: 'Invalid JSON format', details: jsonError.message });
+      }
+
+      console.log('cartData:', cartData);
+
+      const [result] = await this.connection.query(
+        'CALL fn_create_cart_transaction(?, ?)',
+        [cartData, UserIdBuyer]
+      );
+
+      console.log('Result:', result);
+      const message = result[0][0]?.Message;
+
+      if (message === 'Cart Transaction Created') {
+        return res.status(200).json({ message: 'Success', lastTransactionId: result[0][0]?.LastTransactionId });
+      } else {
+        return res.status(400).json({ error: message, transactionId: result[0][0]?.Id });
+      }
+    } catch (error) {
+      console.error('Error creating cart transaction:', error);
+      return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
+  }
+
   // [GET] /trade/getTransactionForAdmin
   GetTransactionForAdmin = async (req, res) => {
     const token = req.headers['authorization'];

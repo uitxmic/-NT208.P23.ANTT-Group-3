@@ -96,7 +96,7 @@ class UsersController {
             console.error('Error creating user:', error);
             return res.status(500).json({ error: 'Error creating user' });
         }
-        
+
     };
 
     //[GET] /users/login
@@ -120,7 +120,7 @@ class UsersController {
                     userId: results[0][0].UserId,
                     username: Username,
                     email: results[0][0].Email,
-                    userRoleId : results[0][0].UserRoleId,
+                    userRoleId: results[0][0].UserRoleId,
                 },
                     process.env.JWT_SECRET,
                     { expiresIn: process.env.JWT_EXPIRE });

@@ -20,4 +20,6 @@ router.use('/acceptRefund', tradeController.AcceptRefund);
 
 router.use('/rejectRefund', tradeController.RejectRefund);
 
+router.use('/requestRefund', tradeController.RequestRefund);    
+
 module.exports = router;

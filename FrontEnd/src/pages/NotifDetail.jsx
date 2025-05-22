@@ -58,7 +58,7 @@ const NotifDetail = () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Không thể từ chối hoàn tiền.');
+                throw new Error(errorData.error || 'Không thể xác nhận đơn hàng.');
             }
             if (response.status === 200 || data.message === 'Success') {
                 toast.success(`Giao dịch ${TransactionId} đã được xác nhận!`);
@@ -71,12 +71,29 @@ const NotifDetail = () => {
 
     const handleRefundRequest = async () => {
         try {
+            const token = localStorage.getItem('access_token');
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            await axios.post(`${API_BASE_URL}/notification/requestRefund/${notifId}`);
-            alert('Yêu cầu hoàn tiền đã được gửi!');
-            navigate(-1); // Navigate back after request
+            const response = await fetch(`${API_BASE_URL}/trade/requestRefund`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ TransactionId: TransactionId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Không thể yêu cầu hoàn tiền.');
+            }
+            if (response.status === 200 || data.message === 'Success') {
+                toast.success(`Giao dịch ${TransactionId} đã được yêu cầu hoàn tiền!`);
+            }
+
         } catch (err) {
-            setError('Không thể gửi yêu cầu hoàn tiền. Vui lòng thử lại.');
+            toast.error('Không thể yêu cầu hoàn tiền. Vui lòng thử lại.');
         }
     };
 
@@ -122,10 +139,14 @@ const NotifDetail = () => {
                             <span className="font-medium">Mã voucher:</span> {notif.VoucherCode || 'N/A'}
                         </p>
                         <p className="text-gray-600 mb-2">
-                            <span className="font-medium">Số tiền giao dịch:</span> {notif.TransactionAmount ? `${notif.TransactionAmount} VNĐ` : 'N/A'}
+                            <span className="font-medium">Số tiền giao dịch:</span> {notif.TransactionAmount != null
+                                ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                                    notif.TransactionAmount * 1000
+                                )
+                                : '0 ₫'}
                         </p>
                         <p className="text-gray-600 mb-2">
-                            <span className="font-medium">Trạng thái:</span> {notif.Status === 1 ? 'Đã giao' : 'Chưa xác định'}
+                            <span className="font-medium">Trạng thái:</span> {notif.Status === 1 ? 'Đã giao' : notif.Status === 0 ? 'Đang được xử lý' : notif.Status === 2 ? 'Đang được yêu cầu hoàn tiền' : 'Chưa xác định'}
                         </p>
                         <p className="text-gray-600 mb-2">
                             <span className="font-medium">Người mua:</span> {notif.Buyer || 'N/A'}

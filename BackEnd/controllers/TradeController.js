@@ -196,7 +196,7 @@ class TradeController {
     }
 
     try {
-      
+
       const [results] = await this.connection.query('CALL fn_complete_transaction(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;
@@ -206,6 +206,36 @@ class TradeController {
         return res.status(200).json({ message: 'Success' });
       else
         return res.status(400).json({ error: message.error });
+    } catch (error) {
+      console.error('Query error:', error);
+      res.status(500).json({ error: 'Database query error', details: error.message });
+    }
+  }
+
+  // [PATCH] /trade/requestRefund
+  RequestRefund = async (req, res) => {
+    const { TransactionId } = req.body;
+    if (!TransactionId) {
+      return res.status(400).json({ error: 'TransactionId is required in request body' });
+    }
+
+    const token = req.headers['authorization'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+
+      const [results] = await this.connection.query('CALL fn_request_refund(?)', [TransactionId]);
+      const message = results[0][0]?.Message;
+      const Id = results[0][0]?.Id;
+      console.log('Id:', Id);
+      console.log('Message:', message);
+      if (Id !== -1)
+        return res.status(200).json({ message: 'Success' });
+      else
+        return res.status(400).json({ error: message });
     } catch (error) {
       console.error('Query error:', error);
       res.status(500).json({ error: 'Database query error', details: error.message });

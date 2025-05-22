@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../components/Layout';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const NotifDetail = () => {
     const { notifId } = useParams();
@@ -10,6 +12,7 @@ const NotifDetail = () => {
     const [notif, setNotif] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [TransactionId, setTransactionId] = useState(null);
 
     useEffect(() => {
         const fetchNotifDetail = async () => {
@@ -20,6 +23,7 @@ const NotifDetail = () => {
                 const response = await axios.get(`${API_BASE_URL}/notification/getNotiById/${NotifId}`);
                 const data = response.data;
                 console.log('Response data:', data);
+                setTransactionId(data.transaction_id);
                 if (data && data.noti_id !== undefined) {
                     console.log('Notification data:', data);
                     setNotif(data);
@@ -39,12 +43,29 @@ const NotifDetail = () => {
 
     const handleConfirmReceipt = async () => {
         try {
+            const token = localStorage.getItem('access_token');
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            await axios.post(`${API_BASE_URL}/notification/confirmReceipt/${notifId}`);
-            alert('Xác nhận đã nhận hàng thành công!');
-            navigate(-1); // Navigate back after confirmation
+            const response = await fetch(`${API_BASE_URL}/trade/completeTransaction`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ TransactionId: TransactionId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Không thể từ chối hoàn tiền.');
+            }
+            if (response.status === 200 || data.message === 'Success') {
+                toast.success(`Giao dịch ${TransactionId} đã được xác nhận!`);
+            }
+
         } catch (err) {
-            setError('Không thể xác nhận nhận hàng. Vui lòng thử lại.');
+            setError('Không thể xác nhận nhận đơn hàng. Vui lòng thử lại.');
         }
     };
 
@@ -107,10 +128,10 @@ const NotifDetail = () => {
                             <span className="font-medium">Trạng thái:</span> {notif.Status === 1 ? 'Đã giao' : 'Chưa xác định'}
                         </p>
                         <p className="text-gray-600 mb-2">
-                            <span className="font-medium">Người mua:</span> User ID {notif.UserIdbuyer || 'N/A'}
+                            <span className="font-medium">Người mua:</span> {notif.Buyer || 'N/A'}
                         </p>
                         <p className="text-gray-600 mb-2">
-                            <span className="font-medium">Người bán:</span> User ID {notif.UserIdseller || 'N/A'}
+                            <span className="font-medium">Người bán:</span> {notif.Seller || 'N/A'}
                         </p>
                         <p className="text-gray-600 mb-2">
                             <span className="font-medium">Mã giao dịch:</span> {notif.transaction_id || 'N/A'}
@@ -119,12 +140,12 @@ const NotifDetail = () => {
                             <span className="font-medium">Ngày nhận:</span>{' '}
                             {notif.updated_at
                                 ? new Date(notif.updated_at).toLocaleDateString('vi-VN', {
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                  })
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })
                                 : 'Ngày không hợp lệ'}
                         </p>
                     </div>
@@ -150,6 +171,7 @@ const NotifDetail = () => {
                     </div>
                 </div>
             </div>
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
         </Layout>
     );
 };

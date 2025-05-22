@@ -156,7 +156,7 @@ class UsersController {
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
             if (results[0][0] && results[0][0].Message == "Change Password Successfully") {
-                return res.json(results[0][0].Message);
+                return res.json({'Message':results[0][0].Message});
             }
             else {
                 return res.status(401).json({ error: 'UserId or OldPassword is incorrect' });

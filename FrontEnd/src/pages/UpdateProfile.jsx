@@ -147,13 +147,23 @@ const UpdateProfile = () => {
                     </div>
                     {/* Add more input fields for other profile data as needed */}
                     <div className="flex justify-between items-center">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="bg-gradient-to-r from-green-400 to-blue-500 text-white py-2 px-6 rounded-md hover:opacity-90 transition duration-200 disabled:opacity-50"
-                        >
-                            {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-                        </button>
+                        <div className="flex items-center gap-x-4">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="bg-gradient-to-r from-green-400 to-blue-500 text-white py-2 px-6 rounded-md hover:opacity-90 transition duration-200 disabled:opacity-50"
+                            >
+                                {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/change-password')}
+                                disabled={loading}
+                                className="bg-gradient-to-r from-pink-400 to-blue-500 text-white py-2 px-6 rounded-md hover:opacity-90 transition duration-200 disabled:opacity-50"
+                            >
+                                {loading ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                            </button>
+                        </div>
                         <button
                             type="button"
                             onClick={() => navigate('/profile')}
@@ -163,8 +173,8 @@ const UpdateProfile = () => {
                         </button>
                     </div>
                 </form>
-            </div>
-        </Layout>
+            </div >
+        </Layout >
     );
 };
 

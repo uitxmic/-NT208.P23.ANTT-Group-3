@@ -96,7 +96,7 @@ function Home() {
                     <div className="min-w-[200px] mx-2">
                       <div className="bg-white rounded-lg shadow-md p-4 flex items-center justify-center h-32">
                         <img
-                          src="https://inhoangha.com/uploads/logo-starbucks.jpg"
+                          src="https://cdn.haitrieu.com/wp-content/uploads/2022/06/logo-starbucks-original.png"
                           alt="Starbucks Voucher"
                           className="h-16 object-contain"
                         />
@@ -135,7 +135,8 @@ function Home() {
                 <p className="text-lg mb-6">
                   Đăng bán ngay hôm nay và kiếm tiền từ những voucher bạn không sử dụng!
                 </p>
-                <button className="bg-white text-pink-500 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100">
+                <button className="bg-white text-pink-500 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100"
+                onClick={() => window.location.href = '/add-voucher'}>
                   Bắt đầu bán ngay
                 </button>
               </section>

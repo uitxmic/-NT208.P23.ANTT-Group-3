@@ -7,10 +7,12 @@ CREATE PROCEDURE fn_get_notification_by_id (
 )
 
 BEGIN
-	SELECT P.PostId, P.VoucherId, VoucherCode, TransactionAmount, UserIdbuyer, UserIdseller, Status,
+	SELECT P.PostId, P.VoucherId, VoucherCode, TransactionAmount, B.Fullname AS Buyer, S.Fullname AS Seller, Status,
 			noti_id, user_id, noti_type, noti_title, noti_content, VouImg, created_at, updated_at, is_read, is_deleted, transaction_id
-	FROM noti N
+	FROM Noti N
     JOIN Transaction T
+    JOIN `User` B ON B.UserId = T.UserIdbuyer
+    JOIN `User` S ON S.UserId = T.UserIdseller
     ON N.transaction_id = T.TransactionId
     JOIN Post P
     ON P.PostId = T.PostId
@@ -19,4 +21,4 @@ END$$
 
 DELIMITER ;
 
-CALL fn_get_notification_by_id(2);
+CALL fn_get_notification_by_id(81);

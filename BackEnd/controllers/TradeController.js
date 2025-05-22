@@ -195,20 +195,8 @@ class TradeController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-    if (userRoleId != 1) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserRoleId = decode.userRoleId;
-      if (UserRoleId != 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-
+      
       const [results] = await this.connection.query('CALL fn_complete_transaction(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;

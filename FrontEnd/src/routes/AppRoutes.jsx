@@ -24,6 +24,7 @@ import TransactionManagerAdmin from "../pages/TransactionManagerAdmin";
 import CartPage from "../pages/cart";
 import AddVoucher from "../pages/AddVoucher";
 import UpdateProfile from "../pages/UpdateProfile";
+import ChangePassword from "../pages/ChangePassword";
 
 function AppRoutes() {
   return (
@@ -61,6 +62,7 @@ function AppRoutes() {
               <Route path="/admin/user-manager" element={<UserManager />} />\
               <Route path="/add-voucher" element={<AddVoucher />} />
               <Route path="/update-profile" element={<UpdateProfile />} />
+              <Route path="/change-password" element={<ChangePassword />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
           </ErrorBoundary>

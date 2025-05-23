@@ -325,6 +325,30 @@ class TradeController {
       res.status(500).json({ error: 'Database query error', details: error.message });
     }
   }
+
+  // [GET] /trade/getTransactionByUserId
+  GetTransactionByUserId = async (req, res) => {
+    const token = req.headers['authorization'];
+
+    // Get query parameters for search and sorting
+    const { search = '', sortColumn = 'CreateAt', sortOrder = 'DESC' } = req.query;
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+      var secretKey = process.env.JWT_SECRET;
+      var decode = jwt.verify(token, secretKey);
+      var UserId = decode.userId;
+
+      const [results] = await this.connection.query('CALL fn_get_transaction_history_by_id(?, ?, ?, ?)', [UserId, search, sortColumn, sortOrder]);
+      res.json(results[0]); // Chỉ trả về kết quả SELECT
+    } catch (error) {
+      console.error('Query error:', error);
+      res.status(500).json({ error: 'Database query error', details: error.message });
+    }
+  }
 }
 
 module.exports = new TradeController;

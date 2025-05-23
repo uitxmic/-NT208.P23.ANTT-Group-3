@@ -25,6 +25,7 @@ import CartPage from "../pages/cart";
 import AddVoucher from "../pages/AddVoucher";
 import UpdateProfile from "../pages/UpdateProfile";
 import ChangePassword from "../pages/ChangePassword";
+import PurchaseHistory from "../pages/PurchaseHistory";
 
 function AppRoutes() {
   return (
@@ -59,10 +60,11 @@ function AppRoutes() {
               <Route path="/voucher-detail/:voucherId" element={<VoucherDetail />} />
               <Route path="/deposit" element={<Deposit />} />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/admin/user-manager" element={<UserManager />} />\
+              <Route path="/admin/user-manager" element={<UserManager />} />
               <Route path="/add-voucher" element={<AddVoucher />} />
               <Route path="/update-profile" element={<UpdateProfile />} />
               <Route path="/change-password" element={<ChangePassword />} />
+              <Route path="/purchase-history" element={<PurchaseHistory />} />
               {/* Thêm các route khác ở đây */}
             </Routes>
           </ErrorBoundary>

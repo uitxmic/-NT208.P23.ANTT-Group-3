@@ -55,4 +55,4 @@ END proc $$
 
 DELIMITER ;
 
-CALL fn_get_transaction_history_by_id(38, '', 'CreateAt', 'DESC');
+CALL fn_get_transaction_history_by_id(38, '', 'TransactionAmount', 'DESC');

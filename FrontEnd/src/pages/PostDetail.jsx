@@ -1,38 +1,222 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+// import OpenAI from 'openai';
 import Layout from '../components/Layout';
 
+// Hàm tính cosine similarity giữa hai vector
+const cosineSimilarity = (vecA, vecB) => {
+    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+    return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+};
 
 const PostDetail = () => {
     const { postId } = useParams();
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
+    const [recommendedPosts, setRecommendedPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
+    // // Khởi tạo OpenAI client
+    // const openai = new OpenAI({
+    //     apiKey: import.meta.env.VITE_OPENAI_API_KEY, // Lưu API key trong .env
+    // });
+
+    // Effect for fetching the main post details
     useEffect(() => {
         const fetchPostDetail = async () => {
+            setLoading(true);
+            setError(null);
             try {
                 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
                 const response = await axios.get(`${API_BASE_URL}/posting/getPostingByPostId/${postId}`);
+                console.log('Post Detail Response:', response.data);
                 const data = response.data;
-                if (Array.isArray(data) && data.length > 0 && data[0].result) {
+                if (Array.isArray(data) && data.length > 0 && data[0].result && data[0].result.length > 0) {
                     setPost(data[0].result[0]);
                 } else {
                     setPost(null);
-                    setError('Không có bài đăng nào từ API');
+                    setError('Không có bài đăng nào từ API.');
                 }
-                setLoading(false);
             } catch (err) {
+                console.error('Error fetching post details:', err);
                 setError('Không thể tải bài đăng. Vui lòng thử lại sau.');
+                setPost(null);
+            }
+        };
+
+        if (postId) {
+            fetchPostDetail();
+        } else {
+            setLoading(false);
+            setError('No Post ID provided.');
+        }
+    }, [postId]);
+
+    // Effect for fetching recommendations
+    useEffect(() => {
+        const fetchRecommendations = async () => {
+            if (!post) {
+                if (!loading && !error) setLoading(false);
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('access_token');
+                const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+                // Fetch transactions
+                let transactions = [];
+                if (token) {
+                    try {
+                        const searchText = '';
+                        const sortColumn = 'Date';
+                        const sortOrder = 'DESC';
+                        const transactionResponse = await fetch(
+                            `${API_BASE_URL}/trade/getTransactionById?search=${encodeURIComponent(searchText)}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`,
+                            {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `${token}`,
+                                    'Content-Type': 'application/json',
+                                },
+                            }
+                        );
+                        if (transactionResponse.ok) {
+                            const jsonData = await transactionResponse.json();
+                            console.log('Transactions Response:', jsonData);
+                            transactions = Array.isArray(jsonData) ? jsonData : (jsonData.data || []);
+                        } else {
+                            console.error('Failed to fetch transactions:', transactionResponse.status, await transactionResponse.text());
+                        }
+                    } catch (e) {
+                        console.error('Error fetching transactions:', e);
+                    }
+                }
+
+                // Fetch all posts
+                const page = 1;
+                const limitValue = 20;
+                const allPostsResponse = await fetch(
+                    `${API_BASE_URL}/posting/getAllPostings?page=${page}&limit=${limitValue}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            ...(token && { 'Authorization': `${token}` }),
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+                let allPosts = [];
+                if (allPostsResponse.ok) {
+                    const allPostsData = await allPostsResponse.json();
+                    console.log('All Posts Response:', allPostsData);
+                    if (Array.isArray(allPostsData)) {
+
+                        allPosts = allPostsData.flatMap(item => item.result || []);
+                    } else if (allPostsData && Array.isArray(allPostsData.data)) {
+                        // Fallback for a potential structure like { data: [post1, post2, ...] }
+                        allPosts = allPostsData.data;
+                    } else {
+                        allPosts = []; // Default to empty if the structure is unexpected
+                    }
+                } else {
+                    console.error('Failed to fetch all posts:', allPostsResponse.status, await allPostsResponse.text());
+                }
+
+                // Generate recommendations
+                const recommendationMap = new Map();
+
+                // Content-Based Filtering: Posts with same or similar category
+                const contentBased = allPosts
+                    .filter((p) => p.Category === post.Category && p.PostId !== post.PostId)
+                    .map((p) => ({ ...p, score: 0.3 }));
+                console.log('Content-Based:', contentBased);
+
+                // Collaborative Filtering: Match transactions by VoucherName
+                let collaborativeBased = [];
+                if (transactions.length > 0) {
+                    const transactionVoucherNames = transactions
+                        .map((t) => t.VoucherName)
+                        .filter((name) => name !== undefined);
+                    collaborativeBased = allPosts
+                        .filter((p) => transactionVoucherNames.includes(p.PostName) && p.PostId !== post.PostId)
+                        .map((p) => ({ ...p, score: 0.4 }));
+                    console.log('Collaborative-Based:', collaborativeBased);
+                }
+
+                // // Embeddings-Based Recommendations
+                // let embeddingBased = [];
+                // try {
+                //     const currentPostText = `${post.PostName || ''} ${post.Content || ''} ${post.Category || ''}`.trim();
+                //     const currentEmbedding = await openai.embeddings.create({
+                //         model: 'text-embedding-3-small',
+                //         input: currentPostText,
+                //     });
+                //     const currentVector = currentEmbedding.data[0].embedding;
+
+                //     for (const p of allPosts) {
+                //         if (p.PostId === post.PostId) continue;
+                //         const postText = `${p.PostName || ''} ${p.Content || ''} ${p.Category || ''}`.trim();
+                //         const embeddingResponse = await openai.embeddings.create({
+                //             model: 'text-embedding-3-small',
+                //             input: postText,
+                //         });
+                //         const postVector = embeddingResponse.data[0].embedding;
+                //         const similarity = cosineSimilarity(currentVector, postVector);
+                //         embeddingBased.push({ ...p, score: similarity * 0.5 });
+                //     }
+                //     console.log('Embedding-Based:', embeddingBased);
+                // } catch (err) {
+                //     console.error('Error generating embeddings:', err);
+                // }
+
+                // Combine recommendations
+                [...contentBased, ...collaborativeBased,].forEach((rec) => {
+                    if (recommendationMap.has(rec.PostId)) {
+                        const existing = recommendationMap.get(rec.PostId);
+                        recommendationMap.set(rec.PostId, {
+                            ...rec,
+                            score: (existing.score + rec.score) / 2,
+                        });
+                    } else {
+                        recommendationMap.set(rec.PostId, rec);
+                    }
+                });
+
+                let recommendations = Array.from(recommendationMap.values())
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 4);
+                console.log('Combined Recommendations:', recommendations);
+
+                // Cold-start fallback
+                if (recommendations.length === 0 && allPosts.length > 0) {
+                    recommendations = allPosts
+                        .filter((p) => p.PostId !== post.PostId)
+                        .sort((a, b) => (b.UpVote || 0) - (a.UpVote || 0))
+                        .slice(0, 4)
+                        .map((p) => ({ ...p, score: 0.1 }));
+                    console.log('Cold-Start Recommendations:', recommendations);
+                }
+
+                setRecommendedPosts(recommendations);
+            } catch (err) {
+                console.error('Error fetching recommendations:', err);
+                setError('Không thể tải gợi ý bài đăng.');
+            } finally {
                 setLoading(false);
             }
         };
 
-        fetchPostDetail();
-    }, [postId]);
+        if (post && postId) {
+            fetchRecommendations();
+        }
+    }, [post, postId]);
 
     const increaseQuantity = () => {
         if (post && quantity < post.Quantity) {
@@ -43,6 +227,48 @@ const PostDetail = () => {
     const decreaseQuantity = () => {
         if (quantity > 1) {
             setQuantity(quantity - 1);
+        }
+    };
+
+    const handleBuyVoucher = (post) => {
+        navigate('/payment', { state: { voucher: post, quantity } });
+    };
+
+    const handleAddToCart = async (post) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            setError('Vui lòng đăng nhập để tiếp tục');
+            setLoading(false);
+            return;
+        }
+
+        if (!post || typeof post.PostId === 'undefined') {
+            setError('Không thể thêm voucher không hợp lệ vào giỏ hàng.');
+            return;
+        }
+
+        try {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/cart/addToCart`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ PostId: post.PostId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Không thể thêm vào giỏ hàng.');
+            }
+
+            alert('Đã thêm voucher vào giỏ hàng thành công!');
+            navigate('/shop-vouchers');
+        } catch (err) {
+            setError(err.message || 'Lỗi khi thêm vào giỏ hàng.');
+            alert(`Lỗi: ${err.message || 'Không thể thêm vào giỏ hàng.'}`);
         }
     };
 
@@ -61,51 +287,6 @@ const PostDetail = () => {
     if (!post) {
         return <div className="text-center py-10">Không tìm thấy bài đăng.</div>;
     }
-
-    // Handle Buy Voucher button click
-    const handleBuyVoucher = (post) => {
-        navigate('/payment', { state: { voucher: post, quantity } });
-    };
-
-    // Handle Add to Cart button click
-    const handleAddToCart = async (post) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục');
-            setLoading(false);
-            return;
-        }
-
-        if (!post || typeof post.PostId === 'undefined') {
-            setError('Không thể thêm voucher không hợp lệ vào giỏ hàng.');
-            return;
-        }
-
-        try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/cart/addToCart`, { // Đảm bảo URL API này là chính xác
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`, // Thêm "Bearer " trước token
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ PostId: post.PostId }), // Gửi PostId của voucher
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Không thể thêm vào giỏ hàng.');
-            }
-
-            alert('Đã thêm voucher vào giỏ hàng thành công!');
-            navigate('/shop-vouchers');
-
-        } catch (err) {
-            setError(err.message || 'Lỗi khi thêm vào giỏ hàng.');
-            alert(`Lỗi: ${err.message || 'Không thể thêm vào giỏ hàng.'}`);
-        }
-    };
 
     const postDate = new Date(post.Date);
     const isValidDate = !isNaN(postDate.getTime());
@@ -138,7 +319,7 @@ const PostDetail = () => {
                             {new Intl.NumberFormat('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND',
-                            }).format(post.Price * 1000)}
+                            }).format((post.Price || 0) * 1000)}
                         </p>
                         <p className="text-gray-500 mb-2">
                             Đăng ngày:{' '}
@@ -182,17 +363,17 @@ const PostDetail = () => {
                                 {new Intl.NumberFormat('vi-VN', {
                                     style: 'currency',
                                     currency: 'VND',
-                                }).format(quantity * post.Price * 1000)}
+                                }).format(quantity * (post.Price || 0) * 1000)}
                             </span>
                         </p>
-                        {/* Action Buttons */}
                         <div className="px-6 pb-6">
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <button
                                     onClick={() => handleBuyVoucher(post)}
                                     className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                                        }`}
                                     aria-label={`Mua voucher ${post.PostName}`}
                                     disabled={post.Quantity === 0}
                                 >
@@ -201,8 +382,9 @@ const PostDetail = () => {
                                 <button
                                     onClick={() => handleAddToCart(post)}
                                     className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-green-600 text-white hover:bg-green-700'}`}
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-green-600 text-white hover:bg-green-700'
+                                        }`}
                                     aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
                                     disabled={post.Quantity === 0}
                                 >
@@ -212,6 +394,55 @@ const PostDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Phần hiển thị bài đăng được gợi ý */}
+                {recommendedPosts.length > 0 ? (
+                    <div className="mt-12">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            Bài đăng được gợi ý
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {recommendedPosts.map((recPost) => (
+                                <div
+                                    key={recPost.PostId}
+                                    className="border rounded-lg p-4 hover:shadow-lg cursor-pointer"
+                                    onClick={() => navigate(`/postdetail/${recPost.PostId}`)}
+                                >
+                                    {recPost.VouImg ? (
+                                        <img
+                                            src={recPost.VouImg}
+                                            alt={recPost.PostName}
+                                            className="w-full h-40 object-cover rounded-md mb-4"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-md mb-4">
+                                            <span className="text-gray-500">Không có hình ảnh</span>
+                                        </div>
+                                    )}
+                                    <h3 className="text-lg font-semibold text-gray-800">
+                                        {recPost.PostName || 'Tên không có'}
+                                    </h3>
+                                    <p className="text-blue-600 font-bold">
+                                        {new Intl.NumberFormat('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND',
+                                        }).format((recPost.Price || 0) * 1000)}
+                                    </p>
+                                    <p className="text-gray-500 text-sm">
+                                        Danh mục: {recPost.Category || 'Không xác định'}
+                                    </p>
+                                    <p className="text-gray-500 text-sm">
+                                        Điểm gợi ý: {(recPost.score * 100).toFixed(2)}%
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="mt-12 text-center text-gray-500">
+                        Không có bài đăng được gợi ý.
+                    </div>
+                )}
             </div>
         </Layout>
     );

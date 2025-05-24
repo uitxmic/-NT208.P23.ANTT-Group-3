@@ -1,7 +1,7 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS fn_get_all_post;$$
-CREATE PROCEDURE fn_get_all_post(
+DROP PROCEDURE IF EXISTS fn_get_all_free_post;$$
+CREATE PROCEDURE fn_get_all_free_post(
 	IN p_page INT,
     IN p_page_size INT
 	)
@@ -33,7 +33,7 @@ BEGIN
       )
    ) AS result
    FROM Post P
-   WHERE P.IsVerified IS TRUE AND P.IsActive IS TRUE AND P.Quantity > 0 AND P.Price > 0
+   WHERE P.IsVerified IS TRUE AND P.IsActive IS TRUE AND P.Quantity > 0 AND P.Price=0
    GROUP BY P.VoucherId, P.PostId, P.UserId, P.PostName, P.VouImg, P.Content, P.Price, P.Date, P.Expire, P.Quantity, P.UpVote, P.UpDown, P.IsActive
    ORDER BY P.Date DESC
    LIMIT p_page_size OFFSET p_offset;
@@ -41,4 +41,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_all_post(1,100);
+call fn_get_all_free_post(1,8);

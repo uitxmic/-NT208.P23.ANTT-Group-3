@@ -98,6 +98,25 @@ class PostingController {
         }
     }
 
+    GetAllFreePostings = async (req, res) => {
+        const { page, limit } = req.query;
+        const token = req.headers['authorization'];
+
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        try {
+            const [results] = await this.connection.query(`CALL fn_get_all_free_post(?, ?)`, [page, limit]);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error getting postings:', err);
+            return res.status(500).json({ error: 'Error getting postings' });
+        }
+    }
+
     // [GET] /posting/getPostingByPostId/:PostId
     GetPostingByPostId = async (req, res) => {
         const { PostId } = req.params;

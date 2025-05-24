@@ -86,10 +86,10 @@ const PostDetail = () => {
             const response = await fetch(`${API_BASE_URL}/cart/addToCart`, { // Đảm bảo URL API này là chính xác
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Thêm "Bearer " trước token
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ PostId: post.PostId }), // Gửi PostId của voucher
+                body: JSON.stringify({ PostId: post.PostId }),
             });
 
             const data = await response.json();
@@ -186,30 +186,32 @@ const PostDetail = () => {
                             </span>
                         </p>
                         {/* Action Buttons */}
-                        <div className="px-6 pb-6">
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <button
-                                    onClick={() => handleBuyVoucher(post)}
-                                    className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-                                    aria-label={`Mua voucher ${post.PostName}`}
-                                    disabled={post.Quantity === 0}
-                                >
-                                    Mua Voucher
-                                </button>
-                                <button
-                                    onClick={() => handleAddToCart(post)}
-                                    className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-green-600 text-white hover:bg-green-700'}`}
-                                    aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
-                                    disabled={post.Quantity === 0}
-                                >
-                                    Thêm vào giỏ hàng
-                                </button>
+                        {post.Price > 0 && (
+                            <div className="px-6 pb-6">
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <button
+                                        onClick={() => handleBuyVoucher(post)}
+                                        className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                                        aria-label={`Mua voucher ${post.PostName}`}
+                                        disabled={post.Quantity === 0}
+                                    >
+                                        Mua Voucher
+                                    </button>
+                                    <button
+                                        onClick={() => handleAddToCart(post)}
+                                        className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-green-600 text-white hover:bg-green-700'}`}
+                                        aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
+                                        disabled={post.Quantity === 0}
+                                    >
+                                        Thêm vào giỏ hàng
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -165,9 +165,9 @@ const PurchaseHistory = () => {
                                                         : transaction.Status === 2
                                                             ? 'Đang xử lý hoàn tiền'
                                                             : transaction.Status === 3
-                                                                ? 'Xử lý hoàn tiền hoàn tất'
+                                                                ? 'Từ chối hoàn tiền'
                                                                 : transaction.Status === 4
-                                                                    ? 'Từ chối hoàn tiền'
+                                                                    ? 'Xử lý hoàn tiền hoàn tiền hoàn tất'
                                                                     : ''}
                                             </span>
                                         </td>

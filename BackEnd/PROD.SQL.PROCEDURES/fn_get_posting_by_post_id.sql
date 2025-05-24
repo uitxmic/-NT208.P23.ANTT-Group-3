@@ -34,3 +34,5 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CALL fn_get_posting_by_post_id(35);

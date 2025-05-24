@@ -136,6 +136,28 @@ class PostingController {
         }
     }
 
+    async fetchPostingDataById(PostId) {
+        if (!PostId) {
+            console.error('fetchPostingDataById: PostId is required.');
+
+            throw new Error('PostId is required to fetch posting data.');
+        }
+
+        try {
+            if (!this.connection) {
+               
+                await this.initConnection();
+            }
+            const [results] = await this.connection.query(`CALL fn_get_posting_by_post_id(?)`, [PostId]);
+
+            return results[0];
+
+        } catch (err) {
+            console.error(`Error fetching posting data by ID ${PostId} internally:`, err);
+            throw new Error(`Database error while fetching posting data for PostId ${PostId}.`);
+        }
+    }
+
     // [PUT] /posting/updatePosting
     UpdatePosting = async (req, res) => {
         const { PostId, VoucherId, Postname, Content } = req.body;

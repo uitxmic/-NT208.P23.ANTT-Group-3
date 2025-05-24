@@ -9,4 +9,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_user_by_id('13');
+CALL fn_get_user_by_id(26);

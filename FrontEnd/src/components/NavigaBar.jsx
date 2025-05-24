@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FaSearch, FaBell, FaBars, FaShoppingCart } from 'react-icons/fa';
+import { FaSearch, FaBell, FaBars, FaShoppingCart, FaHistory } from 'react-icons/fa';
 import UserBalance from './UserBalance';
 import SearchFilterModal from './SearchFilterModal';
 
@@ -314,6 +314,12 @@ const Navbar = ({
             </span>
           )}
         </Link>
+
+        {/* Biểu tượng Lịch sử mua hàng */}
+        <Link to="/purchase-history" className="relative group">
+          <FaHistory className="h-6 w-6 text-blue-600 group-hover:text-blue-800 transition-colors duration-200" />
+        </Link>
+
 
         {/* Ngôn ngữ */}
         <div className="relative">

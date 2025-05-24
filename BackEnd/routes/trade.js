@@ -22,4 +22,8 @@ router.use('/acceptRefund', tradeController.AcceptRefund);
 
 router.use('/rejectRefund', tradeController.RejectRefund);
 
+router.use('/requestRefund', tradeController.RequestRefund);   
+
+router.use('/getTransactionById', tradeController.GetTransactionByUserId);
+
 module.exports = router;

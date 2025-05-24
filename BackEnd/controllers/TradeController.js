@@ -239,19 +239,7 @@ class TradeController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-    if (userRoleId != 1) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserRoleId = decode.userRoleId;
-      if (UserRoleId != 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
 
       const [results] = await this.connection.query('CALL fn_complete_transaction(?)', [TransactionId]);
       const message = results[0][0]?.Message;
@@ -262,6 +250,36 @@ class TradeController {
         return res.status(200).json({ message: 'Success' });
       else
         return res.status(400).json({ error: message.error });
+    } catch (error) {
+      console.error('Query error:', error);
+      res.status(500).json({ error: 'Database query error', details: error.message });
+    }
+  }
+
+  // [PATCH] /trade/requestRefund
+  RequestRefund = async (req, res) => {
+    const { TransactionId } = req.body;
+    if (!TransactionId) {
+      return res.status(400).json({ error: 'TransactionId is required in request body' });
+    }
+
+    const token = req.headers['authorization'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+
+      const [results] = await this.connection.query('CALL fn_request_refund(?)', [TransactionId]);
+      const message = results[0][0]?.Message;
+      const Id = results[0][0]?.Id;
+      console.log('Id:', Id);
+      console.log('Message:', message);
+      if (Id !== -1)
+        return res.status(200).json({ message: 'Success' });
+      else
+        return res.status(400).json({ error: message });
     } catch (error) {
       console.error('Query error:', error);
       res.status(500).json({ error: 'Database query error', details: error.message });
@@ -346,6 +364,30 @@ class TradeController {
         return res.status(200).json({ message: 'Success' });
       else
         return res.status(400).json({ error: message });
+    } catch (error) {
+      console.error('Query error:', error);
+      res.status(500).json({ error: 'Database query error', details: error.message });
+    }
+  }
+
+  // [GET] /trade/getTransactionByUserId
+  GetTransactionByUserId = async (req, res) => {
+    const token = req.headers['authorization'];
+
+    // Get query parameters for search and sorting
+    const { search = '', sortColumn = 'CreateAt', sortOrder = 'DESC' } = req.query;
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+      var secretKey = process.env.JWT_SECRET;
+      var decode = jwt.verify(token, secretKey);
+      var UserId = decode.userId;
+
+      const [results] = await this.connection.query('CALL fn_get_transaction_history_by_id(?, ?, ?, ?)', [UserId, search, sortColumn, sortOrder]);
+      res.json(results[0]); // Chỉ trả về kết quả SELECT
     } catch (error) {
       console.error('Query error:', error);
       res.status(500).json({ error: 'Database query error', details: error.message });

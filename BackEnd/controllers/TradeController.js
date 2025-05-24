@@ -105,6 +105,50 @@ class TradeController {
     }
   }
 
+  CreateFreeTransaction = async (req, res) => {
+    const { VoucherId, PostId, Amount, Quantity, UserIdSeller } = req.body;
+
+    const token = req.headers['authorization'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (!VoucherId || !PostId || !UserIdSeller) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+      var secretKey = process.env.JWT_SECRET;
+      var decode = jwt.verify(token, secretKey);
+      var UserIdBuyer = decode.userId;
+
+      console.log('UserIdBuyer:', UserIdBuyer);
+      console.log('VoucherId:', VoucherId);
+      console.log('PostId:', PostId);
+      console.log('Amount:', Amount);
+      console.log('Quantity:', Quantity);
+      console.log('UserIdSeller:', UserIdSeller);
+
+      const [result] = await this.connection.query(
+        'CALL fn_create_free_transaction(?, ?, ?, ?, ?, ?, @out_message, @out_id)', [VoucherId, PostId, Amount, Quantity, UserIdBuyer, UserIdSeller]
+      );
+
+      const [[out]] = await this.connection.query('SELECT @out_message AS message, @out_id AS id');
+      console.log('OUT:', out);
+
+      if (out.message === 'Thu thập voucher thành công') {
+        return res.status(200).json({ message: 'Success', transactionId: out.id });
+      } else {
+        return res.status(400).json({ error: out.message });
+      }
+
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+      return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
+  }
+
   CreateCartTransaction = async (req, res) => {
     const { cartItems } = req.body;
     const token = req.headers['authorization'];

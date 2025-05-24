@@ -92,7 +92,7 @@ const PostingPage = () => {
       <div className="min-h-screen bg-gray-50 py-10" style={{ paddingTop: '100px' }}>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl mt-5 font-extrabold text-gray-900 text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
             CÁC VOUCHER HIỆN TẠI TRÊN HỆ THỐNG
           </h1>
 

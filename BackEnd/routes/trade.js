@@ -10,6 +10,8 @@ router.use('/20lastestposts', tradeController.Get20LastestPosts);
 
 router.use('/createTransaction', tradeController.CreateTransaction);
 
+router.use('/createFreeTransaction', tradeController.CreateFreeTransaction);
+
 router.use("/createCartTransaction", tradeController.CreateCartTransaction);
 
 router.use('/getTransactionForAdmin', tradeController.GetTransactionForAdmin);

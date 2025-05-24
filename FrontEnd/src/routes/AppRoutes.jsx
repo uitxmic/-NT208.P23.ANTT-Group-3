@@ -10,7 +10,7 @@ import VoucherDetail from "../pages/VoucherDetail";
 import Payment from "../pages/Payment";
 import UserProfile from "../pages/UserProfile";
 import Deposit from "../components/Deposit";
-import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
+import ErrorBoundary from "../components/ErrorBoundary";
 import News from "../pages/News";
 import NewsDetail from "../pages/NewsDetail";
 import SearchResult from "../pages/SearchResult";

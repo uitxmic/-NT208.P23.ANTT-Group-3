@@ -2,6 +2,7 @@ import BannerCarousel from "../components/BannerCarousel";
 import PostList from "../components/PostsList";
 import Layout from "../components/Layout";
 import ErrorBoundary from "../components/ErrorBoundary";
+import FreePost from "../components/FreePost";
 
 function Home() {
   return (
@@ -9,7 +10,7 @@ function Home() {
       <Layout>
         <div className="flex flex-col min-h-screen bg-pink-50">
           {/* Main Content */}
-          <div className="flex flex-1" style={{ marginTop: '4rem'}} >
+          <div className="flex flex-1" style={{ marginTop: '4rem' }} >
             {/* Main Section */}
             <main className="flex-1 p-6">
               <section className="bg-white rounded-lg shadow-sm py-12 mb-12">
@@ -123,6 +124,9 @@ function Home() {
                   </div>
                 </div>
               </section>
+
+              {/* Flash Sale Section (Free Posts) */}
+              <FreePost /> {/* Integrate FreePost component here */}
 
               {/* Section to display news to user */}
               <BannerCarousel />

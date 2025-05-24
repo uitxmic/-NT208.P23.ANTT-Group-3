@@ -218,6 +218,36 @@ const PostDetail = () => {
         }
     }, [post, postId]);
 
+    if (loading) {
+        return (
+            <Layout>
+                <div className="container mx-auto px-4 py-8 pt-20 text-center">
+                    Đang tải...
+                </div>
+            </Layout>
+        );
+    }
+
+    if (error) {
+        return (
+            <Layout>
+                <div className="container mx-auto px-4 py-8 pt-20 text-center text-red-500">
+                    Lỗi: {error}
+                </div>
+            </Layout>
+        );
+    }
+
+    if (!post) {
+        return (
+            <Layout>
+                <div className="container mx-auto px-4 py-8 pt-20 text-center">
+                    Không tìm thấy bài đăng.
+                </div>
+            </Layout>
+        );
+    }
+
     const increaseQuantity = () => {
         if (post && quantity < post.Quantity) {
             setQuantity(quantity + 1);
@@ -251,7 +281,7 @@ const PostDetail = () => {
 
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/cart/addToCart`, { // Đảm bảo URL API này là chính xác
+            const response = await fetch(`${API_BASE_URL}/cart/addToCart`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -281,183 +311,161 @@ const PostDetail = () => {
     return (
         <Layout>
             <div className="container mx-auto px-4 py-8 pt-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Main Post Section: Image and Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    {/* Image Column */}
                     <div className="flex justify-center">
                         {post.VouImg ? (
                             <img
                                 src={post.VouImg}
                                 alt={post.PostName}
-                                className="w-full flex justify-center"
+                                className="w-full max-w-md object-cover rounded-md"
                             />
                         ) : (
-                            <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                            <div className="w-full max-w-md h-48 bg-gray-200 flex items-center justify-center rounded-md">
                                 <span className="text-gray-500">Không có hình ảnh</span>
                             </div>
                         )}
                     </div>
-                    <div className="flex flex-col">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-                            {post.PostName || 'Tên không có'}
-                        </h1>
-                        <p className="text-gray-600 mb-4">
-                            {post.Content || 'Nội dung không có'}
-                        </p>
-                        <p className="text-blue-600 font-bold text-2xl mb-4">
-                            {new Intl.NumberFormat('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                            }).format((post.Price || 0) * 1000)}
-                        </p>
-                        <p className="text-gray-500 mb-2">
-                            Đăng ngày:{' '}
-                            {isValidDate
-                                ? postDate.toLocaleDateString('vi-VN')
-                                : 'Ngày không hợp lệ'}
-                        </p>
-                        <p className="text-gray-500 mb-2">
-                            Hết hạn:{' '}
-                            {new Date(post.Expire).toLocaleDateString('vi-VN')}
-                        </p>
-                        <p className="text-green-600 mb-2">
-                            Số lượng còn lại: {post.Quantity || 0}
-                        </p>
-                        <p className="text-gray-500 mb-4">
-                            Trạng thái: {post.Status || 'Không xác định'}
-                        </p>
-                        <div className="flex items-center mb-4">
-                            <span className="text-gray-700 mr-4">Số lượng:</span>
-                            <button
-                                onClick={decreaseQuantity}
-                                className="px-3 py-1 bg-gray-200 text-gray-700 rounded-l-md hover:bg-gray-300"
-                                disabled={quantity <= 1}
-                            >
-                                -
-                            </button>
-                            <span className="px-4 py-1 bg-gray-100 text-gray-800">
-                                {quantity}
-                            </span>
-                            <button
-                                onClick={increaseQuantity}
-                                className="px-3 py-1 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300"
-                                disabled={quantity >= post.Quantity}
-                            >
-                                +
-                            </button>
-                        </div>
-                        <p className="text-gray-700 mb-4">
-                            Tổng giá:{' '}
-                            <span className="font-bold">
+                    {/* Details Column */}
+                    <div className="flex flex-col justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                                {post.PostName || 'Tên không có'}
+                            </h1>
+                            <p className="text-gray-600 mb-4">
+                                {post.Content || 'Nội dung không có'}
+                            </p>
+                            <p className="text-blue-600 font-bold text-2xl mb-4">
                                 {new Intl.NumberFormat('vi-VN', {
                                     style: 'currency',
                                     currency: 'VND',
-                                }).format(quantity * (post.Price || 0) * 1000)}
-                            </span>
-                        </p>
-
-                        <div className="px-6 pb-6">
-                            <div className="flex flex-col sm:flex-row gap-4">
+                                }).format((post.Price || 0) * 1000)}
+                            </p>
+                            <p className="text-gray-500 mb-2">
+                                Đăng ngày:{' '}
+                                {isValidDate
+                                    ? postDate.toLocaleDateString('vi-VN')
+                                    : 'Ngày không hợp lệ'}
+                            </p>
+                            <p className="text-gray-500 mb-2">
+                                Hết hạn:{' '}
+                                {new Date(post.Expire).toLocaleDateString('vi-VN')}
+                            </p>
+                            <p className="text-green-600 mb-2">
+                                Số lượng còn lại: {post.Quantity || 0}
+                            </p>
+                            <p className="text-gray-500 mb-4">
+                                Trạng thái: {post.Status || 'Không xác định'}
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center">
+                                <span className="text-gray-700 mr-4">Số lượng:</span>
                                 <button
-                                    onClick={() => handleBuyVoucher(post)}
-                                    className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                                        }`}
-                                    aria-label={`Mua voucher ${post.PostName}`}
-                                    disabled={post.Quantity === 0}
+                                    onClick={decreaseQuantity}
+                                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded-l-md hover:bg-gray-300 disabled:opacity-50"
+                                    disabled={quantity <= 1}
                                 >
-                                    Mua Voucher
+                                    -
                                 </button>
+                                <span className="px-4 py-1 bg-gray-100 text-gray-800">
+                                    {quantity}
+                                </span>
                                 <button
-                                    onClick={() => handleAddToCart(post)}
-                                    className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-green-600 text-white hover:bg-green-700'
-                                        }`}
-                                    aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
-                                    disabled={post.Quantity === 0}
+                                    onClick={increaseQuantity}
+                                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300 disabled:opacity-50"
+                                    disabled={quantity >= post.Quantity}
                                 >
-                                    Thêm vào giỏ hàng
+                                    +
                                 </button>
-                                {/* Action Buttons */}
-                                {post.Price > 0 && (
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        <button
-                                            onClick={() => handleBuyVoucher(post)}
-                                            className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
+                            </div>
+                            <p className="text-gray-700">
+                                Tổng giá:{' '}
+                                <span className="font-bold">
+                                    {new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    }).format(quantity * (post.Price || 0) * 1000)}
+                                </span>
+                            </p>
+                            {post.Price > 0 && (
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <button
+                                        onClick={() => handleBuyVoucher(post)}
+                                        className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
                                                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                                                 : 'bg-blue-600 text-white hover:bg-blue-700'
-                                                }`}
-                                            aria-label={`Mua voucher ${post.PostName}`}
-                                            disabled={post.Quantity === 0}
-                                        >
-                                            Mua Voucher
-                                        </button>
-                                        <button
-                                            onClick={() => handleAddToCart(post)}
-                                            className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
+                                            }`}
+                                        aria-label={`Mua voucher ${post.PostName}`}
+                                        disabled={post.Quantity === 0}
+                                    >
+                                        Mua Voucher
+                                    </button>
+                                    <button
+                                        onClick={() => handleAddToCart(post)}
+                                        className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
                                                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                                                 : 'bg-green-600 text-white hover:bg-green-700'
-                                                }`}
-                                            aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
-                                            disabled={post.Quantity === 0}
-                                        >
-                                            Thêm vào giỏ hàng
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Phần hiển thị bài đăng được gợi ý */}
-                        {recommendedPosts.length > 0 ? (
-                            <div className="mt-12">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                                    Bài đăng được gợi ý
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                    {recommendedPosts.map((recPost) => (
-                                        <div
-                                            key={recPost.PostId}
-                                            className="border rounded-lg p-4 hover:shadow-lg cursor-pointer"
-                                            onClick={() => navigate(`/postdetail/${recPost.PostId}`)}
-                                        >
-                                            {recPost.VouImg ? (
-                                                <img
-                                                    src={recPost.VouImg}
-                                                    alt={recPost.PostName}
-                                                    className="w-full h-40 object-cover rounded-md mb-4"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-md mb-4">
-                                                    <span className="text-gray-500">Không có hình ảnh</span>
-                                                </div>
-                                            )}
-                                            <h3 className="text-lg font-semibold text-gray-800">
-                                                {recPost.PostName || 'Tên không có'}
-                                            </h3>
-                                            <p className="text-blue-600 font-bold">
-                                                {new Intl.NumberFormat('vi-VN', {
-                                                    style: 'currency',
-                                                    currency: 'VND',
-                                                }).format((recPost.Price || 0) * 1000)}
-                                            </p>
-                                            <p className="text-gray-500 text-sm">
-                                                Danh mục: {recPost.Category || 'Không xác định'}
-                                            </p>
-                                            <p className="text-gray-500 text-sm">
-                                                Điểm gợi ý: {(recPost.score * 100).toFixed(2)}%
-                                            </p>
-                                        </div>
-                                    ))}
+                                            }`}
+                                        aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
+                                        disabled={post.Quantity === 0}
+                                    >
+                                        Thêm vào giỏ hàng
+                                    </button>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="mt-12 text-center text-gray-500">
-                                Không có bài đăng được gợi ý.
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
+                {/* Recommended Posts Section */}
+                {recommendedPosts.length > 0 ? (
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                            Bài đăng được gợi ý
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {recommendedPosts.map((recPost) => (
+                                <div
+                                    key={recPost.PostId}
+                                    className="border rounded-lg p-4 hover:shadow-lg cursor-pointer"
+                                    onClick={() => navigate(`/postdetail/${recPost.PostId}`)}
+                                >
+                                    {recPost.VouImg ? (
+                                        <img
+                                            src={recPost.VouImg}
+                                            alt={recPost.PostName}
+                                            className="w-full h-40 object-cover rounded-md mb-4"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-md mb-4">
+                                            <span className="text-gray-500">Không có hình ảnh</span>
+                                        </div>
+                                    )}
+                                    <h3 className="text-lg font-semibold text-gray-800">
+                                        {recPost.PostName || 'Tên không có'}
+                                    </h3>
+                                    <p className="text-blue-600 font-bold">
+                                        {new Intl.NumberFormat('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND',
+                                        }).format((recPost.Price || 0) * 1000)}
+                                    </p>
+                                    <p className="text-gray-500 text-sm">
+                                        Danh mục: {recPost.Category || 'Không xác định'}
+                                    </p>
+                                    <p className="text-gray-500 text-sm">
+                                        Điểm gợi ý: {(recPost.score * 100).toFixed(2)}%
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center text-gray-500">
+                        Không có bài đăng được gợi ý.
+                    </div>
+                )}
             </div>
         </Layout>
     );

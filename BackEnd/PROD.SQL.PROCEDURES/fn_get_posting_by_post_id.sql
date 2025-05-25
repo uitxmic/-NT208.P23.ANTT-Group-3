@@ -8,6 +8,9 @@ BEGIN
          'PostId', P.PostId,
          'VoucherId', P.VoucherId,
          'UserId', P.UserId,
+         'UserName', U.Username,
+         'AvgRate', U.AvgRate,
+         'SoldAmount', U.SoldAmount,
          'PostName', P.PostName,
          'VouImg', P.VouImg,
          'Content', P.Content,
@@ -26,7 +29,7 @@ BEGIN
                   END
       )
    ) AS result
-   FROM Post P 
+   FROM Post P JOIN User U on P.UserId = U.UserId
    WHERE P.IsVerified IS TRUE 
    AND P.IsActive IS TRUE
    AND P.PostId = post_id
@@ -35,4 +38,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_posting_by_post_id(35);
+CALL fn_get_posting_by_post_id(22);

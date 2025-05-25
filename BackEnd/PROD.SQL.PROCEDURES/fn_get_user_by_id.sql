@@ -1,4 +1,4 @@
-CALL fn_get_user_by_id('13');
+
 DELIMITER $$
 DROP PROCEDURE IF EXISTS fn_get_user_by_id; $$
 
@@ -8,3 +8,5 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+CALL fn_get_user_by_id(26);

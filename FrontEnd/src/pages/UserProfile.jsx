@@ -27,7 +27,7 @@ const Profile = () => {
         const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -110,7 +110,9 @@ const Profile = () => {
             </p>
             <div className="flex space-x-4 mt-4">
 
-              <button className="mt-4 bg-gradient-to-r from-green-400 to-blue-500 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-gray-200 transition duration-200">
+              <button className="mt-4 bg-gradient-to-r from-green-400 to-blue-500 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-gray-200 transition duration-200"
+                onClick={() => navigate('/update-profile')}
+              >
                 Chỉnh sửa hồ sơ
               </button>
               <button

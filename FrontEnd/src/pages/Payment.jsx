@@ -13,17 +13,40 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [momoQRCodeUrl, setMomoQRCodeUrl] = useState(null);
 
-  const voucher = state?.voucher;
-  const quantity = state?.quantity || 1;
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    setError('Vui lòng đăng nhập để tiếp tục');
+    setTimeout(() => navigate('/login'), 2000);
+    setLoading(false);
+    return;
+  }
+
+  const cartItems = Array.isArray(state?.items)
+    ? state.items
+    : state?.voucher
+      ? [{
+        voucherId: state.voucher.VoucherId,
+        postId: state.voucher.PostId,
+        amount: state.voucher.Price,
+        quantity: state.quantity || 1,
+        userIdSeller: state.voucher.UserId,
+        postName: state.voucher.PostName,
+        vouImg: state.voucher.VouImg,
+      }]
+      : [];
 
   useEffect(() => {
-    if (!voucher) {
-      setError('No voucher selected');
-      setTimeout(() => navigate('/shop-vouchers'), 2000);
+    if (cartItems.length === 0) {
+      setError('Không có sản phẩm nào được chọn để thanh toán');
+      setTimeout(() => navigate('/cart'), 2000);
     }
-  }, [voucher, navigate]);
+  }, [cartItems, navigate]);
 
-  async function getMomoQRCodeUrl(amount, userId, voucher, token) {
+  const calculateTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + (item.amount * item.quantity), 0);
+  };
+
+  async function getMomoQRCodeUrl(userId, token) {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE_URL}/payment/create-payment-voucher`, {
@@ -33,27 +56,52 @@ const Payment = () => {
           'Authorization': token,
         },
         body: JSON.stringify({
-          amount: amount,
+          cartData: cartItems.map(item => ({
+            VoucherId: item.voucherId,
+            PostId: item.postId,
+            Quantity: item.quantity,
+            UserIdSeller: item.userIdSeller,
+            ItemId: item.itemId,
+          })),
           userIdBuyer: userId,
-          userIdSeller: voucher.UserId,
-          voucherId: voucher.VoucherId,
-          postId: voucher.PostId,
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to get QR code');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get QR code');
       }
       const data = await response.json();
       return data.payUrl;
     } catch (error) {
-      console.error(error);
-      return null;
+      console.error('Error fetching MoMo QR code:', error.message);
+      throw error;
     }
   }
 
+  // Xóa các mục đã thanh toán khỏi giỏ hàng
+  const handleUpdate = async (itemId, quantity) => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/cart/updateCart`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ItemId: itemId,
+          Quantity: quantity,
+        }),
+      });
+      if (!response.ok) throw new Error("Cập nhật giỏ hàng thất bại!");
+    } catch (err) {
+      alert(err.message || "Cập nhật giỏ hàng thất bại!");
+    }
+  };
+
   const handlePayment = async () => {
     if (!paymentMethod) {
-      setError('Please select a payment method');
+      setError('Vui lòng chọn phương thức thanh toán');
       return;
     }
 
@@ -61,193 +109,201 @@ const Payment = () => {
     setSuccess('');
     setLoading(true);
 
-    const token = localStorage.getItem('access_token');
-    console.log('hrrr', token);
-    if (!token) {
-      setError('Please login to continue');
-      setTimeout(() => navigate('/login'), 2000);
-      setLoading(false);
-      return;
-    }
-
     try {
+      const totalAmount = calculateTotalPrice();
+
       if (paymentMethod === 'balance') {
-        if (balance === null) {
-          throw new Error('Balance not loaded yet');
-        }
-        if (balance < voucher.Price) {
-          throw new Error('Insufficient balance');
-        }
+        if (balance === null) throw new Error('Số dư chưa được tải');
+        if (balance < totalAmount) throw new Error('Số dư không đủ để thanh toán');
+
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const response = await fetch(`${API_BASE_URL}/trade/createTransaction`, {
+        const response = await fetch(`${API_BASE_URL}/trade/createCartTransaction`, {
           method: 'POST',
           headers: {
             Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            VoucherId: voucher.VoucherId,
-            PostId: voucher.PostId,
-            Amount: voucher.Price,
-            Quantity: quantity,
-            UserIdSeller: voucher.UserId,
+            cartItems: cartItems.map(item => ({
+              VoucherId: item.voucherId,
+              PostId: item.postId,
+              Amount: item.amount,
+              Quantity: item.quantity,
+              UserIdSeller: item.userIdSeller,
+            })),
           }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error);
+          throw new Error(errorData.error || 'Thanh toán thất bại');
         }
 
         const data = await response.json();
         if (data.message === 'Success') {
           setSuccess('Thanh toán thành công, giao dịch của bạn đang được xử lý.');
+
+          cartItems.forEach((item) => {
+            if (item.itemId) {
+              handleUpdate(item.itemId, 0);
+            }
+          });
+
           setTimeout(() => navigate('/user-vouchers'), 2000);
         } else {
-          throw new Error(data.error || 'Payment failed');
+          throw new Error(data.error || 'Thanh toán thất bại');
         }
       } else if (paymentMethod === 'bank') {
-        setSuccess('Please complete the payment using your bank account.');
+        setSuccess('Vui lòng hoàn tất thanh toán bằng tài khoản ngân hàng.');
       } else if (paymentMethod === 'momo') {
         const userId = JSON.parse(atob(token.split('.')[1])).userId;
-        const qrCodeUrl = await getMomoQRCodeUrl(voucher.Price * 1000, userId, voucher, token);
-        console.log(qrCodeUrl);
+        const qrCodeUrl = await getMomoQRCodeUrl(userId, token);
         if (qrCodeUrl) {
-          window.open(qrCodeUrl, '_blank'); // Open QR code URL in new tab
-          setSuccess('Bạn vui lòng quét mã QR bằng ứng dụng MoMo để hoàn tất thanh toán.');
+          window.open(qrCodeUrl, '_blank');
+          setSuccess('Vui lòng quét mã QR bằng ứng dụng MoMo để hoàn tất thanh toán.');
         } else {
-          throw new Error('Failed to generate MoMo QR code');
+          throw new Error('Không thể tạo mã QR MoMo');
         }
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during payment');
+      setError(err.message || 'Đã xảy ra lỗi trong quá trình thanh toán');
     } finally {
       setLoading(false);
     }
   };
 
-  // Rest of the component remains the same, but modify the MoMo section in the JSX
   return (
     <Layout>
-      <div className="flex flex-col min-h-screen bg-gray-100">
+      <div className="flex flex-col min-h-screen bg-gray-100 mt-5">
         <div className="flex-1 p-6">
-          <div className="flex flex-col min-h-screen bg-gray-100">
-            <div className="flex-1 p-6">
-              <h1 className="text-3xl font-bold text-center mb-6">Payment</h1>
+          <h1 className="text-3xl font-bold text-center mb-6">Thanh toán</h1>
 
-              {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-center">
-                  {success}
-                </div>
-              )}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-center">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-center">
+              {success}
+            </div>
+          )}
 
-              <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-                <h2 className="text-2xl font-bold mb-4">Voucher Details</h2>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={voucher?.VouImg || 'https://via.placeholder.com/150'}
-                    alt={voucher?.PostName || 'Voucher Image'}
-                    className="w-32 h-32 object-cover rounded-md"
-                  />
-                  <div>
-                    <h3 className="text-xl font-semibold">{voucher?.PostName}</h3>
-                    <p className="text-gray-600">{voucher?.Label}</p>
-                    <p className="text-orange-600 font-bold mt-2">Giá: {voucher.Price}.000 ₫</p>
-                    <p className="text-orange-600 font-bold mt-2">Số lượng: {quantity}</p>
-                    <p className="text-orange-600 font-bold mt-2">Tổng: {voucher.Price * quantity}.000 ₫</p>
-                    <p className="text-gray-500 text-sm">
-                      Ngày hết hạn: {voucher?.Expire ? new Date(voucher.Expire).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
+          <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h2 className="text-2xl font-bold mb-4">Chi tiết sản phẩm</h2>
+            {cartItems.map((item, index) => (
+              <div key={index} className="flex items-center space-x-4 mb-4 border-b pb-4 last:border-b-0">
+                <img
+                  src={item.vouImg || 'https://via.placeholder.com/150'}
+                  alt={item.postName || 'Voucher Image'}
+                  className="w-32 h-32 object-cover rounded-md"
+                />
+                <div>
+                  <h3 className="text-xl font-semibold">{item.postName}</h3>
+                  <p className="text-orange-600  mt-2">
+                    Giá: {''}
+                    <span className="text-orange-600  mt-2">
+                      {balance != null
+                        ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.amount * 1000)
+                        : '0 ₫'}
+                    </span>
+                  </p>
+                  <p className="text-orange-600  mt-2">Số lượng: {item.quantity}</p>
                 </div>
               </div>
+            ))}
+            <div className="mt-4 text-right">
+              <p className="text-xl font-bold text-orange-600">
+                Tổng cộng: {''}
+                <span className="text-xl font-bold text-orange-600">
+                  {balance != null
+                    ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(calculateTotalPrice() * 1000)
+                    : '0 ₫'}
+                </span>
+              </p>
+            </div>
+          </div>
 
-              <div className="bg-white p-6 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">Lựa chọn phương thức thanh toán</h2>
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Lựa chọn phương thức thanh toán</h2>
 
-                <UserBalance setBalance={setBalance} />
+            <UserBalance setBalance={setBalance} />
 
-                {balance !== null ? (
-                  <p className="text-gray-600 mb-4">
-                    Số dư tài khoản của bạn: <span className="text-sm font-semibold">{balance != null
-                      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                        balance * 1000
-                      )
-                      : '0 ₫'}</span>
-                  </p>
-                ) : (
-                  <p className="text-gray-600 mb-4">Loading balance...</p>
+            {balance !== null ? (
+              <p className="text-gray-600 mb-4">
+                Số dư tài khoản của bạn:{' '}
+                <span className="text-sm font-semibold">
+                  {balance != null
+                    ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(balance * 1000)
+                    : '0 ₫'}
+                </span>
+              </p>
+            ) : (
+              <p className="text-gray-600 mb-4">Đang tải số dư...</p>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="balance"
+                    checked={paymentMethod === 'balance'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="form-radio"
+                  />
+                  <span>Thanh toán với số dư tài khoản của bạn</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="bank"
+                    checked={paymentMethod === 'bank'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="form-radio"
+                  />
+                  <span>Thanh toán bằng tài khoản ngân hàng</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="momo"
+                    checked={paymentMethod === 'momo'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="form-radio"
+                  />
+                  <span>Thanh toán với ví MoMo</span>
+                </label>
+                {paymentMethod === 'momo' && (
+                  <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                    <p className="text-gray-700 mb-1">
+                      Nhấn nút bên dưới để lấy mã QR và quét bằng ứng dụng MoMo.
+                    </p>
+                    <span className="text-xs text-yellow-700">
+                      Lưu ý: Giao dịch này không được bảo vệ, bạn sẽ chuyển tiền trực tiếp cho người bán.
+                    </span>
+                  </div>
                 )}
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="balance"
-                        checked={paymentMethod === 'balance'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="form-radio"
-                      />
-                      <span>Thanh toán với số dư tài khoản của bạn</span>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="bank"
-                        checked={paymentMethod === 'bank'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="form-radio"
-                      />
-                      <span>Pay with Bank Account</span>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="momo"
-                        checked={paymentMethod === 'momo'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="form-radio"
-                      />
-                      <span>Thanh toán với ví MoMo</span>
-                    </label>
-                    {paymentMethod === 'momo' && (
-                      <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
-                        <p className="text-gray-700 mb-1">
-                          Nhấn nút bên dưới để lấy mã QR và quét bằng ứng dụng MoMo.
-                        </p>
-                        <span className="text-xs text-yellow-700">
-                          Lưu ý: Giao dịch này không được bảo vệ, bạn sẽ chuyển tiền trực tiếp cho người bán.
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handlePayment}
-                  className={`mt-6 w-full p-3 rounded-lg text-white transition duration-300 ${loading || balance === null ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                    }`}
-                  disabled={loading || balance === null}
-                >
-                  {loading ? 'Processing...' : 'Confirm Payment'}
-                </button>
               </div>
             </div>
+
+            <button
+              onClick={handlePayment}
+              className={`mt-6 w-full p-3 rounded-lg text-white transition duration-300 ${loading || balance === null ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
+              disabled={loading || balance === null}
+            >
+              {loading ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
+            </button>
           </div>
         </div>
       </div>

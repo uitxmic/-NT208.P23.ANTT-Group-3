@@ -14,5 +14,7 @@ router.use('/getValidUserVoucher', VoucherController.GetValidUserVouchers);
 
 router.get('/getVoucherDetail/:voucherid', VoucherController.GetDetailUserVoucher);
 
+router.post('/addVoucher', VoucherController.AddVoucher);
+
 
 module.exports = router;

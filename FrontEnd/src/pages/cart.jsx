@@ -88,16 +88,17 @@ function CartPage() {
   const calculateTotalPrice = () => {
     return cartItems
       .filter(item => selectedItems.has(item.ItemId))
-      .reduce((total, item) => total + (item.Price * 1000 * item.Quantity), 0);
+      .reduce((total, item) => total + (item.Price * item.Quantity), 0);
   };
 
   const itemsToPurchase = cartItems.filter(item => selectedItems.has(item.ItemId));
 
   const handleBuyNow = () => {
     const items = itemsToPurchase.map(item => ({
+      itemId: item.ItemId,
       voucherId: item.VoucherId,
       postId: item.PostId,
-      amount: item.Price * 1000,
+      amount: item.Price,
       quantity: item.Quantity,
       userIdSeller: item.UserId,
       postName: item.PostName,
@@ -161,7 +162,9 @@ function CartPage() {
                               <div>
                                 <div className="font-semibold">{item.PostName}</div>
                                 <div className="text-sm text-gray-500">
-                                  {(item.Price * 1000)?.toLocaleString()} ₫
+                                  {item.Price > 0
+                                    ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.Price * 1000)
+                                    : '0 ₫'}
                                 </div>
                               </div>
                             </div>
@@ -218,9 +221,12 @@ function CartPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <div className="text-right">
-                    <span className="text-gray-600">Tổng tiền: </span>
-                    <span className="text-xl font-bold text-orange-600">
-                      {calculateTotalPrice().toLocaleString()} ₫
+                    <span className="text-gray-600">Tổng tiền: {''}
+                      <span className="text-orange-600 font-bold mt-2">
+                        {calculateTotalPrice() > 0
+                          ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(calculateTotalPrice() * 1000)
+                          : '0 ₫'}
+                      </span>
                     </span>
                   </div>
                   <button

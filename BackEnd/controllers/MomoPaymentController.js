@@ -76,7 +76,7 @@ class MomoPaymentController {
         return requestBody;
     }
 
-        createPaymentRequestForVoucher(amount, orderInfo, extraData = "") {
+    createPaymentRequestForVoucher(amount, orderInfo, extraData = "") {
 
 
         const requestId = this.partnerCode + new Date().getTime();
@@ -126,26 +126,42 @@ class MomoPaymentController {
         }
     }
 
-    async UpdateVoucherId(userIdBuyer, userIdSeller, voucherId, postId) {
+    async UpdateVoucherId(extraData) {
         try {
             if (!this.connection) {
                 console.error('Database connection not initialized');
                 throw new Error('Database connection not initialized');
             }
-            console.log('Updating voucher ID:', { userIdBuyer, voucherId, postId });
 
-            const query = 'CALL fn_update_voucher_id_after_buying(?, ?, ?, ?)';
-            const [result] = await this.connection.query(query, [userIdBuyer, userIdSeller, voucherId, postId]);
-
-            if (result.affectedRows === 0) {
-                console.error(`User ${userIdBuyer} not found`);
-                throw new Error(`User ${userIdBuyer} not found`);
+            // Parse extraData
+            let parsedData;
+            try {
+                parsedData = JSON.parse(extraData);
+            } catch (error) {
+                console.error('Invalid extraData format:', error.message);
+                throw new Error('Invalid extraData format');
             }
 
-            console.log(`Updated voucher ID for user ${userIdBuyer}, voucher ID: ${voucherId}`);
-            return { success: true };
+            const { cartData, userIdBuyer } = parsedData;
+
+            if (!cartData || !Array.isArray(cartData) || cartData.length === 0 || !userIdBuyer) {
+                console.error('Missing or invalid cartData or userIdBuyer in extraData');
+                throw new Error('Missing or invalid cartData or userIdBuyer');
+            }
+
+            console.log('Updating cart transaction:', { cartData, userIdBuyer });
+
+            // Chuyển cartData thành chuỗi JSON
+            const cartDataJson = JSON.stringify(cartData);
+
+            // Gọi stored procedure fn_create_momo_cart_transaction
+            const query = 'CALL fn_create_momo_cart_transaction(?, ?)';
+            const [result] = await this.connection.query(query, [cartDataJson, userIdBuyer]);
+
+            console.log(`Updated cart transaction for user ${userIdBuyer}`);
+            return { success: true, message: result[0]?.Message, lastTransactionId: result[0]?.LastTransactionId };
         } catch (error) {
-            console.error('Error updating voucher ID:', error.message, error.stack);
+            console.error('Error updating cart transaction:', error.message, error.stack);
             throw error;
         }
     }

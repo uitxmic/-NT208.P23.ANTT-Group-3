@@ -197,6 +197,32 @@ class VoucherController {
             return res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     };
+
+    // [POST] /voucher/addVoucher
+    AddVoucher = async (req, res) => {
+        const { VoucherName, Category, ExpirationDay, VoucherCodes } = req.body;
+        const token = req.headers.authorization;
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+
+            if (!VoucherName || !Category || !ExpirationDay || !VoucherCodes) {
+                return res.status(400).json({ message: "All fields are required in request body" });
+            }
+
+            const [result] = await this.connection.execute("CALL fn_add_voucher(?, ?, ?, ?, ?)", [VoucherName, userId, Category, ExpirationDay, VoucherCodes] );
+            return res.json(result[0]);
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    }
 }
 
 module.exports = new VoucherController; 

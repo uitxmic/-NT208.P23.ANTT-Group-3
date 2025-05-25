@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { SearchAPI } from '../components/SearchFilterModal'; // Import SearchAPI
-import Layout from '../components/Layout'; // Giả sử bạn có Layout chung
+import Layout from '../components/Layout';
 
 // Components con để hiển thị từng loại kết quả (bạn cần tạo các component này)
 const VoucherCard = ({ voucher }) => (
@@ -64,24 +64,64 @@ const PostCard = ({ post }) => (
 );
 
 const UserCard = ({ user }) => {
-
     const formatAvgRate = (rate) => {
         if (rate === null || rate === undefined) return 'Chưa có';
         const numRate = parseFloat(rate);
         return isNaN(numRate) ? 'Chưa có' : numRate.toFixed(1);
     };
+
+    const formatBalance = (balance) => {
+        if (balance === null || balance === undefined) return '0 ₫';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(balance);
+    };
+
+    const avatarUrl = user.AvatarUrl || 'https://via.placeholder.com/150?text=User';
+
     return (
-    <div className="border p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-        <h3 className="text-xl font-semibold text-purple-600">{user.Username}</h3>
-        <p className="text-gray-700">Họ tên: {user.Fullname || 'Chưa cập nhật'}</p>
-        <p className="text-gray-600">Email: {user.Email}</p>
-        <p className="text-sm text-gray-500">Đánh giá trung bình: {formatAvgRate(user.AvgRate)}</p>
-        <p className="text-sm text-gray-500">Vai trò: {user.RoleID === 1 ? 'Admin' : (user.UserRoleId === 2 ? 'User' : 'Seller')}</p>
-        {/* Thêm Link đến trang hồ sơ người dùng nếu có */}
-        <Link to={`/profile/${user.UserId}`} className="text-purple-500 hover:underline mt-2 inline-block">Xem hồ sơ</Link>
-    </div>
+        <div className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-center max-w-sm mx-auto transform hover:scale-105 transition-transform duration-300">
+            <img
+                src={avatarUrl}
+                alt={user.Username}
+                className="w-24 h-24 rounded-full mb-4 object-cover transition-transform duration-300 hover:scale-110"
+            />
+            <h3 className="text-xl font-bold text-purple-700 mb-2">{user.Username}</h3>
+            <div className="text-gray-700 text-sm space-y-2 w-full">
+                <div className="flex justify-between">
+                    <span className="font-medium">Họ tên:</span>
+                    <span>{user.Fullname || 'Chưa cập nhật'}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="font-medium">Email:</span>
+                    <span>{user.Email}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="font-medium">Số dư:</span>
+                    <span>{formatBalance(user.Balance)}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="font-medium">Số điện thoại:</span>
+                    <span>{user.PhoneNumber || 'Chưa cập nhật'}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="font-medium">Xếp hạng trung bình:</span>
+                    <span>{formatAvgRate(user.AvgRate)}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="font-medium">Trạng thái xác thực:</span>
+                    <span className={user.IsVerified ? 'text-green-500' : 'text-red-500'}>
+                        {user.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
+                    </span>
+                </div>
+            </div>
+            <Link to={user.UserId ? `/profile/${user.UserId}` : '#'}
+                className={`mt-4 text-purple-500 hover:text-purple-700 text-sm font-medium transition-colors duration-200 ${!user.UserId ? 'pointer-events-none opacity-50' : ''}`}
+            >
+                Xem hồ sơ
+            </Link>
+        </div>
     );
 };
+
 
 const SearchResult = () => {
     const { type } = useParams(); // 'vouchers', 'posts', 'users'
@@ -130,7 +170,17 @@ const SearchResult = () => {
     }, [type, location.search]); // Sử dụng location.search để theo dõi thay đổi của query params
 
     if (loading) {
-        return <Layout><div className="container mx-auto p-4 text-center">Đang tải kết quả...</div></Layout>;
+        return (
+            <Layout>
+                <div className="container mx-auto p-4 text-center">
+                    <svg className="animate-spin h-8 w-8 text-gray-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <p className="mt-2 text-gray-600">Đang tải kết quả...</p>
+                </div>
+            </Layout>
+        );
     }
 
     if (error) {

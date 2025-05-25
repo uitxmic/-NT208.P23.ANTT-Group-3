@@ -55,40 +55,52 @@ class UsersController {
 
     // /users/getUserById
     GetUserById = async (req, res) => {
-        let token = req.headers.authorization;
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
+    let userId;
+    let token = req.headers.authorization;
 
-        if (token.startsWith('Bearer ')) {
-            // Remove Bearer from string
-            token = token.slice(7, token.length);
-        }
-
-        try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
-
-            const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
-            // fn_get_user_by_id is expected to return an array of users, even if it's just one user
-            // So results[0] would be like [{ UserId: 1, Fullname: 'Test User', ... }]
-            if (results[0] && results[0].length > 0) {
-                 // Send the array containing the user object, as the frontend expects data[0]
-                res.json(results[0]);
-            } else {
-                return res.status(404).json({ message: "User not found" });
-            }
-        }
-        catch (error) {
-            console.error('Error in GetUserById:', error);
-            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                return res.status(401).json({ message: "Invalid or expired token", details: error.message });
-            }
-            res.status(500).json({ error: 'Internal server error', details: error.message });
-        }
+    // Kiểm tra token
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
 
+    // Xử lý Bearer token
+    if (token.startsWith('Bearer ')) {
+        token = token.slice(7, token.length);
+    }
+
+    try {
+        // Trường hợp 1: ID được truyền qua URL params (xem profile người khác)
+        if (req.params && req.params.id) {
+            userId = req.params.id;
+            if (isNaN(userId)) {
+                return res.status(400).json({ error: 'Invalid userId, must be a number' });
+            }
+        } 
+        // Trường hợp 2: Dùng ID từ token (xem profile bản thân)
+        else {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            userId = decoded.userId;
+        }
+
+        // Gọi stored procedure để lấy thông tin người dùng
+        const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [parseInt(userId)]);
+        
+        // Kiểm tra kết quả
+        if (results[0] && results[0].length > 0) {
+            res.json(results[0]);
+        } else {
+            return res.status(404).json({ message: "User not found" });
+        }
+    }
+    catch (error) {
+        console.error('Error in GetUserById:', error);
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: "Invalid or expired token", details: error.message });
+        }
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+}
     // [POST] /users/createUser
     CreateUser = async (req, res) => {
         const { Username, Fullname, Password, Email, PhoneNumber } = req.body;

@@ -120,21 +120,23 @@ const FreePost = () => {
 
     useEffect(() => {
         fetchFreePosts();
+    }, []);
+
+     useEffect(() => {
+        if (freePosts.length === 0) {
+            return; // Don't start a timer if there are no posts
+        }
 
         const timer = setInterval(() => {
             setFreePosts(prevPosts =>
                 prevPosts.map(post => ({
                     ...post,
-                    timeLeft: calculateTimeLeft(post.Expire),
+                    timeLeft: calculateTimeLeft(post.Expire), // Update timeLeft
                 }))
             );
-            if (freePosts.length > 0) {
-                const commonTimeLeft = calculateTimeLeft(freePosts[0].Expire);
-                console.log('Thời gian chung còn lại:', commonTimeLeft);
-            }
         }, 1000);
 
-        return () => clearInterval(timer);
+        return () => clearInterval(timer); // Cleanup timer on unmount or when freePosts changes
     }, [freePosts]);
 
     return (

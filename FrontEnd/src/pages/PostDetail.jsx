@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// import OpenAI from 'openai';
 import Layout from '../components/Layout';
 
 // Hàm tính cosine similarity giữa hai vector
@@ -20,11 +19,6 @@ const PostDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
-
-    // // Khởi tạo OpenAI client
-    // const openai = new OpenAI({
-    //     apiKey: import.meta.env.VITE_OPENAI_API_KEY, // Lưu API key trong .env
-    // });
 
     // Effect for fetching the main post details
     useEffect(() => {
@@ -117,13 +111,11 @@ const PostDetail = () => {
                     const allPostsData = await allPostsResponse.json();
                     console.log('All Posts Response:', allPostsData);
                     if (Array.isArray(allPostsData)) {
-
                         allPosts = allPostsData.flatMap(item => item.result || []);
                     } else if (allPostsData && Array.isArray(allPostsData.data)) {
-                        // Fallback for a potential structure like { data: [post1, post2, ...] }
                         allPosts = allPostsData.data;
                     } else {
-                        allPosts = []; // Default to empty if the structure is unexpected
+                        allPosts = [];
                     }
                 } else {
                     console.error('Failed to fetch all posts:', allPostsResponse.status, await allPostsResponse.text());
@@ -150,34 +142,8 @@ const PostDetail = () => {
                     console.log('Collaborative-Based:', collaborativeBased);
                 }
 
-                // // Embeddings-Based Recommendations
-                // let embeddingBased = [];
-                // try {
-                //     const currentPostText = `${post.PostName || ''} ${post.Content || ''} ${post.Category || ''}`.trim();
-                //     const currentEmbedding = await openai.embeddings.create({
-                //         model: 'text-embedding-3-small',
-                //         input: currentPostText,
-                //     });
-                //     const currentVector = currentEmbedding.data[0].embedding;
-
-                //     for (const p of allPosts) {
-                //         if (p.PostId === post.PostId) continue;
-                //         const postText = `${p.PostName || ''} ${p.Content || ''} ${p.Category || ''}`.trim();
-                //         const embeddingResponse = await openai.embeddings.create({
-                //             model: 'text-embedding-3-small',
-                //             input: postText,
-                //         });
-                //         const postVector = embeddingResponse.data[0].embedding;
-                //         const similarity = cosineSimilarity(currentVector, postVector);
-                //         embeddingBased.push({ ...p, score: similarity * 0.5 });
-                //     }
-                //     console.log('Embedding-Based:', embeddingBased);
-                // } catch (err) {
-                //     console.error('Error generating embeddings:', err);
-                // }
-
                 // Combine recommendations
-                [...contentBased, ...collaborativeBased,].forEach((rec) => {
+                [...contentBased, ...collaborativeBased].forEach((rec) => {
                     if (recommendationMap.has(rec.PostId)) {
                         const existing = recommendationMap.get(rec.PostId);
                         recommendationMap.set(rec.PostId, {
@@ -352,11 +318,8 @@ const PostDetail = () => {
                                 Hết hạn:{' '}
                                 {new Date(post.Expire).toLocaleDateString('vi-VN')}
                             </p>
-                            <p className="text-green-600 mb-2">
+                            <p className="text-green-600 mb-4">
                                 Số lượng còn lại: {post.Quantity || 0}
-                            </p>
-                            <p className="text-gray-500 mb-4">
-                                Trạng thái: {post.Status || 'Không xác định'}
                             </p>
                         </div>
                         <div className="flex flex-col gap-4">
@@ -394,8 +357,8 @@ const PostDetail = () => {
                                     <button
                                         onClick={() => handleBuyVoucher(post)}
                                         className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'
                                             }`}
                                         aria-label={`Mua voucher ${post.PostName}`}
                                         disabled={post.Quantity === 0}
@@ -405,8 +368,8 @@ const PostDetail = () => {
                                     <button
                                         onClick={() => handleAddToCart(post)}
                                         className={`w-full py-2 font-semibold rounded-lg transition-colors duration-200 ${post.Quantity === 0
-                                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                                : 'bg-green-600 text-white hover:bg-green-700'
+                                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                            : 'bg-green-600 text-white hover:bg-green-700'
                                             }`}
                                         aria-label={`Thêm voucher ${post.PostName} vào giỏ hàng`}
                                         disabled={post.Quantity === 0}
@@ -418,12 +381,92 @@ const PostDetail = () => {
                         </div>
                     </div>
                 </div>
+                {/* Seller Information Section */}
+                <div className="border rounded-lg p-4 mb-12 shadow-sm">
+                    <div className="flex items-center mb-4">
+                        <img
+                            src={post.VouImg || 'https://via.placeholder.com/150'}
+                            alt={`${post.UserName || 'Người bán'}'s avatar`}
+                            className="w-16 h-16 rounded-full mr-4 object-cover"
+                        />
+                        <div>
+                            <p className="text-lg font-semibold text-gray-800">
+                                {post.UserName || 'bluevelvet.vn'}
+                            </p>
+                            <p className="text-gray-500 text-sm">Online 26 phút trước</p>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p className="text-gray-600">
+                                Đánh Giá: <span className="font-semibold">{post.AvgRate || 'Chưa có'}</span>
+                            </p>
+                            <p className="text-gray-600">
+                                Số Lượng Đã Bán: <span className="font-semibold">{post.SoldAmount || 0}</span>
+                            </p>
+                            <p className="text-gray-600">
+                                Sản Phẩm: <span className="font-semibold">{post.SoldAmount || 0}</span>
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600">
+                                Tham Gia: <span className="font-semibold">2 năm trước</span>
+                            </p>
+                            <p className="text-gray-600">
+                                Nguồn Theo Dõi:{' '}
+                                <span className="font-semibold">
+                                    {new Intl.NumberFormat('vi-VN').format(32400)}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <button
+                            className="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center justify-center gap-2"
+                            onClick={() => alert('Chức năng Chat Ngay đang được phát triển!')}
+                        >
+                            <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                                ></path>
+                            </svg>
+                            Chat Ngay
+                        </button>
+                        <button
+                            className="flex-1 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center justify-center gap-2"
+                            onClick={() => alert('Chức năng Xem Shop đang được phát triển!')}
+                        >
+                            <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                ></path>
+                            </svg>
+                            Xem Shop
+                        </button>
+                    </div>
+                </div>
                 {/* Recommended Posts Section */}
                 {recommendedPosts.length > 0 ? (
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                            Bài đăng được gợi ý
-                        </h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng được gợi ý</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {recommendedPosts.map((recPost) => (
                                 <div
@@ -462,13 +505,11 @@ const PostDetail = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center text-gray-500">
-                        Không có bài đăng được gợi ý.
-                    </div>
+                    <div className="text-center text-gray-500">Không có bài đăng được gợi ý.</div>
                 )}
             </div>
         </Layout>
     );
-}
+};
 
 export default PostDetail;

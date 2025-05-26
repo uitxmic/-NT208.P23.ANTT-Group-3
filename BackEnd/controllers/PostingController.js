@@ -145,7 +145,7 @@ class PostingController {
 
         try {
             if (!this.connection) {
-               
+
                 await this.initConnection();
             }
             const [results] = await this.connection.query(`CALL fn_get_posting_by_post_id(?)`, [PostId]);

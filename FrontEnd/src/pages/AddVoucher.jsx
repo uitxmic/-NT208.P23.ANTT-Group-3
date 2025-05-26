@@ -28,32 +28,103 @@ const AddVoucher = () => {
         }));
     };
 
+// ...existing code...
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setFileName(file.name);
             const reader = new FileReader();
             reader.onload = (event) => {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                
-                const vouchers = jsonData.slice(1).map(row => ({
-                    VoucherName: row[0] || '',
-                    Category: row[1] || '',
-                    ExpirationDay: row[2] || '',
-                    VoucherCodes: row[3] || ''
-                })).filter(v => v.VoucherCodes.trim() !== '');
+                try {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                setVouchersFromFile(vouchers);
-                setFormData((prevData) => ({
-                    ...prevData,
-                    VoucherCodes: vouchers.map(v => v.VoucherCodes).join(',')
-                }));
+                    const parsedVouchers = jsonData.slice(1).map(row => {
+                        let expirationDayValue = row[2] || '';
+                        // Kiểm tra nếu giá trị là một số (Excel serial date)
+                        if (typeof row[2] === 'number') {
+                            const dateObj = XLSX.SSF.parse_date_code(row[2]);
+                            if (dateObj) {
+                                const year = dateObj.y;
+                                const month = String(dateObj.m).padStart(2, '0');
+                                const day = String(dateObj.d).padStart(2, '0');
+                                expirationDayValue = `${year}-${month}-${day}`;
+                            } else {
+                                expirationDayValue = row[2].toString();
+                            }
+                        } else if (row[2] instanceof Date) {
+                            const year = row[2].getFullYear();
+                            const month = String(row[2].getMonth() + 1).padStart(2, '0');
+                            const day = String(row[2].getDate()).padStart(2, '0');
+                            expirationDayValue = `${year}-${month}-${day}`;
+                        }
+                        return {
+                            VoucherName: String(row[0] || '').trim(),
+                            Category: String(row[1] || '').trim(),
+                            ExpirationDay: expirationDayValue,
+                            VoucherCodes: String(row[3] || '').trim()
+                        };
+                    }).filter(v => v.VoucherCodes !== ''); // Lọc những dòng có mã voucher
+
+                    console.log('Parsed vouchers from file:', parsedVouchers);
+                    setVouchersFromFile(parsedVouchers);
+
+                    if (parsedVouchers.length > 0) {
+                        const firstVoucher = parsedVouchers[0];
+                        const allCodes = parsedVouchers
+                            .map(v => v.VoucherCodes) // Các mã đã được trim và lọc ở trên
+                            .filter(code => code) // Đảm bảo không có code rỗng sau map
+                            .join(',');
+
+                        if (firstVoucher.VoucherName && firstVoucher.Category && firstVoucher.ExpirationDay && allCodes) {
+                            setFormData({
+                                VoucherName: firstVoucher.VoucherName,
+                                Category: firstVoucher.Category,
+                                ExpirationDay: firstVoucher.ExpirationDay,
+                                VoucherCodes: allCodes
+                            });
+                            toast.success(`Đã đọc ${parsedVouchers.length} voucher từ file. Sẵn sàng để thêm.`);
+                        } else {
+                            toast.error('File Excel thiếu thông tin cần thiết (Tên, Loại, Ngày hết hạn ở dòng đầu tiên có mã voucher) hoặc không có mã voucher hợp lệ.');
+                            setFormData({ VoucherName: '', Category: '', ExpirationDay: '', VoucherCodes: '' });
+                            e.target.value = ''; // Reset file input
+                            setFileName('');
+                            setVouchersFromFile([]);
+                        }
+                    } else {
+                        toast.info('File không chứa mã voucher nào hợp lệ.');
+                        setFormData({ VoucherName: '', Category: '', ExpirationDay: '', VoucherCodes: '' });
+                        e.target.value = ''; // Reset file input
+                        setFileName('');
+                        setVouchersFromFile([]);
+                    }
+                } catch (readError) {
+                    toast.error("Lỗi khi đọc hoặc xử lý file Excel.");
+                    console.error("File processing error:", readError);
+                    setError("Lỗi xử lý file.");
+                    e.target.value = ''; // Reset file input
+                    setFileName('');
+                    setVouchersFromFile([]);
+                    setFormData({ VoucherName: '', Category: '', ExpirationDay: '', VoucherCodes: '' });
+                }
+            };
+            reader.onerror = () => {
+                toast.error("Không thể đọc file.");
+                setError("Lỗi đọc file.");
+                e.target.value = ''; // Reset file input
+                setFileName('');
+                setVouchersFromFile([]);
+                setFormData({ VoucherName: '', Category: '', ExpirationDay: '', VoucherCodes: '' });
             };
             reader.readAsArrayBuffer(file);
+        } else {
+            setFileName('');
+            setVouchersFromFile([]);
+            // Reset formData if a file was previously selected and then cleared
+            setFormData({ VoucherName: '', Category: '', ExpirationDay: '', VoucherCodes: '' });
         }
     };
 
@@ -72,34 +143,48 @@ const AddVoucher = () => {
                 return;
             }
 
-            if (useFileUpload && vouchersFromFile.length === 0) {
-                toast.error('Vui lòng upload file chứa mã voucher.');
-                setIsSubmitting(false);
-                return;
-            }
-
             if (useFileUpload) {
-                // Process each voucher from file
-                for (const voucher of vouchersFromFile) {
-                    const response = await axios.post(`${API_BASE_URL}/voucher/addVoucher`, voucher, {
-                        headers: {
-                            'Authorization': `${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (response.data.Id === null) {
-                        throw new Error(response.data.message || 'Đã xảy ra lỗi khi thêm voucher');
-                    }
+                if (vouchersFromFile.length === 0) {
+                    toast.error('Vui lòng chọn một file Excel và đảm bảo file có chứa dữ liệu voucher hợp lệ.');
+                    setIsSubmitting(false);
+                    return;
                 }
-                setSuccess('Thêm các voucher từ file thành công!');
-                setVouchersFromFile([]);
-                setFileName('');
-                e.target.querySelector('input[type="file"]').value = '';
+                // formData should now be populated from handleFileChange
+                if (!formData.VoucherName || !formData.Category || !formData.ExpirationDay || !formData.VoucherCodes) {
+                    toast.error('Dữ liệu từ file Excel không đầy đủ hoặc không hợp lệ. Cần có Tên Voucher, Loại, Ngày hết hạn và ít nhất một Mã Voucher.');
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                // Gửi một yêu cầu duy nhất với formData đã được chuẩn bị
+                const response = await axios.post(`${API_BASE_URL}/voucher/addVoucher`, formData, {
+                    headers: {
+                        'Authorization': `${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.data.Id !== null) {
+                    setSuccess('Thêm các voucher từ file thành công!');
+                    setVouchersFromFile([]);
+                    setFileName('');
+                    const fileInput = document.getElementById('voucherFile');
+                    if (fileInput) {
+                        fileInput.value = ''; // Reset file input
+                    }
+                    setFormData({ // Reset form data
+                        VoucherName: '',
+                        Category: '',
+                        ExpirationDay: '',
+                        VoucherCodes: ''
+                    });
+                } else {
+                    throw new Error(response.data.message || 'Đã xảy ra lỗi khi thêm voucher từ file');
+                }
             } else {
                 // Process single voucher from form
-                if (!formData.VoucherCodes) {
-                    toast.error('Vui lòng nhập mã voucher.');
+                if (!formData.VoucherCodes || !formData.VoucherName || !formData.Category || !formData.ExpirationDay) {
+                    toast.error('Vui lòng nhập đầy đủ thông tin voucher.');
                     setIsSubmitting(false);
                     return;
                 }
@@ -123,7 +208,8 @@ const AddVoucher = () => {
                 }
             }
         } catch (err) {
-            setError(err.message || 'Đã xảy ra lỗi khi thêm voucher');
+            setError(err.response?.data?.message || err.message || 'Đã xảy ra lỗi khi thêm voucher');
+            toast.error(err.response?.data?.message || err.message || 'Đã xảy ra lỗi khi thêm voucher');
         } finally {
             setIsSubmitting(false);
         }

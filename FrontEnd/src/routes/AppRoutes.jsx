@@ -26,6 +26,7 @@ import AddVoucher from "../pages/AddVoucher";
 import UpdateProfile from "../pages/UpdateProfile";
 import ChangePassword from "../pages/ChangePassword";
 import PurchaseHistory from "../pages/PurchaseHistory";
+import UserDetail from "../pages/UserDetail";
 
 function AppRoutes() {
   return (
@@ -45,7 +46,8 @@ function AppRoutes() {
               <Route path="/user-vouchers" element={<UserVoucherList />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/profile" element={<UserProfile />} />
-              <Route path="/deposit" element={<Deposit />} />
+              <Route path="/profile/:id" element={<UserDetail />} />
+              {/* <Route path="/deposit" element={<Deposit />} /> */}
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/search" element={<SearchResult />} />
@@ -59,7 +61,7 @@ function AppRoutes() {
               <Route path="/postdetail/:postId" element={<PostDetail />} />
               <Route path="/voucher-detail/:voucherId" element={<VoucherDetail />} />
               <Route path="/deposit" element={<Deposit />} />
-              <Route path="/cart" element={<CartPage />} />
+              {/* <Route path="/cart" element={<CartPage />} /> */}
               <Route path="/admin/user-manager" element={<UserManager />} />
               <Route path="/add-voucher" element={<AddVoucher />} />
               <Route path="/update-profile" element={<UpdateProfile />} />

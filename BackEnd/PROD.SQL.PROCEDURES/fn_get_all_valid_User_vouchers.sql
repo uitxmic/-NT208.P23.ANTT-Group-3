@@ -5,22 +5,29 @@ CREATE PROCEDURE fn_get_all_valid_User_vouchers(IN p_UserId INT)
 BEGIN
    SELECT 
         V.VoucherId,
-        VoucherName,
-        VoucherCode,
-        Category,
+        V.VoucherName,
+        GROUP_CONCAT(DISTINCT V.VoucherCode) AS VoucherCodes,
+        V.Category,
         V.UserId,
         V.ExpirationDay,
-        GROUP_CONCAT(DISTINCT VoucherCode) AS VoucherCode,
-        GROUP_CONCAT(DISTINCT P.VouImg) AS VouImg
+        (SELECT P.VouImg 
+         FROM Post P 
+         WHERE P.VoucherId = V.VoucherId 
+         ORDER BY P.PostId DESC 
+         LIMIT 1) AS VouImg
     FROM Voucher V 
-    JOIN Post P ON V.VoucherId = P.VoucherId
+    LEFT JOIN Post P ON V.VoucherId = P.VoucherId
     WHERE V.ExpirationDay >= CURDATE()
       AND V.UserId = p_UserId
     GROUP BY 
-        V.VoucherId, V.VoucherName, Category, V.UserId, V.ExpirationDay
+        V.VoucherId, 
+        V.VoucherName, 
+        V.Category, 
+        V.UserId, 
+        V.ExpirationDay
     ORDER BY V.ExpirationDay ASC;
 END $$
 
 DELIMITER ;
 
-CALL fn_get_all_valid_User_vouchers(26);
+CALL fn_get_all_valid_User_vouchers(2);

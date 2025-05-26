@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FaSearch, FaBell, FaBars, FaShoppingCart } from 'react-icons/fa';
+import { FaSearch, FaBell, FaBars, FaShoppingCart, FaHistory } from 'react-icons/fa';
 import UserBalance from './UserBalance';
 import SearchFilterModal from './SearchFilterModal';
 
@@ -31,10 +31,12 @@ const Navbar = ({
 
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch('http://127.0.0.1:3000/users/getUserById', {
+        console.log(token);
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -57,7 +59,8 @@ const Navbar = ({
     const fetchNotifications = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch('http://127.0.0.1:3000/notification/get5latestnoti', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/notification/get5latestnoti`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -311,6 +314,12 @@ const Navbar = ({
             </span>
           )}
         </Link>
+
+        {/* Biểu tượng Lịch sử mua hàng */}
+        <Link to="/purchase-history" className="relative group">
+          <FaHistory className="h-6 w-6 text-blue-600 group-hover:text-blue-800 transition-colors duration-200" />
+        </Link>
+
 
         {/* Ngôn ngữ */}
         <div className="relative">

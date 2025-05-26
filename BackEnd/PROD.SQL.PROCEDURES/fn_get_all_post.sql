@@ -19,6 +19,7 @@ BEGIN
          'Content', P.Content,
          'Price', P.Price,
          'Date', P.Date,
+         'Category', (SELECT V.Category FROM Voucher V WHERE V.VoucherId = P.VoucherId GROUP BY V.Category),
          'Expire', P.Expire,
          'Quantity', P.Quantity,
          'UpVote', P.UpVote,
@@ -32,7 +33,7 @@ BEGIN
       )
    ) AS result
    FROM Post P
-   WHERE P.IsVerified IS TRUE AND P.IsActive IS TRUE AND P.Quantity > 0
+   WHERE P.IsVerified IS TRUE AND P.IsActive IS TRUE AND P.Quantity > 0 AND P.Price > 0
    GROUP BY P.VoucherId, P.PostId, P.UserId, P.PostName, P.VouImg, P.Content, P.Price, P.Date, P.Expire, P.Quantity, P.UpVote, P.UpDown, P.IsActive
    ORDER BY P.Date DESC
    LIMIT p_page_size OFFSET p_offset;
@@ -40,4 +41,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_all_post(1,5);
+CALL fn_get_all_post(1,100);

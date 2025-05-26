@@ -2,6 +2,7 @@ import BannerCarousel from "../components/BannerCarousel";
 import PostList from "../components/PostsList";
 import Layout from "../components/Layout";
 import ErrorBoundary from "../components/ErrorBoundary";
+import FreePost from "../components/FreePost";
 
 function Home() {
   return (
@@ -9,14 +10,14 @@ function Home() {
       <Layout>
         <div className="flex flex-col min-h-screen bg-pink-50">
           {/* Main Content */}
-          <div className="flex flex-1" style={{ marginTop: '4rem'}} >
+          <div className="flex flex-1" style={{ marginTop: '4rem' }} >
             {/* Main Section */}
             <main className="flex-1 p-6">
               <section className="bg-white rounded-lg shadow-sm py-12 mb-12">
                 <div className="flex flex-col md:flex-row items-center justify-center">
                   <div className="md:w-1/2 flex justify-center">
                     <img
-                      src="https://img.gotit.vn/compress/gotit_website/1709263961_yLb5z.png"
+                      src="public\vouchertop.jpg"
                       alt="Phone Mockup"
                       className="w-64 md:w-80"
                     />
@@ -96,7 +97,7 @@ function Home() {
                     <div className="min-w-[200px] mx-2">
                       <div className="bg-white rounded-lg shadow-md p-4 flex items-center justify-center h-32">
                         <img
-                          src="https://inhoangha.com/uploads/logo-starbucks.jpg"
+                          src="https://cdn.haitrieu.com/wp-content/uploads/2022/06/logo-starbucks-original.png"
                           alt="Starbucks Voucher"
                           className="h-16 object-contain"
                         />
@@ -124,6 +125,9 @@ function Home() {
                 </div>
               </section>
 
+              {/* Flash Sale Section (Free Posts) */}
+              <FreePost /> {/* Integrate FreePost component here */}
+
               {/* Section to display news to user */}
               <BannerCarousel />
 
@@ -135,7 +139,8 @@ function Home() {
                 <p className="text-lg mb-6">
                   Đăng bán ngay hôm nay và kiếm tiền từ những voucher bạn không sử dụng!
                 </p>
-                <button className="bg-white text-pink-500 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100">
+                <button className="bg-white text-pink-500 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100"
+                onClick={() => window.location.href = '/add-voucher'}>
                   Bắt đầu bán ngay
                 </button>
               </section>

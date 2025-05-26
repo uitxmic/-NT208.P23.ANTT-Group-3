@@ -24,6 +24,10 @@ BEGIN
     SET AccountBalance = AccountBalance + p_amount
     WHERE UserId = p_user_id_seller;
     
+	UPDATE `User`
+    SET SoldAmount = SoldAmount + p_amount
+    WHERE UserId = p_user_id_seller;
+    
     INSERT INTO Noti (user_id, noti_type, noti_title, noti_content, image_url, 
 						created_at, updated_at, is_read, is_deleted) VALUES
 	(p_user_id_seller, 'order', 'Đơn hàng đã hoàn tất', 'Đơn hàng của bạn đã hoàn tất, kiểm tra số dư ngay', 

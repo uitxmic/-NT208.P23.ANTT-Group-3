@@ -97,6 +97,25 @@ class CartController {
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
     }
+
+    async UpdateCartTransaction(UserIdBuyer,  ItemId, Quantity) {
+        try {
+            if (!this.connection) {
+                console.error('Database connection not initialized');
+                throw new Error('Database connection not initialized');
+            }
+
+            const query = 'CALL fn_update_cart(?, ?, ?)';
+            const [result] = await this.connection.query(query, [UserIdBuyer, ItemId, Quantity]);
+
+            console.log(`Updated cart transaction for user ${UserIdBuyer}`);
+            return { success: true, message: result[0]?.Message };
+        } catch (error) {
+            console.error('Error updating cart transaction:', error.message, error.stack);
+            throw error;
+        }
+    }
+
 }
 
 module.exports = new CartController();

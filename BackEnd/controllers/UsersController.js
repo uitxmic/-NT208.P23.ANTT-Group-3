@@ -33,7 +33,19 @@ class UsersController {
     // [Get] /users/getUsers
     GetAllUser = async (req, res) => {
         try {
-            const [results] = await this.connection.query('CALL get_all_users()');
+            const { sortBy = 'UserId', sortOrder = 'DESC', searchTerm = '' } = req.query;
+            const token = req.headers.authorization;
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized: No token provided" });
+            }
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userRoleId = decoded.userRoleId;
+            if (userRoleId != 1) {
+                return res.status(403).json({ message: "Forbidden: You do not have permission to access this resource" });
+            }
+
+            const [results] = await this.connection.query('CALL fn_get_all_user_for_admin(?, ?, ?)', [sortBy, sortOrder, searchTerm]);
             res.json(results[0]); // Chỉ trả về kết quả SELECT
         }
         catch (error) {
@@ -44,26 +56,52 @@ class UsersController {
 
     // /users/getUserById
     GetUserById = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
+    let userId;
+    let token = req.headers.authorization;
 
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
-
-        try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
-
-            const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [UserId]);
-            res.json(results[0]);
-        }
-        catch (error) {
-            console.error('Query error:', error);
-            res.status(500).json({ error: 'Database query error', details: error.message });
-        }
+    // Kiểm tra token
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
 
+    // Xử lý Bearer token
+    if (token.startsWith('Bearer ')) {
+        token = token.slice(7, token.length);
+    }
+
+    try {
+        // Trường hợp 1: ID được truyền qua URL params (xem profile người khác)
+        if (req.params && req.params.id) {
+            userId = req.params.id;
+            if (isNaN(userId)) {
+                return res.status(400).json({ error: 'Invalid userId, must be a number' });
+            }
+        } 
+        // Trường hợp 2: Dùng ID từ token (xem profile bản thân)
+        else {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            userId = decoded.userId;
+        }
+
+        // Gọi stored procedure để lấy thông tin người dùng
+        const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [parseInt(userId)]);
+        
+        // Kiểm tra kết quả
+        if (results[0] && results[0].length > 0) {
+            res.json(results[0]);
+        } else {
+            return res.status(404).json({ message: "User not found" });
+        }
+    }
+    catch (error) {
+        console.error('Error in GetUserById:', error);
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: "Invalid or expired token", details: error.message });
+        }
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+}
     // [POST] /users/createUser
     CreateUser = async (req, res) => {
         const { Username, Fullname, Password, Email, PhoneNumber } = req.body;
@@ -86,7 +124,7 @@ class UsersController {
             console.error('Error creating user:', error);
             return res.status(500).json({ error: 'Error creating user' });
         }
-        
+
     };
 
     //[GET] /users/login
@@ -121,7 +159,7 @@ class UsersController {
                     userId: results[0][0].UserId,
                     username: Username,
                     email: results[0][0].Email,
-                    userRoleId : results[0][0].UserRoleId,
+                    userRoleId: results[0][0].UserRoleId,
                 },
                     process.env.JWT_SECRET,
                     {expiresIn: process.env.JWT_EXPIRE});
@@ -172,7 +210,7 @@ class UsersController {
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
             if (results[0][0] && results[0][0].Message == "Change Password Successfully") {
-                return res.json(results[0][0].Message);
+                return res.json({'Message':results[0][0].Message});
             }
             else {
                 return res.status(401).json({ error: 'UserId or OldPassword is incorrect' });
@@ -208,6 +246,28 @@ class UsersController {
             return res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     };
+
+    // [PATCH] /users/updateUser
+    UpdateUser = async (req, res) => {
+        const { Fullname, Email, PhoneNumber } = req.body;
+        const token = req.headers.authorization;
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const userId = decoded.userId;
+
+            const [results] = await this.connection.query('CALL fn_update_user(?, ?, ?, ?)', [userId, Fullname, Email, PhoneNumber]);
+            res.json(results[0]);
+        } catch (error) {
+            console.error('Query error:', error);
+            res.status(500).json({ error: 'Database query error', details: error.message });
+        }
+    }
 
     // [GET] /users/session
     GetSession = async (req, res) =>

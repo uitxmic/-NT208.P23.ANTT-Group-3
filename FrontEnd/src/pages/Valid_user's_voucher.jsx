@@ -17,7 +17,8 @@ const UserVoucherList = () => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:3000/voucher/getValidUserVoucher', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/voucher/getValidUserVoucher`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -79,7 +80,7 @@ const UserVoucherList = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
         {/* Nội dung chính */}
         <div className="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
-          <h1 className="text-4xl font-extrabold text-gray-800 text-center mb-8 tracking-tight">
+          <h1 className="text-4xl mt-5 font-extrabold text-gray-800 text-center mb-8 tracking-tight">
             Các voucher của bạn
           </h1>
 
@@ -136,6 +137,18 @@ const UserVoucherList = () => {
             </div>
           )}
         </div>
+      </div>
+      {/* Button to add vouchers */}
+      <div className="fixed bottom-8 right-8">
+        <button
+          onClick={() => navigate('/add-voucher')}
+          className="bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+          aria-label="Add voucher"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
       </div>
     </Layout>
   );

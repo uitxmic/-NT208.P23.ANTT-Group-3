@@ -11,19 +11,37 @@ const Admin = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [language, setLanguage] = useState('vi');
     const [sidebarHeight, setSidebarHeight] = useState('calc(100vh - 64px)'); // Chiều cao mặc định
-    const accessToken = localStorage.getItem('access_token');
 
     useEffect(() => {
-        console.log('Access Token:', accessToken);
-        const userRoleId = JSON.parse(atob(accessToken.split('.')[1])).userRoleId;
-        if (!userRoleId || userRoleId !== 1) {
-            alert('Bạn không có quyền truy cập trang này!');
-            navigate('/login');
-        } else {
-            setUser(userRoleId);
-            // Dữ liệu giả lập cho stats
-            setStats({ transactions: 150, users: 85 });
-        }
+        const fetchSession = async () => {
+            try {
+                const response = await fetch('/api/session', {
+                    credentials: 'include', // Use session-based authentication
+                });
+
+                if (!response.ok) {
+                    alert('Bạn không có quyền truy cập trang này!');
+                    navigate('/login');
+                    return;
+                }
+
+                const data = await response.json();
+                const userRoleId = data.user.UserRoleId;
+
+                if (!userRoleId || userRoleId !== 1) {
+                    alert('Bạn không có quyền truy cập trang này!');
+                    navigate('/login');
+                } else {
+                    setUser(userRoleId);
+                    setStats({ transactions: 150, users: 85 }); // Dữ liệu giả lập cho stats
+                }
+            } catch (error) {
+                console.error('Error fetching session:', error);
+                navigate('/login');
+            }
+        };
+
+        fetchSession();
     }, [navigate]);
 
     const handleLogout = () => {

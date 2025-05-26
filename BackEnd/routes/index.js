@@ -9,6 +9,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const searchRouter = require('./search');
 const newsRouter = require('./news');
 const cartRouter = require('./cart');
+const sessionRoutes = require('./session');
 
 function routes(app) {
     app.get('/test', (req, res) => {

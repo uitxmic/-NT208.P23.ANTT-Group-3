@@ -1,7 +1,5 @@
 //middlewares/authMiddleware.js
 const cookieParser = require('cookie-parser');
-const fs = require('fs');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -9,29 +7,17 @@ const parserCookie = cookieParser();
 app.use(parserCookie);
 
 const authMiddleware = (req, res, next) => {
-    try{
-        const data = fs.readFileSync('sessions.json', 'utf8');
-        sessions = JSON.parse(data);
-    } catch (err) {
-        console.error('Read file error:', err);
-        return res.status(500).json({ error: 'Read file error', details: err.message });
-    }
-    const session_id = req.cookies.session_id;
-    console.log('sessions:', sessions);
-    token = sessions[session_id];
-    console.log('au token:', token);
-
-    if (!token) {
-        return res.redirect('users/login');
+    if (!req.session || !req.session.user) {
+        console.error('No session or user found in session');
+        return res.redirect('/users/login');
     }
 
     try {
-        const secretKey = process.env.JWT_SECRET;
-        const decoded = jwt.verify(token, secretKey);
-        req.user = decoded;
+        // Attach user information from session to the request object
+        req.user = req.session.user;
         next();
     } catch (err) {
-        res.redirect('users/login');
+        console.error('Error in authMiddleware:', err);
         return res.status(403).json({ error: 'Unauthorized' });
     }
 };

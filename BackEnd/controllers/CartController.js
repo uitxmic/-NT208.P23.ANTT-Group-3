@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 class CartController {
@@ -24,20 +23,15 @@ class CartController {
 
     // [Get] /cart/getCart
     GetCart = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
 
+        try {
+            const UserId = req.session.user.UserId;
             const [results] = await this.connection.query('CALL fn_get_cart(?)', [UserId]);
             res.json(results[0]);
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Query error:', error);
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
@@ -45,26 +39,21 @@ class CartController {
 
     // [Post] /cart/addToCart
     AddToCart = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
 
+        try {
+            const UserId = req.session.user.UserId;
             const { PostId } = req.body;
 
-            if (!PostId ) {
-                return res.status(400).json({ message: "Bad Request: PostId and Quantity are required" });
+            if (!PostId) {
+                return res.status(400).json({ message: "Bad Request: PostId is required" });
             }
 
             await this.connection.query('CALL fn_add_to_cart(?, ?)', [UserId, PostId]);
             res.status(200).json({ message: "Product added to cart successfully" });
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Query error:', error);
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
@@ -72,17 +61,12 @@ class CartController {
 
     // [Post] /cart/updateCart
     UpdateCart = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        
-        try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
 
+        try {
+            const UserId = req.session.user.UserId;
             const { ItemId, Quantity } = req.body;
 
             if (!ItemId || typeof Quantity === 'undefined' || Quantity === null) {
@@ -91,8 +75,7 @@ class CartController {
 
             await this.connection.query('CALL fn_update_cart(?, ?, ?)', [UserId, ItemId, Quantity]);
             res.status(200).json({ message: "Cart updated successfully" });
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Query error:', error);
             res.status(500).json({ error: 'Database query error', details: error.message });
         }

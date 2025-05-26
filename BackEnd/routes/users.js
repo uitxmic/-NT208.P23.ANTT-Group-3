@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const usersController = require('../controllers/UsersController');
-const redisClient = require('../middlewares/init.redis');
 
 router.use('/getUsers', usersController.GetAllUser);
 router.get('/getUserById', usersController.GetUserById);

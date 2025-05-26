@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 class NotificationController {
@@ -24,19 +23,12 @@ class NotificationController {
 
     // [GET] /notification Lấy 5 thông báo mới nhất của user
     get5LatestNotifications = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            var secretKey = process.env.JWT_SECRET;
-            var decode = jwt.verify(token, secretKey);
-            var userId = decode.userId;
-            if (isNaN(userId)) {
-                return res.status(400).json({ error: 'Invalid or missing userId' });
-            }
 
+        try {
+            const userId = req.session.user.UserId;
             const [results] = await this.connection.query('CALL fn_get_5_latest_notifications(?)', [userId]);
             if (!results[0] || results[0].length === 0) {
                 return res.status(404).json({ message: 'No notifications found' });
@@ -97,19 +89,12 @@ class NotificationController {
 
     // [GET] /notification/orders?userId=18 - Lấy tất cả thông báo loại "order"
     getAllOrderNotifications = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            var secretKey = process.env.JWT_SECRET;
-            var decode = jwt.verify(token, secretKey);
-            var userId = decode.userId;
-            if (isNaN(userId)) {
-                return res.status(400).json({ error: 'Invalid or missing userId' });
-            }
 
+        try {
+            const userId = req.session.user.UserId;
             const [results] = await this.connection.query('CALL fn_get_all_order_notifications(?)', [userId]);
             if (!results[0] || results[0].length === 0) {
                 return res.status(404).json({ message: 'No order notifications found' });
@@ -124,19 +109,12 @@ class NotificationController {
 
 
     getAllSystemNotifications = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            var secretKey = process.env.JWT_SECRET;
-            var decode = jwt.verify(token, secretKey);
-            var userId = decode.userId;
-            if (isNaN(userId)) {
-                return res.status(400).json({ error: 'Invalid or missing userId' });
-            }
 
+        try {
+            const userId = req.session.user.UserId;
             const [results] = await this.connection.query('CALL fn_get_all_system_notifications(?)', [userId]);
             if (!results[0] || results[0].length === 0) {
                 return res.status(404).json({ message: 'No system notifications found' });
@@ -150,19 +128,12 @@ class NotificationController {
     };
 
     getAllWalletNotifications = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            var secretKey = process.env.JWT_SECRET;
-            var decode = jwt.verify(token, secretKey);
-            var userId = decode.userId;
-            if (isNaN(userId)) {
-                return res.status(400).json({ error: 'Invalid or missing userId' });
-            }
 
+        try {
+            const userId = req.session.user.UserId;
             const [results] = await this.connection.query('CALL fn_get_all_wallet_notifications(?)', [userId]);
             if (!results[0] || results[0].length === 0) {
                 return res.status(404).json({ message: 'No wallet notifications found' });
@@ -176,19 +147,12 @@ class NotificationController {
     };
 
     getAllPromotionNotifications = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-        try {
-            var secretKey = process.env.JWT_SECRET;
-            var decode = jwt.verify(token, secretKey);
-            var userId = decode.userId;
-            if (isNaN(userId)) {
-                return res.status(400).json({ error: 'Invalid or missing userId' });
-            }
 
+        try {
+            const userId = req.session.user.UserId;
             const [results] = await this.connection.query('CALL fn_get_all_promotion_notifications(?)', [userId]);
             if (!results[0] || results[0].length === 0) {
                 return res.status(404).json({ message: 'No promotion notifications found' });

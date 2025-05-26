@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 class VoucherController {
@@ -17,17 +16,6 @@ class VoucherController {
             });
 
             console.log('Connected to the database (async)');
-            const jwt = require('jsonwebtoken');
-
-            const user = {
-                userId: 22,
-                Username: 'user2',
-                role: 'user'
-            };
-
-            const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-            console.log('Test token:', token);
         } catch (err) {
             console.error('Database connection error:', err);
         }
@@ -47,22 +35,15 @@ class VoucherController {
     // [GET] /voucher/getVoucherByUserId/:UserId
     GetVoucherByUserId = async (req, res) => {
         const { UserId } = req.params;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-
 
         if (!UserId) {
             return res.status(400).json({ error: 'UserId is required in request params' });
         }
 
         try {
-            var secretKey = process.env.JWT_SECRET;
-            var decoded = jwt.verify(token, secretKey);
+            const UserIdFromSession = req.session.user.UserId;
 
-            if (Number(decoded.userId) !== Number(UserId.trim())) {
+            if (Number(UserIdFromSession) !== Number(UserId.trim())) {
                 return res.status(403).json({ error: 'You are not allowed to access this user\'s data' });
             }
 
@@ -78,17 +59,9 @@ class VoucherController {
     // [POST] /voucher/giveVoucher
     GiveVoucher = async (req, res) => {
         const { recipient_phonenumber, voucher_name } = req.body;
-        const token = req.headers.authorization?.split(" ")[1];
-        console.log(req.headers.authorization);
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const Sender_ID = decoded.userId;
+            const Sender_ID = req.session.user.UserId;
 
             if (!recipient_phonenumber || !voucher_name) {
                 return res.status(400).json({ message: "Recipient phone number and voucher name are required in request body" });
@@ -104,16 +77,8 @@ class VoucherController {
 
     // [GET] /voucher/getValidVoucher
     GetValidVouchers = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
-
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
+            const userId = req.session.user.UserId;
 
             // Truyền userId vào stored procedure
             const [result] = await this.connection.execute("CALL fn_get_all_valid_vouchers(?)", [userId]);
@@ -131,16 +96,8 @@ class VoucherController {
     };
 
     GetValidUserVouchers = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
-
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
+            const userId = req.session.user.UserId;
 
             // Truyền userId vào stored procedure
             const [result] = await this.connection.execute("CALL fn_get_all_valid_User_vouchers(?)", [userId]);
@@ -159,11 +116,6 @@ class VoucherController {
 
     GetDetailUserVoucher = async (req, res) => {
         try {
-            const token = req.headers.authorization?.split(" ")[1];
-            if (!token) {
-                return res.status(401).json({ message: "Unauthorized: No token provided" });
-            }
-
             const { voucherid } = req.params;
 
             console.log('Received voucherId:', voucherid);
@@ -176,9 +128,7 @@ class VoucherController {
             const parsedVoucherId = parseInt(voucherid, 10);
             console.log('Fetching voucher with ID:', parsedVoucherId);
 
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
+            const userId = req.session.user.UserId;
 
             // Truyền userId và voucherId vào stored procedure
             const [result] = await this.connection.execute(
@@ -201,16 +151,9 @@ class VoucherController {
     // [POST] /voucher/addVoucher
     AddVoucher = async (req, res) => {
         const { VoucherName, Category, ExpirationDay, VoucherCodes } = req.body;
-        const token = req.headers.authorization;
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
+            const userId = req.session.user.UserId;
 
             if (!VoucherName || !Category || !ExpirationDay || !VoucherCodes) {
                 return res.status(400).json({ message: "All fields are required in request body" });
@@ -225,4 +168,4 @@ class VoucherController {
     }
 }
 
-module.exports = new VoucherController; 
+module.exports = new VoucherController;

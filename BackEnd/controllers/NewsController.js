@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 class NewsController{
@@ -38,18 +37,21 @@ class NewsController{
 
     // [GET] /news/:PostId
     GetNewsById = async (req, res) => {
-        const { PostId } = req.params;
-
-        if (!PostId) {
-            return res.status(400).json({ error: 'PostId is required in request params' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
 
         try {
-            const [results] = await this.pool.query('CALL fn_get_news_by_id(?)', [PostId]);
+            const { newsId } = req.params;
+            if (!newsId) {
+                return res.status(400).json({ message: "Bad Request: newsId is required" });
+            }
+
+            const [results] = await this.pool.query('CALL fn_get_news_by_id(?)', [newsId]);
             res.json(results[0]);
         } catch (error) {
-            console.error('Error getting news by ID:', error);
-            res.status(500).json({ error: 'Error getting news by ID' });
+            console.error('Query error:', error);
+            res.status(500).json({ error: 'Database query error', details: error.message });
         }
     }
 

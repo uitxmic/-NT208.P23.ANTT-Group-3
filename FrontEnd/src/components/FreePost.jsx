@@ -10,40 +10,22 @@ const FreePost = () => {
     const navigate = useNavigate();
 
     const fetchFreePosts = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục');
-            setLoading(false);
-            return;
-        }
-
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/posting/getAllFreePostings?page=1&limit=8`, {
                 method: 'GET',
-                headers: {
-                    Authorization: `${token}`,
-                },
+                credentials: 'include', // Use session-based authentication
             });
 
             if (!response.ok) {
-                throw new Error('Không thể lấy danh sách flash sale');
+                throw new Error('Unable to fetch free posts');
             }
 
             const data = await response.json();
-            let fetchedPosts = [];
-            if (data && Array.isArray(data.result)) {
-                fetchedPosts = data.result;
-            } else if (Array.isArray(data)) {
-                fetchedPosts = data
-                    .filter(item => item.result && Array.isArray(item.result))
-                    .flatMap(item => item.result);
-            }
-
-            const freePostsFiltered = fetchedPosts.filter(post => post.Status === 'Active');
+            const freePostsFiltered = data.filter(post => post.Status === 'Active');
             setFreePosts(freePostsFiltered.slice(0, 4));
         } catch (err) {
-            setError(err.message || 'Đã xảy ra lỗi khi lấy danh sách flash sale');
+            setError(err.message || 'An error occurred while fetching free posts');
             setFreePosts([]);
         } finally {
             setLoading(false);
@@ -51,12 +33,6 @@ const FreePost = () => {
     };
 
     const handleCollectVoucher = async (post) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục');
-            return;
-        }
-
         setLoading(true);
         setError('');
         setSuccessMessage('');
@@ -67,7 +43,6 @@ const FreePost = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `${token}`,
                 },
                 body: JSON.stringify({
                     VoucherId: post.VoucherId,

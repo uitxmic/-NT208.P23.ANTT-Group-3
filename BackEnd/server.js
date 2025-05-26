@@ -3,8 +3,8 @@ const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
 const routes = require('./routes/index');
 const cookieParser = require("cookie-parser");
-const sessionMiddleware = require('./middlewares/init.redis.js');
 const cors = require('cors');
+const sessionMiddleware = require('./middlewares/init.redis');
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'https://ripe-phones-play.loca.lt'],

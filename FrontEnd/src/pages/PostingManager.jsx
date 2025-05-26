@@ -1,17 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { jwtDecode } from 'jwt-decode';
 
-
-const getUserIdFromToken = (token) => {
-  try {
-    const decoded = jwtDecode(token);
-    return decoded.userId;
-  } catch (error) {
-    console.error('Invalid token:', error);
-    return null;
-  }
-};
 
 const PostManager = () => {
   const [postname, setPostname] = useState('');
@@ -21,7 +10,6 @@ const PostManager = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [token, setToken] = useState(localStorage.getItem('access_token'));
   const [voucher, setVoucher] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState('');
   const [price, setPrice] = useState('');
@@ -40,98 +28,26 @@ const PostManager = () => {
 
   const fetchVoucher = async () => {
     try {
-      const UserId = getUserIdFromToken(token);
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/voucher/getVoucherByUserId/${UserId}`, {
+      const response = await fetch(`${API_BASE_URL}/voucher/getAll`, {
         method: 'GET',
-        headers: { Authorization: `${token}` },
+        credentials: 'include', // Use session-based authentication
       });
-      if (!response.ok) throw new Error('Failed to fetch voucher ID');
+
+      if (!response.ok) {
+        throw new Error('Unable to fetch vouchers.');
+      }
+
       const data = await response.json();
       setVoucher(data);
-    } catch (error) {
-      setError(error.message || 'An error occurred while fetching voucher ID.');
-    }
-  };
-
-  const fetchPosts = async () => {
-    try {
-      const UserId = getUserIdFromToken(token);
-      if (!UserId) {
-        setError('Invalid token. UserId not found.');
-        return;
-      }
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/posting/getPostingsByUserId/${UserId}`, {
-        method: 'GET',
-        headers: { Authorization: `${token}` },
-      });
-      if (!response.ok) throw new Error('Failed to fetch posts');
-      const data = await response.json();
-      setPosts(data);
-    } catch (error) {
-      setError(error.message || 'An error occurred while fetching posts.');
+    } catch (err) {
+      setError(err.message || 'An error occurred while fetching vouchers.');
     }
   };
 
   useEffect(() => {
-    fetchPosts();
     fetchVoucher();
   }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
-
-    const UserId = getUserIdFromToken(token);
-    if (!UserId) {
-      setError('Invalid token. UserId not found.');
-      setLoading(false);
-      return;
-    }
-
-    const formData = {
-      VoucherId: selectedVoucherId,
-      UserId: UserId,
-      Postname: postname,
-      Content: description,
-      VouImg: image || 'https://example.com/default-image.jpg',
-      Price: price,
-      Quantity: quantity,
-    };
-
-    try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/posting/createPosting`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) throw new Error('Failed to create post');
-      const data = await response.json();
-      if (data[0]?.Message === 'Post Created') {
-        setSuccess('Post created successfully!');
-        setDescription('');
-        setImage(null);
-        setPostname('');
-        setPrice('');
-        setQuantity('');
-        setSelectedVoucherId('');
-        fetchPosts();
-      } else {
-        setError('Failed to create post. Please try again.');
-      }
-    } catch (error) {
-      setError(error.message || 'An error occurred. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Layout>

@@ -12,7 +12,6 @@ const Navbar = ({
   showLanguageDropdown,
   setShowLanguageDropdown,
 }) => {
-  const isLoggedIn = !!localStorage.getItem('access_token');
   const navigate = useNavigate();
   const [balance, setBalance] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
@@ -22,28 +21,20 @@ const Navbar = ({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(0); // State cho số lượng item trong giỏ hàng
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (!isLoggedIn) return;
-
       try {
-        const token = localStorage.getItem('access_token');
-        console.log(token);
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
-          headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'application/json',
-          },
+          credentials: 'include', // Use session-based authentication
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Không thể lấy thông tin người dùng.');
+          throw new Error(errorData.message || 'Unable to fetch user info.');
         }
 
         const data = await response.json();
@@ -52,84 +43,20 @@ const Navbar = ({
           setUserInfo(userData);
         }
       } catch (err) {
-        console.error('Lỗi khi lấy thông tin người dùng:', err);
-      }
-    };
-
-    const fetchNotifications = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const response = await fetch(`${API_BASE_URL}/notification/get5latestnoti`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Không thể lấy thông báo.');
-        }
-
-        const data = await response.json();
-        setNotifications(data);
-        setUnreadCount(data.filter((notif) => !notif.is_read).length);
-      } catch (err) {
-        console.error('Lỗi khi lấy thông báo:', err);
+        console.error('Error fetching user info:', err);
       }
     };
 
     fetchUserInfo();
-    fetchNotifications();
-  }, [isLoggedIn]);
-
-  // Fetch cart item count
-  useEffect(() => {
-    const fetchCartCount = async () => {
-      if (!isLoggedIn) {
-        setCartItemCount(0); // Reset khi không đăng nhập
-        return;
-      }
-      try {
-        const token = localStorage.getItem('access_token');
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-        const response = await fetch(`${API_BASE_URL}/cart/getCart`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setCartItemCount(data.length || 0); // data là một mảng các cart items
-        } else {
-          // Có thể log lỗi hoặc set count về 0 nếu không lấy được
-          console.error('Không thể lấy số lượng giỏ hàng');
-          setCartItemCount(0);
-        }
-      } catch (err) {
-        console.error('Lỗi khi lấy số lượng giỏ hàng:', err);
-        setCartItemCount(0);
-      }
-    };
-
-    fetchCartCount();
-    // Thêm một listener để cập nhật số lượng giỏ hàng khi có thay đổi từ các trang khác
-    // Ví dụ: sử dụng custom event
-    const handleCartUpdate = () => fetchCartCount();
-    window.addEventListener('cartUpdated', handleCartUpdate);
-
-    return () => {
-      window.removeEventListener('cartUpdated', handleCartUpdate);
-    };
-  }, [isLoggedIn]);
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    navigate('/login');
+    fetch('/api/session', {
+      method: 'DELETE',
+      credentials: 'include',
+    }).then(() => {
+      navigate('/login');
+    });
   };
 
   const handleMouseLeaveDropdown = () => {
@@ -362,7 +289,7 @@ const Navbar = ({
 
         {/* Số dư và người dùng */}
         <UserBalance setBalance={setBalance} />
-        {isLoggedIn ? (
+        {userInfo ? (
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1 bg-pink-200 text-blue-700 px-4 py-2 rounded-full shadow-md">
               <span className="text-sm font-medium">{text.balanceLabel}</span>

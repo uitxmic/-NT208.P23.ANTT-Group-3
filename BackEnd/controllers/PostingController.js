@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 class PostingController {
@@ -23,21 +22,18 @@ class PostingController {
 
     // [POST] /posting/createPosting
     CreatePosting = async (req, res) => {
-        const { VoucherId, Postname, Content, VouImg, Price, Quantity } = req.body;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized', id: '-1' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
+
+        const { VoucherId, Postname, Content, VouImg, Price, Quantity } = req.body;
 
         if (!VoucherId || !Postname || !Content) {
             return res.status(400).json({ error: 'VoucherId, Postname, and Content are required in request body', id: '-1' });
         }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
+            const UserId = req.session.user.UserId;
 
             const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content, VouImg, Price, Quantity]);
 
@@ -52,16 +48,17 @@ class PostingController {
     // [GET] /posting/getPostingsByUserId/:UserId
     GetPostingsByUserId = async (req, res) => {
         const { UserId } = req.params;
-        const token = req.headers['authorization'];
 
         if (!UserId) {
             return res.status(400).json({ error: 'UserId is required in request params' });
         }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const RequestUserId = decoded.userId;
+            if (!req.session || !req.session.user) {
+                return res.status(401).json({ message: "Unauthorized: No session found" });
+            }
+
+            const RequestUserId = req.session.user.UserId;
 
             if (RequestUserId != UserId) {
 
@@ -81,11 +78,6 @@ class PostingController {
     // [GET] /posting/getAllPostings 
     GetAllPostings = async (req, res) => {
         const { page, limit } = req.query;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
 
         try {
             const [results] = await this.connection.query(`CALL fn_get_all_post(?, ?)`, [page, limit]);
@@ -100,11 +92,6 @@ class PostingController {
 
     GetAllFreePostings = async (req, res) => {
         const { page, limit } = req.query;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
 
         try {
             const [results] = await this.connection.query(`CALL fn_get_all_free_post(?, ?)`, [page, limit]);

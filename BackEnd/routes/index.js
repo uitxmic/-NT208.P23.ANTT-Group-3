@@ -8,6 +8,7 @@ const momoPayment = require('./payment');
 const searchRouter = require('./search');
 const newsRouter = require('./news');
 const cartRouter = require('./cart');
+const ratingRouter = require('./rating');
 
 function routes(app) {
     app.get('/test', (req, res) => {
@@ -34,6 +35,8 @@ function routes(app) {
     app.use('/news', newsRouter);
 
     app.use('/cart', cartRouter);
+
+    app.use('/rating', ratingRouter);
 
 }
 module.exports = routes;

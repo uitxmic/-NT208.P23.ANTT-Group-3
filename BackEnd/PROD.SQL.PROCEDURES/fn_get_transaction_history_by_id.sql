@@ -25,6 +25,8 @@ proc: BEGIN
     -- Dynamic SQL for flexible query
     SET @sql = CONCAT('
         SELECT 
+            T.UserIdSeller,
+            T.PostId,
             T.TransactionId,
             T.TransactionAmount,
             S.Fullname AS Seller,

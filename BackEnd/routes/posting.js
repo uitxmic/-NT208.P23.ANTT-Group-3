@@ -12,6 +12,7 @@ router.use('/get20LastestPostings', postingController.Get20LastestPostings);
 // private api
 router.use('/createPosting', postingController.CreatePosting);
 router.use('/getPostingsByUserId/:UserId', postingController.GetPostingsByUserId);
+router.use('/getSellerPostings/:UserId', postingController.GetAllSellerPostings);
 router.use('/getAllPostings', postingController.GetAllPostings);
 router.use('/getAllFreePostings', postingController.GetAllFreePostings);
 router.use('/getPostingByPostId/:PostId', postingController.GetPostingByPostId);

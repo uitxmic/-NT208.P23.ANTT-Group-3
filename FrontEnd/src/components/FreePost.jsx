@@ -19,7 +19,7 @@ const FreePost = () => {
 
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/posting/getAllFreePostings?page=1&limit=8`, {
+            const response = await fetch(`${API_BASE_URL}/posting/getAllFreePostings?page=1&limit=10`, {
                 method: 'GET',
                 headers: {
                     Authorization: `${token}`,
@@ -122,7 +122,7 @@ const FreePost = () => {
         fetchFreePosts();
     }, []);
 
-     useEffect(() => {
+    useEffect(() => {
         if (freePosts.length === 0) {
             return; // Don't start a timer if there are no posts
         }

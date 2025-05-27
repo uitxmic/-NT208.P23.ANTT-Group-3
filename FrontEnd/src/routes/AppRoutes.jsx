@@ -5,6 +5,7 @@ import Sign_up from "../pages/Sign_up";
 import PostManager from "../pages/PostingManager";
 import PostingPage from "../pages/PostingPage";
 import PostDetail from "../pages/PostDetail";
+import SellerPost from "../pages/SellerPost";
 import UserVoucherList from "../pages/Valid_user's_voucher";
 import VoucherDetail from "../pages/VoucherDetail";
 import Payment from "../pages/Payment";
@@ -43,6 +44,7 @@ function AppRoutes() {
               <Route path="/" element={<Home />} />
               <Route path="/posting-manager" element={<PostManager />} />
               <Route path="/shop-vouchers" element={<PostingPage />} />
+              <Route path="/seller-post/:UserId" element={<SellerPost />} />
               <Route path="/user-vouchers" element={<UserVoucherList />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/profile" element={<UserProfile />} />

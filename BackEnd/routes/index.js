@@ -9,6 +9,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 const searchRouter = require('./search');
 const newsRouter = require('./news');
 const cartRouter = require('./cart');
+const ratingRouter = require('./rating');
 const sessionRoutes = require('./session');
 
 function routes(app) {
@@ -41,6 +42,8 @@ function routes(app) {
     app.use('/news', newsRouter);
 
     app.use('/cart', cartRouter);
+
+    app.use('/rating', ratingRouter);
 
     app.use('/session', sessionRoutes);
 

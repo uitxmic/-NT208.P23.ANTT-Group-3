@@ -8,32 +8,38 @@ const momoPayment = require('./payment');
 const searchRouter = require('./search');
 const newsRouter = require('./news');
 const cartRouter = require('./cart');
+const express = require('express');
 
 function routes(app) {
+
+    const apiRouter = express.Router();
+
     app.get('/test', (req, res) => {
         res.json({ message: 'Test route' });
     }
     );
 
-    app.use('/users', usersRouter);
+    apiRouter.use('/users', usersRouter);
 
-    app.use('/voucher', voucherRouter);
+    apiRouter.use('/voucher', voucherRouter);
 
-    app.use('/posting', postingRouter);
+    apiRouter.use('/posting', postingRouter);
 
-    app.use('/trade', tradeRouter);
+    apiRouter.use('/trade', tradeRouter);
 
-    app.use('/notification', notificationRouter);
+    apiRouter.use('/notification', notificationRouter);
 
-    app.use('/googlecloud', googlecloud);
+    apiRouter.use('/googlecloud', googlecloud);
 
-    app.use('/payment', momoPayment);
+    apiRouter.use('/payment', momoPayment);
 
-    app.use('/search', searchRouter);
+    apiRouter.use('/search', searchRouter);
 
-    app.use('/news', newsRouter);
+    apiRouter.use('/news', newsRouter);
 
-    app.use('/cart', cartRouter);
+    apiRouter.use('/cart', cartRouter);
+
+    app.use('/api', apiRouter);
 
 }
 module.exports = routes;

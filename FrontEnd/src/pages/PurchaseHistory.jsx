@@ -13,18 +13,14 @@ const PurchaseHistory = () => {
     const [sortOrder, setSortOrder] = useState('DESC');
 
     const fetchTransactions = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            toast.error('Please log in to view your purchase history.');
-            return;
-        }
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/getTransactionById?search=${encodeURIComponent(searchText)}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `${token}`,
+                    'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
 
             if (!response.ok) {

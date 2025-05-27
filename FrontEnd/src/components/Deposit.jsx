@@ -39,8 +39,11 @@ const Deposit = () => {
             }
         } catch (err) {
             setError(err.message || 'An error occurred while creating payment');
+
         } finally {
+
             setLoading(false);
+
         }
     };
 

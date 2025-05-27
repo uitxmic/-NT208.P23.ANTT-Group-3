@@ -25,30 +25,37 @@ const Log_in = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Include cookies in the request
         body: JSON.stringify({ Username, Password }),
       });
+      console.error('Login response:', response);
 
       if (!response.ok) {
-        throw new Error(text.invalidCredentials);
+        throw new Error(text.invalidCredentials || 'Invalid credentials');
       }
 
-      const data = await response.json();
-      if (!data) {
-        throw new Error('Đăng nhập thất bại', text.invalidCredentials);
+      const data = await response.text(); // Expecting a plain text response
+      if (data !== 'Đăng nhập thành công!') {
+        throw new Error(text.errorMessage || 'Login failed');
       }
 
-      localStorage.setItem('access_token', data.access_token);
+      // Redirect based on user role (assuming role is stored in session and fetched separately)
+      const roleResponse = await fetch(`${API_BASE_URL}/session/userRoleId`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies in the request
+      });
 
-      const userRoleId = JSON.parse(atob(data.access_token.split('.')[1])).userRoleId;
-      console.log(userRoleId);
+      if (!roleResponse.ok) {
+        throw new Error('Failed to fetch user role');
+      }
 
-      if (userRoleId === 1) {
+      const roleData = await roleResponse.json();
+      if (roleData.userRoleId === 1) {
         navigate('/admin');
-      }
-      else
+      } else {
         navigate('/');
+      }
     } catch (error) {
-      console.error('Error:', error);
       setError(error.message || text.errorMessage);
     } finally {
       setLoading(false);
@@ -71,8 +78,9 @@ const Log_in = () => {
       });
 
       const data = await response.json();
-      if (data.state === 'success') {
-        localStorage.setItem('access_token', data.access_token);
+      if (data.state === 'success' && data.sessionId) {
+        // Store session ID in localStorage or cookies if needed
+        localStorage.setItem('sessionId', data.sessionId);
         navigate('/');
       } else {
         throw new Error(data.error || text.googleLoginFailed);

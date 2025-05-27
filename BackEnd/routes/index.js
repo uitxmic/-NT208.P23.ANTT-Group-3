@@ -42,5 +42,7 @@ function routes(app) {
 
     app.use('/cart', cartRouter);
 
+    app.use('/session', sessionRoutes);
+
 }
 module.exports = routes;

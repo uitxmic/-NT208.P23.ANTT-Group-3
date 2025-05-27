@@ -131,10 +131,11 @@ class UsersController {
 
                 res.cookie('session_id', req.sessionID, {
                     maxAge: 1000 * 60 * 60, // 1 hour
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
-                    sameSite: 'Strict' // Only send cookie in the same site
+                    httpOnly: true, // Đảm bảo cookie chỉ truy cập được từ server
+                    sameSite: 'Lax', // Cho phép cookie được gửi trong các yêu cầu cùng site
                 });
+                console.log("Session ID:", req.sessionID);
+                console.log("Session user:", req.session.user);
 
                 res.send("Đăng nhập thành công!");
             }

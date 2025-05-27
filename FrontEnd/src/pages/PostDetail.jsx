@@ -27,9 +27,15 @@ const PostDetail = () => {
             setError(null);
             try {
                 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-                const response = await axios.get(`${API_BASE_URL}/posting/getPostingByPostId/${postId}`);
-                console.log('Post Detail Response:', response.data);
-                const data = response.data;
+                const response = await fetch(`${API_BASE_URL}/posting/getPostingByPostId/${postId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                console.log('Post Detail Response:', data);
                 if (Array.isArray(data) && data.length > 0 && data[0].result && data[0].result.length > 0) {
                     setPost(data[0].result[0]);
                 } else {
@@ -61,36 +67,33 @@ const PostDetail = () => {
 
             setLoading(true);
             try {
-                const token = localStorage.getItem('access_token');
                 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-                // Fetch transactions
+                // Fetch transactions without token
                 let transactions = [];
-                if (token) {
-                    try {
-                        const searchText = '';
-                        const sortColumn = 'Date';
-                        const sortOrder = 'DESC';
-                        const transactionResponse = await fetch(
-                            `${API_BASE_URL}/trade/getTransactionById?search=${encodeURIComponent(searchText)}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`,
-                            {
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `${token}`,
-                                    'Content-Type': 'application/json',
-                                },
-                            }
-                        );
-                        if (transactionResponse.ok) {
-                            const jsonData = await transactionResponse.json();
-                            console.log('Transactions Response:', jsonData);
-                            transactions = Array.isArray(jsonData) ? jsonData : (jsonData.data || []);
-                        } else {
-                            console.error('Failed to fetch transactions:', transactionResponse.status, await transactionResponse.text());
+                try {
+                    const searchText = '';
+                    const sortColumn = 'Date';
+                    const sortOrder = 'DESC';
+                    const transactionResponse = await fetch(
+                        `${API_BASE_URL}/trade/getTransactionById?search=${encodeURIComponent(searchText)}&sortColumn=${sortColumn}&sortOrder=${sortOrder}`,
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
                         }
-                    } catch (e) {
-                        console.error('Error fetching transactions:', e);
+                    );
+                    if (transactionResponse.ok) {
+                        const jsonData = await transactionResponse.json();
+                        console.log('Transactions Response:', jsonData);
+                        transactions = Array.isArray(jsonData) ? jsonData : (jsonData.data || []);
+                    } else {
+                        console.error('Failed to fetch transactions:', transactionResponse.status, await transactionResponse.text());
                     }
+                } catch (e) {
+                    console.error('Error fetching transactions:', e);
                 }
 
                 // Fetch all posts
@@ -101,7 +104,6 @@ const PostDetail = () => {
                     {
                         method: 'GET',
                         headers: {
-                            ...(token && { 'Authorization': `${token}` }),
                             'Content-Type': 'application/json',
                         },
                     }
@@ -233,13 +235,6 @@ const PostDetail = () => {
 
     // Handle Add to Cart button click
     const handleAddToCart = async (post) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục');
-            setLoading(false);
-            return;
-        }
-
         if (!post || typeof post.PostId === 'undefined') {
             setError('Không thể thêm voucher không hợp lệ vào giỏ hàng.');
             return;
@@ -250,9 +245,9 @@ const PostDetail = () => {
             const response = await fetch(`${API_BASE_URL}/cart/addToCart`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ PostId: post.PostId }),
             });
 

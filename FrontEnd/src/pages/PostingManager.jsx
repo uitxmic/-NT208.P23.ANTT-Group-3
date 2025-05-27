@@ -29,7 +29,7 @@ const PostManager = () => {
   const fetchVoucher = async () => {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/voucher/getAll`, {
+      const response = await fetch(`${API_BASE_URL}/voucher/getVoucherByUserId`, {
         method: 'GET',
         credentials: 'include', // Use session-based authentication
       });
@@ -49,6 +49,60 @@ const PostManager = () => {
     fetchVoucher();
   }, []);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    const UserId = getUserIdFromToken(token);
+    if (!UserId) {
+      setError('Invalid token. UserId not found.');
+      setLoading(false);
+      return;
+    }
+
+    const formData = {
+      VoucherId: selectedVoucherId,
+      UserId: UserId,
+      Postname: postname,
+      Content: description,
+      VouImg: image || 'https://example.com/default-image.jpg',
+      Price: price,
+      Quantity: quantity,
+    };
+
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/posting/createPosting`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) throw new Error('Failed to create post');
+      const data = await response.json();
+      if (data[0]?.Message === 'Post Created') {
+        setSuccess('Post created successfully!');
+        setDescription('');
+        setImage(null);
+        setPostname('');
+        setPrice('');
+        setQuantity('');
+        setSelectedVoucherId('');
+        fetchPosts();
+      } else {
+        setError('Failed to create post. Please try again.');
+      }
+    } catch (error) {
+      setError(error.message || 'An error occurred. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="flex flex-col min-h-screen font-inter" style={{ paddingTop: '4rem' }}>
@@ -62,9 +116,9 @@ const PostManager = () => {
               <div className="bg-white p-4 rounded-lg shadow">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">Danh sách Voucher</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {voucher.map((item) => (
+                  {voucher.map((item, index) => (
                     <div
-                      key={item.VoucherId}
+                      key={`${item.VoucherId}-${index}`}
                       className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition"
                       onClick={() => handleVoucherSelect(item)}
                     >
@@ -92,8 +146,8 @@ const PostManager = () => {
                 <p className="text-sm text-gray-600">Chưa có bài đăng nào.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {posts.map((post) => (
-                    <div key={post.PostId} className="border rounded-lg p-3">
+                  {posts.map((post, index) => (
+                    <div key={`${post.PostId}-${index}`} className="border rounded-lg p-3">
                       {post.VoucherImage && (
                         <img
                           src={post.VoucherImage}
@@ -178,8 +232,8 @@ const PostManager = () => {
                     </option>
                     <option value="new">Tạo voucher mới</option>
                     {Array.isArray(voucher) && voucher.length > 0 ? (
-                      voucher.map((item) => (
-                        <option key={item.VoucherId} value={item.VoucherId}>
+                      voucher.map((item, index) => (
+                        <option key={`${item.VoucherId}-${index}`} value={item.VoucherId}>
                           {item.VoucherName}
                         </option>
                       ))
@@ -249,8 +303,8 @@ const PostManager = () => {
                       <option value="" disabled>
                         Chọn số lượng
                       </option>
-                      {Array.from({ length: quantity }, (_, i) => i + 1).map((num) => (
-                        <option key={num} value={num}>
+                      {Array.from({ length: quantity }, (_, i) => i + 1).map((num, index) => (
+                        <option key={`${num}-${index}`} value={num}>
                           {num}
                         </option>
                       ))}

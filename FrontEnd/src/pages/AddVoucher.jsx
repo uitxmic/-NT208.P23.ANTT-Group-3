@@ -28,7 +28,6 @@ const AddVoucher = () => {
         }));
     };
 
-// ...existing code...
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -136,12 +135,6 @@ const AddVoucher = () => {
 
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const token = localStorage.getItem('access_token');
-            if (!token) {
-                toast.error('Vui lòng đăng nhập để tiếp tục.');
-                setIsSubmitting(false);
-                return;
-            }
 
             if (useFileUpload) {
                 if (vouchersFromFile.length === 0) {
@@ -149,19 +142,17 @@ const AddVoucher = () => {
                     setIsSubmitting(false);
                     return;
                 }
-                // formData should now be populated from handleFileChange
                 if (!formData.VoucherName || !formData.Category || !formData.ExpirationDay || !formData.VoucherCodes) {
                     toast.error('Dữ liệu từ file Excel không đầy đủ hoặc không hợp lệ. Cần có Tên Voucher, Loại, Ngày hết hạn và ít nhất một Mã Voucher.');
                     setIsSubmitting(false);
                     return;
                 }
 
-                // Gửi một yêu cầu duy nhất với formData đã được chuẩn bị
                 const response = await axios.post(`${API_BASE_URL}/voucher/addVoucher`, formData, {
                     headers: {
-                        'Authorization': `${token}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    withCredentials: true
                 });
 
                 if (response.data.Id !== null) {
@@ -172,7 +163,7 @@ const AddVoucher = () => {
                     if (fileInput) {
                         fileInput.value = ''; // Reset file input
                     }
-                    setFormData({ // Reset form data
+                    setFormData({
                         VoucherName: '',
                         Category: '',
                         ExpirationDay: '',
@@ -182,7 +173,6 @@ const AddVoucher = () => {
                     throw new Error(response.data.message || 'Đã xảy ra lỗi khi thêm voucher từ file');
                 }
             } else {
-                // Process single voucher from form
                 if (!formData.VoucherCodes || !formData.VoucherName || !formData.Category || !formData.ExpirationDay) {
                     toast.error('Vui lòng nhập đầy đủ thông tin voucher.');
                     setIsSubmitting(false);
@@ -190,9 +180,9 @@ const AddVoucher = () => {
                 }
                 const response = await axios.post(`${API_BASE_URL}/voucher/addVoucher`, formData, {
                     headers: {
-                        'Authorization': `${token}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    withCredentials: true
                 });
 
                 if (response.data.Id !== null) {

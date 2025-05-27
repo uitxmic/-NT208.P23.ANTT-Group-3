@@ -22,6 +22,7 @@ const Navbar = ({
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -76,12 +77,11 @@ const Navbar = ({
 
   const markAsRead = async (notificationId) => {
     try {
-      const token = localStorage.getItem('access_token');
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE_URL}/notification/markAsRead/${notificationId}`, {
         method: 'POST',
+        credentials: 'include', // Include cookies in the request
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });

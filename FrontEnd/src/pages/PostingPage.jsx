@@ -14,20 +14,14 @@ const PostingPage = () => {
 
   // Fetch vouchers from API
   const fetchVouchers = async (page, limitValue) => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      setError('Vui lòng đăng nhập để tiếp tục');
-      setLoading(false);
-      return;
-    }
-
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE_URL}/posting/getAllPostings?page=${page}&limit=${limitValue}`, {
         method: 'GET',
         headers: {
-          Authorization: `${token}`,
+          'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {

@@ -16,8 +16,9 @@ const UserManager = () => {
             const response = await fetch(`${API_BASE_URL}/users/getUsers?sortBy=${sortBy}&sortOrder=${sortOrder}&searchTerm=${encodeURIComponent(searchTerm)}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `${localStorage.getItem('access_token')}`
-                }
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');

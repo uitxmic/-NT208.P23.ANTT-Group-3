@@ -34,18 +34,8 @@ class VoucherController {
 
     // [GET] /voucher/getVoucherByUserId/:UserId
     GetVoucherByUserId = async (req, res) => {
-        const { UserId } = req.params;
-
-        if (!UserId) {
-            return res.status(400).json({ error: 'UserId is required in request params' });
-        }
-
         try {
-            const UserIdFromSession = req.session.user.UserId;
-
-            if (Number(UserIdFromSession) !== Number(UserId.trim())) {
-                return res.status(403).json({ error: 'You are not allowed to access this user\'s data' });
-            }
+            const UserId = req.session.user.UserId;
 
             const [results] = await this.connection.query('CALL fn_get_voucher_by_user_id(?)', [UserId]);
             res.json(results[0]);

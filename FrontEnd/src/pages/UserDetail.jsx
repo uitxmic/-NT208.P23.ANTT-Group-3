@@ -13,19 +13,14 @@ const UserDetail = () => {
     const fetchUserData = async () => {
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-            const token = localStorage.getItem('access_token');
             
-            if (!token) {
-                throw new Error('Unauthorized: No token provided');
-            }
-
             // Fetch thông tin người dùng
             const userResponse = await fetch(`${API_BASE_URL}/users/getUserById/${id}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
             
             if (!userResponse.ok) {
@@ -46,9 +41,9 @@ const UserDetail = () => {
             const vouchersResponse = await fetch(`${API_BASE_URL}/vouchers/getByUserId/${id}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
             
             if (!vouchersResponse.ok) {

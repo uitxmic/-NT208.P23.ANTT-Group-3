@@ -10,23 +10,37 @@ const Layout = ({ children }) => {
   const [sidebarHeight, setSidebarHeight] = useState('calc(100vh - 64px)'); // Chiều cao mặc định
   const [language, setLanguage] = useState('vi'); // Mặc định là Tiếng Việt
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false); // Quản lý trạng thái dropdown
+  const [userRoleId, setUserRoleId] = useState(null); // Trạng thái lưu trữ userRoleId
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Lấy thông tin người dùng từ localStorage
-  const token = localStorage.getItem('access_token');
-  let userRoleId = null;
-  if (token) {
-    try {
-      userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-    } catch (error) {
-      console.error('Error decoding token:', error);
-    }
-  } else {
-    console.warn('No access token found in localStorage.');
-  }
+  // Lấy thông tin người dùng từ session
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      let userRoleId = null;
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/session/userRoleId`, {
+          method: 'GET',
+          credentials: 'include', // Include cookies in the request
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          userRoleId = data.userRoleId;
+        } else {
+          console.error('Failed to fetch user role');
+        }
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+      setUserRoleId(userRoleId); // Cập nhật trạng thái userRoleId
+    };
+
+    fetchUserRole();
+  }, []);
 
   // Tính chiều cao tối đa của trang cho Sidebar
   useEffect(() => {

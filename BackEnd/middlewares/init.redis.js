@@ -9,9 +9,8 @@ try {
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: process.env.NODE_ENV === 'production', // Đặt thành true nếu dùng HTTPS
-            httpOnly: true,
             maxAge: 1000 * 60 * 60, // 1 giờ
+            credentials: true, // Cho phép gửi cookie trong các yêu cầu cross-origin
         },
     });
 } catch (error) {

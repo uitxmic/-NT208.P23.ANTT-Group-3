@@ -123,8 +123,10 @@ const Log_in = () => {
 
   const text = getText();
 
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
   return (
-    <GoogleOAuthProvider clientId="269747751566-9p1a31qjqacmtf57h78c1fkl0b97ggrc.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={googleClientId}>
       <div className="flex flex-col min-h-screen bg-white">
         {/* Header với logo và nút ngôn ngữ */}
         <header className="bg-white p-4 shadow-md flex items-center justify-between">

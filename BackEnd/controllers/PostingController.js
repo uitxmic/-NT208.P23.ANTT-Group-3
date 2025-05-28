@@ -81,11 +81,35 @@ class PostingController {
         }
     }
 
+
     GetAllFreePostings = async (req, res) => {
         const { page, limit } = req.query;
 
         try {
             const [results] = await this.connection.query(`CALL fn_get_all_free_post(?, ?)`, [page, limit]);
+
+            res.json(results[0]);
+
+        } catch (err) {
+            console.error('Error getting postings:', err);
+            return res.status(500).json({ error: 'Error getting postings' });
+        }
+    }
+
+    GetAllSellerPostings = async (req, res) => {
+        const { page, limit } = req.query;
+        const token = req.headers['authorization'];
+        const { UserId } = req.params;
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        if (!UserId) {
+            return res.status(400).json({ error: 'UserId is required in request params' });
+        }
+
+        try {
+            const [results] = await this.connection.query(`CALL fn_get_all_seller_post_by_sellerId(?, ?, ?)`, [UserId, page, limit]);
 
             res.json(results[0]);
 

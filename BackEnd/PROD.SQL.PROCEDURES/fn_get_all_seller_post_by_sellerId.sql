@@ -1,8 +1,15 @@
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS fn_get_posting_by_post_id;$$
-CREATE PROCEDURE fn_get_posting_by_post_id(IN post_id INT)
+DROP PROCEDURE IF EXISTS fn_get_all_seller_post_by_sellerId;$$
+CREATE PROCEDURE fn_get_all_seller_post_by_sellerId(
+	IN P_userid INT,
+	IN p_page INT,
+    IN p_page_size INT
+	)
 BEGIN
+	DECLARE p_offset INT;
+    SET p_offset = (p_page - 1) * p_page_size;
+
    SELECT JSON_ARRAYAGG(
       JSON_OBJECT(
          'PostId', P.PostId,
@@ -25,12 +32,12 @@ BEGIN
          'Content', P.Content,
          'Price', P.Price,
          'Date', P.Date,
+         'Category', (SELECT V.Category FROM Voucher V WHERE V.VoucherId = P.VoucherId GROUP BY V.Category),
          'Expire', P.Expire,
          'Quantity', P.Quantity,
          'UpVote', P.UpVote,
          'UpDown', P.UpDown,
          'IsActive', P.IsActive,
-         'IsVerified', P.IsVerified,
          'Status', CASE 
                      WHEN P.Expire < CURDATE() THEN 'Expired'
                      WHEN P.IsActive = FALSE THEN 'Inactive'
@@ -38,13 +45,13 @@ BEGIN
                   END
       )
    ) AS result
-   FROM Post P JOIN User U on P.UserId = U.UserId
-   WHERE P.IsVerified IS TRUE 
-   AND P.IsActive IS TRUE
-   AND P.PostId = post_id
-   AND P.Quantity > 0;
+    FROM Post P JOIN User U on P.UserId = U.UserId
+   WHERE P.IsVerified IS TRUE AND P.IsActive IS TRUE AND P.Quantity > 0 AND P.Price > 0 AND P.UserId=P_userid
+   GROUP BY P.VoucherId, P.PostId, P.UserId, P.PostName, P.VouImg, P.Content, P.Price, P.Date, P.Expire, P.Quantity, P.UpVote, P.UpDown, P.IsActive
+   ORDER BY P.Date DESC
+   LIMIT p_page_size OFFSET p_offset;
 END $$
 
 DELIMITER ;
 
-CALL fn_get_posting_by_post_id(54);
+CALL fn_get_all_seller_post_by_sellerId(35,1,100);

@@ -2,14 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../components/Layout';
-
-// Hàm tính cosine similarity giữa hai vector
-const cosineSimilarity = (vecA, vecB) => {
-    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-    return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-};
+import { FaStar } from 'react-icons/fa'; // Thêm biểu tượng ngôi sao
 
 const PostDetail = () => {
     const { postId } = useParams();
@@ -388,24 +381,29 @@ const PostDetail = () => {
                             <p className="text-lg font-semibold text-gray-800">
                                 {post.UserName || 'bluevelvet.vn'}
                             </p>
-                            <p className="text-gray-500 text-sm">Online 26 phút trước</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
+                            <p className="text-gray-600 flex items-center">
+                                Đánh Giá:{' '}
+                                <span className="font-semibold ml-1">
+                                    {post.AvgRate || 'Chưa có'}
+                                </span>
+                                {post.AvgRate && <FaStar className="text-yellow-400 ml-1" />}                            </p>
                             <p className="text-gray-600">
-                                Đánh Giá: <span className="font-semibold">{post.AvgRate || 'Chưa có'}</span>
+                                Số Lượng Đã Bán:{' '}
+                                <span className="font-semibold">{post.SoldAmount || 0}</span>
                             </p>
                             <p className="text-gray-600">
-                                Số Lượng Đã Bán: <span className="font-semibold">{post.SoldAmount || 0}</span>
-                            </p>
-                            <p className="text-gray-600">
-                                Sản Phẩm: <span className="font-semibold">{post.SoldAmount || 0}</span>
+                                Sản Phẩm:{' '}
+                                <span className="font-semibold">{post.ProductAmount || 0}</span>
                             </p>
                         </div>
                         <div>
                             <p className="text-gray-600">
-                                Tham Gia: <span className="font-semibold">2 năm trước</span>
+                                Tham Gia:{' '}
+                                <span className="font-semibold">2 năm trước</span>
                             </p>
                             <p className="text-gray-600">
                                 Nguồn Theo Dõi:{' '}
@@ -438,8 +436,7 @@ const PostDetail = () => {
                         </button>
                         <button
                             className="flex-1 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center justify-center gap-2"
-                            onClick={() => alert('Chức năng Xem Shop đang được phát triển!')}
-                        >
+                            onClick={() => navigate(`/seller-post/${post.UserId}`)}                        >
                             <svg
                                 className="w-5 h-5"
                                 fill="none"

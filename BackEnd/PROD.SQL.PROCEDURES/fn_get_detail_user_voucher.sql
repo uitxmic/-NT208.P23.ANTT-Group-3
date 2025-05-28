@@ -20,10 +20,11 @@ BEGIN
     WHERE V.ExpirationDay >= CURDATE()
       AND V.UserId = p_UserId
       AND V.VoucherId = p_VoucherId
+      AND V.isUsed = 0
     GROUP BY 
         V.VoucherId, V.VoucherName, V.Category, V.UserId, V.ExpirationDay;
 END $$
 
 DELIMITER ;
 
-call fn_get_detail_user_voucher(29,4);
+call fn_get_detail_user_voucher(29,2);

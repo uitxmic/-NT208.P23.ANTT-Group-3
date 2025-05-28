@@ -168,7 +168,6 @@ class VoucherController {
 
             console.log('Received voucherId:', voucherid);
 
-            // Kiểm tra voucherid có tồn tại và là số
             if (!voucherid || isNaN(voucherid)) {
                 return res.status(400).json({ error: "Invalid voucherId, must be a number" });
             }
@@ -180,7 +179,6 @@ class VoucherController {
             const decoded = jwt.verify(token, secretKey);
             const userId = decoded.userId;
 
-            // Truyền userId và voucherId vào stored procedure
             const [result] = await this.connection.execute(
                 "CALL fn_get_detail_user_voucher(?, ?)",
                 [userId, parsedVoucherId]
@@ -216,13 +214,53 @@ class VoucherController {
                 return res.status(400).json({ message: "All fields are required in request body" });
             }
 
-            const [result] = await this.connection.execute("CALL fn_add_voucher(?, ?, ?, ?, ?)", [VoucherName, userId, Category, ExpirationDay, VoucherCodes] );
+            const [result] = await this.connection.execute("CALL fn_add_voucher(?, ?, ?, ?, ?)", [VoucherName, userId, Category, ExpirationDay, VoucherCodes]);
             return res.json(result[0]);
         } catch (error) {
             console.error('Query error:', error);
             return res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     }
+
+    UseVoucher = async (req, res) => {
+        const { VoucherCode } = req.body;
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!VoucherCode) {
+            return res.status(400).json({ message: "Voucher code is required in request body" });
+        }
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        try {
+            const secretKey = process.env.JWT_SECRET;
+            const decoded = jwt.verify(token, secretKey);
+            const UserId = decoded.userId;
+
+            const [result] = await this.connection.execute("CALL fn_update_user_voucher(?, ?)", [UserId, VoucherCode]);
+
+            if (!result || !result[0] || result[0].length === 0) {
+                return res.status(500).json({ message: "Unexpected database response" });
+            }
+
+            const responseData = result[0];
+            const firstRow = responseData[0];
+            if (firstRow.Message === "No Voucher Found") {
+                return res.status(400).json({ message: "Invalid voucher code or user ID" });
+            }
+
+            if (firstRow.Message === "Updating Failed") {
+                return res.status(500).json({ message: "Failed to update voucher" });
+            }
+
+            return res.json({ message: "Success", data: responseData });
+        } catch (error) {
+            console.error('Query error:', error);
+            return res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    };
 }
 
 module.exports = new VoucherController; 

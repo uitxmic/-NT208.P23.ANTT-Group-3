@@ -35,10 +35,6 @@ const Notification = () => {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error('Không thể tải thông báo.');
-            }
-
             const data = await response.json();
             setNotifications(Array.isArray(data) ? data : []);
         } catch (err) {

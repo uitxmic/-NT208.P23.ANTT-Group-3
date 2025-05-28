@@ -1,28 +1,25 @@
-const mysql = require('mysql2/promise');
-require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class PostingController {
-    constructor() {
-        this.initConnection();
+    constructor(){
+        this.init();
+    }
+    
+    async init(){
+        this.connection = await initConnection();
     }
 
-    async initConnection() {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-        } catch (err) {
-            console.error('Database connection error:', err);
+    // Add this method to close the connection
+    async closeConnection() {
+        if (this.connection) {
+            await this.connection.end();
+            console.log('Database connection closed');
         }
     }
 
     // [POST] /posting/createPosting
     CreatePosting = async (req, res) => {
-        if (!req.session || !req.session.user) {
+        if (!req.session) {
             return res.status(401).json({ message: "Unauthorized: No session found" });
         }
 
@@ -33,7 +30,7 @@ class PostingController {
         }
 
         try {
-            const UserId = req.session.user.UserId;
+            const UserId = req.session.UserId;
 
             const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content, VouImg, Price, Quantity]);
 
@@ -45,28 +42,22 @@ class PostingController {
         }
     }
 
-    // [GET] /posting/getPostingsByUserId/:UserId
-    GetPostingsByUserId = async (req, res) => {
-        const { UserId } = req.params;
 
-        if (!UserId) {
-            return res.status(400).json({ error: 'UserId is required in request params' });
+
+    // [GET] /posting/getPostingsByUserId
+    GetPostingsByUserId = async (req, res) => {;
+        if (!req.session) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
 
         try {
-            if (!req.session || !req.session.user) {
+            if (!req.session) {
                 return res.status(401).json({ message: "Unauthorized: No session found" });
             }
 
-            const RequestUserId = req.session.user.UserId;
-
-            if (RequestUserId != UserId) {
-
-                return res.status(403).json({ error: 'Unauthorized. Your UserId is not allowed' });
-            }
+            const UserId = req.session.user.UserId;
 
             const [results] = await this.connection.query(`CALL fn_show_post_info_by_id(?)`, [UserId]);
-
             res.json(results[0]);
 
         } catch (err) {

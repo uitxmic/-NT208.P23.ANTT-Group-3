@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Home from "../pages/Home";
 import Log_in from "../pages/Log_in";
 import Sign_up from "../pages/Sign_up";
@@ -29,9 +31,20 @@ import PurchaseHistory from "../pages/PurchaseHistory";
 import UserDetail from "../pages/UserDetail";
 
 function AppRoutes() {
+  const navigate = useNavigate();
+
+  // Ensure login and signup routes are accessible without session check
+  useEffect(() => {
+    const sessionId = sessionStorage.getItem("sessionId");
+    const currentPath = window.location.pathname;
+    if (!sessionId && !["/login", "/signup"].includes(currentPath)) {
+      navigate("/"); // Redirect to home if no sessionId and not on login or signup
+    }
+  }, [navigate]);
+
   return (
     <Routes>
-      {/* Các route không cần Layout */}
+      {/* Allow login and signup routes without session */}
       <Route path="/login" element={<Log_in />} />
       <Route path="/signup" element={<Sign_up />} />
       {/* Các route sử dụng Layout */}

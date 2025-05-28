@@ -1,29 +1,13 @@
-const mysql = require('mysql2/promise');
-const { parse } = require('path');
-const { start } = require('repl');
 require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class SearchController {
     constructor() {
-        this.initConnection();
+        this.init();
     }
 
-    async initConnection() {
-        try {
-            this.pool = await mysql.createPool({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0,
-            });
-            // console[test] = await this.pool.query('SELECT 1');
-            console.log('Database pool connection success.');
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+    async init() {
+        this.connection = await initConnection();
     }
 
     // [GET] /search/vouchers

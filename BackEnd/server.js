@@ -5,6 +5,7 @@ const routes = require('./routes/index');
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
 const sessionMiddleware = require('./middlewares/init.redis');
+const closeConnection = require('./middlewares/dbConnection').closeConnection;
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'https://ripe-phones-play.loca.lt'],
@@ -41,6 +42,13 @@ if (typeof routes === 'function') {
 } else {
   console.error('Routes is not a function');
 }
+
+process.on('SIGINT', async () => {
+  console.log('Received SIGINT. Closing server...');
+  await closeConnection();
+  console.log('Database connection closed.');
+  process.exit(0);
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://${hostname}:${port}/`);

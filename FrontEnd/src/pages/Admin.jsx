@@ -45,9 +45,13 @@ const Admin = () => {
     }, [navigate]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        fetch(`${API_BASE_URL}/session`, {
+        method: 'DELETE',
+        credentials: 'include',
+        }).then(() => {
         navigate('/login');
+        });
     };
 
     // Dữ liệu giả lập cho biểu đồ

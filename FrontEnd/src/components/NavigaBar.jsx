@@ -52,7 +52,8 @@ const Navbar = ({
   }, []);
 
   const handleLogout = () => {
-    fetch('/api/session', {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    fetch(`${API_BASE_URL}/session`, {
       method: 'DELETE',
       credentials: 'include',
     }).then(() => {

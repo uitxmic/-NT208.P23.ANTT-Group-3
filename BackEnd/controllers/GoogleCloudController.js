@@ -1,28 +1,15 @@
-const express = require('express');
 const { OAuth2Client } = require('google-auth-library');
-const app = express();
-const mysql = require('mysql2/promise');
 require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class GoogleCloudController {
   constructor() {
     this.client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    this.initConnection();
+    this.init();
   }
 
-  async initConnection() {
-    try {
-      this.connection = await mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
-      });
-
-      console.log('Connected to the database (async)');
-    } catch (err) {
-      console.error('Database connection error:', err);
-    }
+  async init() {
+    this.connection = await initConnection();
   }
 
   // [POST] /googlecloud/signInWithGoogle

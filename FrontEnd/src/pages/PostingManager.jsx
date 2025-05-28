@@ -45,8 +45,25 @@ const PostManager = () => {
     }
   };
 
+  const fetchPosts = async () => {
+    try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/posting/getPostingsByUserId`, {
+            method: 'GET',
+            credentials: 'include', // Use session-based authentication
+        });
+        if (!response.ok) throw new Error('Failed to fetch posts');
+        const data = await response.json();
+        setPosts(data);
+    } catch (error) {
+        setError(error.message || 'An error occurred while fetching posts.');
+    }
+  };
+
+
   useEffect(() => {
     fetchVoucher();
+    fetchPosts();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -55,16 +72,8 @@ const PostManager = () => {
     setSuccess('');
     setLoading(true);
 
-    const UserId = getUserIdFromToken(token);
-    if (!UserId) {
-      setError('Invalid token. UserId not found.');
-      setLoading(false);
-      return;
-    }
-
     const formData = {
       VoucherId: selectedVoucherId,
-      UserId: UserId,
       Postname: postname,
       Content: description,
       VouImg: image || 'https://example.com/default-image.jpg',
@@ -78,8 +87,8 @@ const PostManager = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `${token}`,
         },
+        credentials: 'include', // Use session-based authentication
         body: JSON.stringify(formData),
       });
       if (!response.ok) throw new Error('Failed to create post');
@@ -250,7 +259,7 @@ const PostManager = () => {
                   <input
                     type="text"
                     id="postname"
-                    value={postname}
+                    value={postname || ''} // Default to an empty string
                     onChange={(e) => setPostname(e.target.value)}
                     className="w-full p-2 border rounded bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     placeholder="Nhập tên bài đăng"
@@ -264,7 +273,7 @@ const PostManager = () => {
                   </label>
                   <textarea
                     id="description"
-                    value={description}
+                    value={description || ''} // Default to an empty string
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full p-2 border rounded bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     placeholder="Nhập nội dung bài đăng"
@@ -319,7 +328,7 @@ const PostManager = () => {
                   <input
                     type="url"
                     id="imageUrl"
-                    value={image}
+                    value={image || ''} // Default to an empty string
                     onChange={(e) => setImage(e.target.value)}
                     className="w-full p-2 border rounded bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     placeholder="Nhập URL hình ảnh"

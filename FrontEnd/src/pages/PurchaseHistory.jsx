@@ -98,7 +98,6 @@ const PurchaseHistory = () => {
 
     const handleSubmitRating = async (transactionId) => {
         try {
-            const token = localStorage.getItem('access_token');
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const transaction = transactions.find(t => t.TransactionId === transactionId);
             const ratingData = {
@@ -113,8 +112,8 @@ const PurchaseHistory = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
+                credentials: 'include', // Use session-based authentication
                 body: JSON.stringify(ratingData),
             });
 

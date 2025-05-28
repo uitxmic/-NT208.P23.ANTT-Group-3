@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const postingController = require('../controllers/PostingController');
-
 router.use('/get20LastestPostings', postingController.Get20LastestPostings);
 router.use('/createPosting', postingController.CreatePosting);
-router.use('/getPostingsByUserId/:UserId', postingController.GetPostingsByUserId);
+router.use('/getPostingsByUserId', postingController.GetPostingsByUserId);
 router.use('/getAllPostings', postingController.GetAllPostings);
 router.use('/getAllFreePostings', postingController.GetAllFreePostings);
 router.use('/getPostingByPostId/:PostId', postingController.GetPostingByPostId);

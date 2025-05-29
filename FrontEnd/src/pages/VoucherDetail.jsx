@@ -175,8 +175,7 @@ const VoucherDetail = () => {
                             <img
                                 src={voucher._displayImgUrl}
                                 alt={voucher.VoucherName}
-                                className="w-full max-w-md h-72 object-cover rounded-lg border border-gray-200"
-                            />
+                                className="w-full h-auto object-contain rounded-md mb-4" />
                         ) : (
                             <div className="w-full max-w-md h-72 bg-gray-100 flex items-center justify-center rounded-lg border border-gray-200">
                                 <span className="text-gray-500 text-lg">Không có hình ảnh</span>
@@ -208,6 +207,10 @@ const VoucherDetail = () => {
                                     ) : (
                                         <span className="text-gray-500">Không có mã</span>
                                     )}
+                                </p>
+                                <p>
+                                    <span className="font-semibold text-gray-800">Số lượng còn lại:</span>{' '}
+                                    {voucher.Amount || 'Không xác định'}
                                 </p>
                                 <p>
                                     <span className="font-semibold text-gray-800">Danh mục:</span>{' '}

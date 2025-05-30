@@ -13,7 +13,7 @@ const PostDetail = () => {
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
-    // Effect for fetching the main post details
+    // Effect for fetching
     useEffect(() => {
         const fetchPostDetail = async () => {
             setLoading(true);

@@ -201,12 +201,12 @@ const Navbar = ({
   const text = getText();
 
   return (
-    <div className="bg-gradient-to-r from-pink-100 to-white shadow-lg p-3 flex justify-between items-center fixed top-0 left-0 right-0 z-40">
+    <div className="bg-gradient-to-r from-pink-100 to-white shadow-lg p-3 flex flex-wrap justify-between items-center fixed top-0 left-0 right-0 z-40">
       {/* Trái */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4"> {/* Order 1 by default */}
         <button
           onClick={toggleSidebar}
-          className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+          className="text-blue-600 hover:text-blue-800 transition-colors duration-200" // Consider md:hidden if sidebar is only for mobile
         >
           <FaBars className="text-2xl" />
         </button>
@@ -219,7 +219,8 @@ const Navbar = ({
       </div>
 
       {/* Tìm kiếm */}
-      <div className="relative w-1/3">
+      {/* Full width on small screens, 1/3 on medium up. Appears last on small screens due to order-3. */}
+      <div className="relative w-full md:w-1/3 order-3 mt-2 md:mt-0 md:order-2">
         <input
           type="text"
           placeholder={text.searchPlaceholder}
@@ -230,7 +231,6 @@ const Navbar = ({
         />
 
         {/* Biểu tượng tìm kiếm */}
-
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500" />
         {isFilterOpen && (
           <SearchFilterModal
@@ -242,7 +242,9 @@ const Navbar = ({
       </div>
 
       {/* Phải */}
-      <div className="flex items-center space-x-6">
+      {/* Takes full width on small screens (below md), auto width on medium up. Allows internal items to wrap. */}
+      {/* Order 2 on small screens (appears after Left), order 3 on medium up (appears after Search). */}
+      <div className="flex items-center flex-wrap justify-end space-x-2 sm:space-x-3 md:space-x-4 order-2 mt-2 md:mt-0 md:order-3 w-full md:w-auto">
         {/* Thông báo */}
         <div
           className="relative"
@@ -315,8 +317,8 @@ const Navbar = ({
           )}
         </Link>
 
-        {/* Biểu tượng Lịch sử mua hàng */}
-        <Link to="/purchase-history" className="relative group">
+        {/* Biểu tượng Lịch sử mua hàng - Hidden on extra-small screens, shown from sm upwards */}
+        <Link to="/purchase-history" className="relative group hidden sm:inline-flex items-center">
           <FaHistory className="h-6 w-6 text-blue-600 group-hover:text-blue-800 transition-colors duration-200" />
         </Link>
 
@@ -325,15 +327,17 @@ const Navbar = ({
         <div className="relative">
           <button
             onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-            className="text-blue-700 hover:text-blue-900 focus:outline-none flex items-center space-x-2"
+            className="text-blue-700 hover:text-blue-900 focus:outline-none flex items-center space-x-1 sm:space-x-2"
           >
             <img
               src={language === 'vi' ? 'https://flagcdn.com/w40/vn.png' : 'https://flagcdn.com/w40/gb.png'}
               alt="flag"
-              className="w-6 h-4 rounded-sm shadow-sm"
+              className="w-5 h-3 sm:w-6 sm:h-4 rounded-sm shadow-sm"
             />
-            <span>{language === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+            <span className="hidden sm:inline">{language === 'vi' ? 'Tiếng Việt' : 'English'}</span>
+            <span className="sm:hidden">{language === 'vi' ? 'VN' : 'EN'}</span> {/* Abbreviation for very small screens */}
           </button>
+
           {showLanguageDropdown && (
             <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
               <button
@@ -361,12 +365,14 @@ const Navbar = ({
         </div>
 
         {/* Số dư và người dùng */}
-        <UserBalance setBalance={setBalance} />
+        <div className="hidden sm:inline-flex items-center"> {/* Hide UserBalance component on extra-small screens */}
+          <UserBalance setBalance={setBalance} />
+        </div>
         {isLoggedIn ? (
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1 bg-pink-200 text-blue-700 px-4 py-2 rounded-full shadow-md">
-              <span className="text-sm font-medium">{text.balanceLabel}</span>
-              <span className="text-sm font-semibold">{balance != null
+          <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+            <div className="items-center space-x-1 bg-pink-200 text-blue-700 px-2 py-1 sm:px-3 sm:py-2 rounded-full shadow-md hidden sm:flex"> {/* Hide balance text on extra-small screens */}
+              <span className="text-xs sm:text-sm font-medium">{text.balanceLabel}</span>
+              <span className="text-xs sm:text-sm font-semibold">{balance != null
                 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
                   balance * 1000
                 )
@@ -381,7 +387,7 @@ const Navbar = ({
               }}
             >
               <div className="flex items-center space-x-2 cursor-pointer">
-                <span className="text-blue-700 font-medium">{userInfo?.Username || 'Người dùng'}</span>
+                <span className="text-blue-700 font-medium text-sm sm:text-base">{userInfo?.Username || 'Người dùng'}</span>
               </div>
               {isDropdownOpen && (
                 <div

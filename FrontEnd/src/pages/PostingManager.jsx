@@ -190,12 +190,12 @@ const PostManager = () => {
                       <p className="text-xs text-blue-500">{post.Label}</p>
                       <p
                         className={`text-xs font-semibold ${post.IsActive === 1 && post.IsVerified === 1
-                            ? 'text-green-500' // Active
-                            : post.IsActive === 0 && post.IsVerified === 1
-                              ? 'text-red-500' // Inactive
-                              : post.IsActive === 0 && post.IsVerified === 0
-                                ? 'text-yellow-500' // Pending
-                                : 'text-gray-500' // Default case, if any
+                          ? 'text-green-500' // Active
+                          : post.IsActive === 0 && post.IsVerified === 1
+                            ? 'text-red-500' // Inactive
+                            : post.IsActive === 0 && post.IsVerified === 0
+                              ? 'text-yellow-500' // Pending
+                              : 'text-gray-500' // Default case, if any
                           }`}
                       >
                         {post.IsActive === 1 && post.IsVerified === 1
@@ -236,13 +236,15 @@ const PostManager = () => {
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label htmlFor="voucher" className="block text-sm font-medium text-gray-600 mb-1">
-                    Voucher
+                    Tên Voucher
                   </label>
                   <select
                     id="voucher"
                     value={selectedVoucherId}
                     onChange={(e) => {
-                      const selected = voucher.find((v) => v.VoucherId === e.target.value);
+                      const selectedValue = e.target.value;
+                      const numericVoucherId = Number(selectedValue);
+                      const selected = voucher.find((v) => v.VoucherId === numericVoucherId);
                       if (selected) {
                         handleVoucherSelect(selected);
                       } else {

@@ -296,17 +296,11 @@ const Navbar = ({
         <div className="hidden sm:inline-flex items-center"> {/* Hide UserBalance component on extra-small screens */}
           <UserBalance setBalance={setBalance} />
         </div>
-        {isLoggedIn ? (
+        {(userInfo !== null) ? (
           <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
             <div className="items-center space-x-1 bg-pink-200 text-blue-700 px-2 py-1 sm:px-3 sm:py-2 rounded-full shadow-md hidden sm:flex"> {/* Hide balance text on extra-small screens */}
               <span className="text-xs sm:text-sm font-medium">{text.balanceLabel}</span>
               <span className="text-xs sm:text-sm font-semibold">{balance != null
-        <UserBalance setBalance={setBalance} />
-        {userInfo ? (
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1 bg-pink-200 text-blue-700 px-4 py-2 rounded-full shadow-md">
-              <span className="text-sm font-medium">{text.balanceLabel}</span>
-              <span className="text-sm font-semibold">{balance != null
                 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
                   balance * 1000
                 )

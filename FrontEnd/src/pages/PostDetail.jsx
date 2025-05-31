@@ -62,7 +62,6 @@ const PostDetail = () => {
             try {
                 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-                // Fetch transactions without token
                 let transactions = [];
                 try {
                     const searchText = '';

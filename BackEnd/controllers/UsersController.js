@@ -18,7 +18,7 @@ class UsersController {
 
     // [Get] /users/getUsers
     GetAllUser = async (req, res) => {
-        if (!req.session.user || req.session.user.userRoleId !== 1) {
+        if (!req.session.user || req.session.user.UserRoleId !== 1) {
             return res.status(403).json({ message: "Forbidden: You do not have permission to access this resource" });
         }
 

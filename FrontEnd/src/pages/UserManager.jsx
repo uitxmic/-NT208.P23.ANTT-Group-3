@@ -15,24 +15,15 @@ const UserManager = () => {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/users/getUsers?sortBy=${sortBy}&sortOrder=${sortOrder}&searchTerm=${encodeURIComponent(searchTerm)}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 credentials: 'include',
             });
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Không thể tải danh sách người dùng');
             }
             const data = await response.json();
-            if (Array.isArray(data)) {
-                setUsers(data);
-            } else {
-                setUsers([]);
-                toast.error('Không thể lấy danh sách người dùng');
-            }
+            setUsers(data);
         } catch (error) {
-            console.error('Error fetching users:', error);
-            toast.error('Failed to fetch users');
+            toast.error(error.message || 'Đã xảy ra lỗi khi tải danh sách người dùng');
         } finally {
             setLoading(false);
         }

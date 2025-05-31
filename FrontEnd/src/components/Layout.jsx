@@ -29,14 +29,14 @@ const Layout = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
-          userRoleId = data.userRoleId;
+          userRoleId = Number(data.UserRoleId); 
         } else {
           console.error('Failed to fetch user role');
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
-      setUserRoleId(userRoleId); // Cập nhật trạng thái userRoleId
+      setUserRoleId(userRoleId);
     };
 
     fetchUserRole();

@@ -32,11 +32,6 @@ function routes(app) {
 
     app.use('/payment', momoPayment);
 
-    app.get('/dashboard', (req, res) => {
-        app.use(authMiddleware);
-        res.render('dashboard');
-    });
-
     app.use('/search', searchRouter);
 
     app.use('/news', newsRouter);

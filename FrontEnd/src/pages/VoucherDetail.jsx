@@ -73,20 +73,14 @@ const VoucherDetail = () => {
     const confirmUseVoucher = async () => {
         setShowConfirmModal(false);
 
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục.');
-            return;
-        }
-
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/voucher/useVoucher`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     VoucherCode: selectedVoucherCode,
                 }),

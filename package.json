@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "react-toastify": "^11.0.5",
-    "xlsx": "^0.18.5",
     "@react-oauth/google": "^0.12.1",
     "@redis/client": "^1.2.0",
     "carousel": "^0.0.3",
@@ -10,7 +8,9 @@
     "express-session": "^1.18.1",
     "google-auth-library": "^9.15.1",
     "react-slick": "^0.30.3",
+    "react-toastify": "^11.0.5",
     "redis": "^4.7.0",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "xlsx": "^0.18.5"
   }
 }

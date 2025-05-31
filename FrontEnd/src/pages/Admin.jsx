@@ -15,8 +15,10 @@ const Admin = () => {
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const response = await fetch('/api/session', {
-                    credentials: 'include', // Use session-based authentication
+                const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+                const response = await fetch(`${API_BASE_URL}/session/userId`, {
+                    method: 'GET',
+                    credentials: 'include',
                 });
 
                 if (!response.ok) {
@@ -25,14 +27,23 @@ const Admin = () => {
                     return;
                 }
 
-                const data = await response.json();
-                const userRoleId = data.user.UserRoleId;
+                const roleResponse = await fetch(`${API_BASE_URL}/session/userRoleId`, {
+                    method: 'GET',
+                    credentials: 'include', // Include cookies in the request
+                });
 
-                if (!userRoleId || userRoleId !== 1) {
+                if (!roleResponse.ok) {
+                    throw new Error('Failed to fetch user role');
+                }
+
+                const roleData = await roleResponse.json();
+
+                if (!(roleData.UserRoleId===1)){
                     alert('Bạn không có quyền truy cập trang này!');
                     navigate('/login');
+                    return;
                 } else {
-                    setUser(userRoleId);
+                    setUser(roleData.UserRoleId);
                     setStats({ transactions: 150, users: 85 }); // Dữ liệu giả lập cho stats
                 }
             } catch (error) {

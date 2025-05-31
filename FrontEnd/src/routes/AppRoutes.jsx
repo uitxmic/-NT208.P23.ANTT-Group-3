@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Home from "../pages/Home";
 import Log_in from "../pages/Log_in";
 import Sign_up from "../pages/Sign_up";
@@ -33,15 +33,41 @@ import UserDetail from "../pages/UserDetail";
 
 function AppRoutes() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Ensure login and signup routes are accessible without session check
   useEffect(() => {
-    const sessionId = sessionStorage.getItem("sessionId");
-    const currentPath = window.location.pathname;
-    if (!sessionId && !["/login", "/signup"].includes(currentPath)) {
-      navigate("/"); // Redirect to home if no sessionId and not on login or signup
-    }
-  }, [navigate]);
+    const checkSession = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const currentPath = location.pathname;
+
+        // Exclude login and signup routes from session validation
+        if (["/login", "/signup"].includes(currentPath)) {
+          return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/session/userId`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            if (!["/login", "/signup", "/"].includes(currentPath)) {
+              navigate('/');
+            }
+          } else {
+            console.error('Error checking session:', response.statusText);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+
+    checkSession();
+  }, [navigate, location.pathname]);
 
   return (
     <Routes>

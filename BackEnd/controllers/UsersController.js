@@ -1,6 +1,5 @@
 const { initConnection } = require('../middlewares/dbConnection');
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken'); // Ensure jwt is imported
 
 class UsersController {
     constructor() {
@@ -190,17 +189,12 @@ class UsersController {
     // [PATCH] /users/updateUser
     UpdateUser = async (req, res) => {
         const { Fullname, Email, PhoneNumber } = req.body;
-        const token = req.headers.authorization;
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized : No active session" });
         }
-
+        const userId = req.session.user.UserId;
+                
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
-
             const [results] = await this.connection.query('CALL fn_update_user(?, ?, ?, ?)', [userId, Fullname, Email, PhoneNumber]);
             res.json(results[0]);
         } catch (error) {

@@ -71,10 +71,9 @@ class NewsController{
     // [PUT] /news/update
     UpdateNews = async (req, res) => {
         const { PostId, VoucherId, Postname, Content } = req.body;
-        const token = req.headers['authorization'];
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
 
         if (!PostId || !Postname || !Content) {
@@ -94,11 +93,10 @@ class NewsController{
 
     // [PUT] /news/deactivate
     DeactivateNews = async (req, res) => {
-        const { PostId } = req.body;
-        const token = req.headers['authorization'];
+        const { PostId } = req.body;;
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
 
         if (!PostId) {
@@ -117,10 +115,9 @@ class NewsController{
     // [PUT] /news/activate
     ActivateNews = async (req, res) => {
         const { PostId } = req.body;
-        const token = req.headers['authorization'];
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
 
         if (!PostId) {

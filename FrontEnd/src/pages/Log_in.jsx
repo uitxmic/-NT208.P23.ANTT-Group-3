@@ -39,7 +39,6 @@ const Log_in = () => {
         throw new Error(text.errorMessage || 'Login failed');
       }
 
-      // Redirect based on user role (assuming role is stored in session and fetched separately)
       const roleResponse = await fetch(`${API_BASE_URL}/session/userRoleId`, {
         method: 'GET',
         credentials: 'include', // Include cookies in the request
@@ -50,7 +49,7 @@ const Log_in = () => {
       }
 
       const roleData = await roleResponse.json();
-      if (roleData.userRoleId === 1) {
+      if (roleData.UserRoleId === 1) {
         navigate('/admin');
       } else {
         navigate('/');
@@ -74,14 +73,27 @@ const Log_in = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Đảm bảo cookie session được gửi về
         body: JSON.stringify({ tokenId: credentialResponse.credential }),
       });
 
       const data = await response.json();
-      if (data.state === 'success' && data.sessionId) {
-        // Store session ID in localStorage or cookies if needed
-        localStorage.setItem('sessionId', data.sessionId);
-        navigate('/');
+      if (data.state === 'success') {
+        const roleResponse = await fetch(`${API_BASE_URL}/session/userRoleId`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies in the request
+        });
+
+        if (!roleResponse.ok) {
+          throw new Error('Failed to fetch user role');
+        }
+
+        const roleData = await roleResponse.json();
+        if (roleData.UserRoleId === 1) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
         throw new Error(data.error || text.googleLoginFailed);
       }

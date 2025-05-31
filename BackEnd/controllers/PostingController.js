@@ -4,7 +4,7 @@ class PostingController {
     constructor(){
         this.init();
     }
-    
+     
     async init(){
         this.connection = await initConnection();
     }
@@ -98,10 +98,9 @@ class PostingController {
 
     GetAllSellerPostings = async (req, res) => {
         const { page, limit } = req.query;
-        const token = req.headers['authorization'];
         const { UserId } = req.params;
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ error: 'Unauthorized: No session found' });
         }
 
         if (!UserId) {
@@ -110,9 +109,7 @@ class PostingController {
 
         try {
             const [results] = await this.connection.query(`CALL fn_get_all_seller_post_by_sellerId(?, ?, ?)`, [UserId, page, limit]);
-
             res.json(results[0]);
-
         } catch (err) {
             console.error('Error getting postings:', err);
             return res.status(500).json({ error: 'Error getting postings' });
@@ -201,14 +198,10 @@ class PostingController {
     // [PATCH] /posting/activePosting
     ActivePosting = async (req, res) => {
         const { PostId } = req.body;
-        const token = req.headers['authorization'];
-
-        const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-        if (!token || userRoleId !== 1) {
+        // Kiểm tra session và quyền admin
+        if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
             return res.status(401).json({ error: 'You are not admin and do not have right to do this' });
         }
-
 
         if (!PostId) {
             return res.status(400).json({ error: 'PostId is required in request body' });
@@ -216,9 +209,7 @@ class PostingController {
 
         try {
             const [results] = await this.connection.query(`CALL fn_active_post(?)`, [PostId]);
-
             res.json(results[0]);
-
         } catch (err) {
             console.error('Error activating posting:', err);
             return res.status(500).json({ error: 'Error activating posting' });
@@ -263,14 +254,10 @@ class PostingController {
 
     // [GET] /posting/getAllPostingsForAdmin
     GetAllPostingsForAdmin = async (req, res) => {
+        if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
         try {
-            const token = req.headers['authorization'];
-            const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-            if (!token && userRoleId !== 1) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-
             const [results] = await this.connection.query(`CALL fn_get_all_post_for_admin()`);
             res.json(results[0]);
 

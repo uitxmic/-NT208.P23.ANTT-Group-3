@@ -3,9 +3,10 @@ const express = require('express');
 class SessionController {
     // [GET] /session
     getSession = (req, res) => {
-        if (req.session && req.session.UserId) {
-            res.json({ UserId: req.session.UserId });
+        if (req.session && req.session.user && req.session.user.UserId) {
+            res.status(200).json({ UserId: req.session.user.UserId });
         } else {
+            console.error('No active session found');
             res.status(401).json({ message: 'No active session' });
         }
     };

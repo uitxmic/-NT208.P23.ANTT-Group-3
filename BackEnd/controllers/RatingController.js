@@ -12,10 +12,8 @@ class RatingController {
 
     // [Post] /rating/addRating
     AddRating = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
         try {
             const { PostId, Vote, Rating, TransactionId, UserIdseller} = req.body;

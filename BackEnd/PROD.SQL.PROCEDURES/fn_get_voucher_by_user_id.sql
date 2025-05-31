@@ -3,14 +3,18 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS fn_get_voucher_by_user_id;$$
 CREATE PROCEDURE fn_get_voucher_by_user_id(IN uid INT)
 BEGIN
- SELECT 
+ SELECT DISTINCT
         V.VoucherId,
         V.VoucherName,
         GROUP_CONCAT(DISTINCT V.VoucherCode) AS VoucherCodes,
         V.Category,
         V.UserId,
         V.ExpirationDay,
-        P.Price,
+        (SELECT P.Price 
+         FROM Post P 
+         WHERE P.VoucherId = V.VoucherId 
+         ORDER BY P.Price  DESC 
+         LIMIT 1) AS Price,
         (SELECT P.VouImg 
          FROM Post P 
          WHERE P.VoucherId = V.VoucherId 
@@ -33,4 +37,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_voucher_by_user_id(7)
+CALL fn_get_voucher_by_user_id(29)

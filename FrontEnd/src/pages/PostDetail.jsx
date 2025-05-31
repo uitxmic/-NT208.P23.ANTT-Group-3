@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../components/Layout';
-import { FaStar } from 'react-icons/fa'; // Thêm biểu tượng ngôi sao
+import { FaStar, FaShoppingBag, FaBox, FaUserPlus, FaCalendarAlt } from 'react-icons/fa'; 
 
 const PostDetail = () => {
     const { postId } = useParams();
@@ -13,7 +13,7 @@ const PostDetail = () => {
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
-    // Effect for fetching the main post details
+    // Effect for fetching
     useEffect(() => {
         const fetchPostDetail = async () => {
             setLoading(true);

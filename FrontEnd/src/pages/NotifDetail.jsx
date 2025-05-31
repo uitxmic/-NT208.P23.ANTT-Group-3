@@ -124,7 +124,7 @@ const NotifDetail = () => {
                         <img
                             src={notif.VouImg}
                             alt={notif.noti_title || 'Hình ảnh thông báo'}
-                            className="w-full h-auto object-cover rounded-md mb-4 max-h-96"
+                            className="w-full h-auto object-contain rounded-md mb-4"
                         />
                     )}
                     <p className="text-gray-600 mb-4">

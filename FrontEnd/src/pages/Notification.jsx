@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { FaShoppingCart, FaGift, FaWallet, FaCog } from 'react-icons/fa'; // Import icons
+import { FaShoppingCart, FaGift, FaWallet, FaCog } from 'react-icons/fa';
 
 const Notification = () => {
-    const [selectedType, setSelectedType] = useState(null);
+    const navigate = useNavigate();
+    const [selectedType, setSelectedType] = useState('orders');
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -39,9 +41,18 @@ const Notification = () => {
         }
     };
 
+    useEffect(() => {
+        const selectedCategory = categories.find((category) => category.type === selectedType);
+        if (selectedCategory) {
+            fetchNotifications(selectedCategory.route);
+        }
+    }, [selectedType]);
+
     const handleCategoryClick = (category) => {
+        if (selectedType === category.type) {
+            return; // Không làm gì nếu danh mục đã được chọn
+        }
         setSelectedType(category.type);
-        fetchNotifications(category.route);
     };
 
     return (
@@ -87,6 +98,11 @@ const Notification = () => {
                                 <div
                                     key={notif.noti_id}
                                     className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                                    onClick={() => {
+                                        if (notif.noti_type === 'order') {
+                                            navigate(`/notification/${notif.noti_id}`);
+                                        }
+                                    }}
                                 >
                                     <div className="flex items-start space-x-4">
                                         {notif.image_url ? (

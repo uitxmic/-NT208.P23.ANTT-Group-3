@@ -175,25 +175,10 @@ class TradeController {
 
   // [GET] /trade/getTransactionForAdmin
   GetTransactionForAdmin = async (req, res) => {
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
+      return res.status(401).json({ error: 'Unauthorized: No session or not admin' });
     }
-
-    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-    if (userRoleId != 1) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserRoleId = decode.userRoleId;
-      if (UserRoleId != 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-
       const [results] = await this.connection.query('CALL fn_get_all_transaction_for_admin()');
       res.json(results[0]); // Chỉ trả về kết quả SELECT
     } catch (error) {
@@ -230,15 +215,10 @@ class TradeController {
     if (!TransactionId) {
       return res.status(400).json({ error: 'TransactionId is required in request body' });
     }
-
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ error: 'Unauthorized: No session found' });
     }
-
     try {
-
       const [results] = await this.connection.query('CALL fn_request_refund(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;

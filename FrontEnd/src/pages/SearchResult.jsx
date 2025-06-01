@@ -3,17 +3,6 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import { SearchAPI } from '../components/SearchFilterModal';
 import Layout from '../components/Layout';
 
-const VoucherCard = ({ voucher }) => (
-    <div className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-lg transition-all duration-300">
-        <h3 className="text-xl font-semibold text-indigo-600 mb-2">{voucher.VoucherName}</h3>
-        <p className="text-gray-700 mb-1">Nhãn: {voucher.Label}</p>
-        <p className="text-gray-600 mb-1">Giá: {voucher.Price ? `${voucher.Price.toLocaleString()} đ` : 'N/A'}</p>
-        <p className="text-sm text-gray-500 mb-1">Người đăng: {voucher.Username}</p>
-        <p className={`text-sm font-medium ${new Date(voucher.Expire) < new Date() ? 'text-red-600' : 'text-green-600'}`}>
-            Hết hạn: {new Date(voucher.Expire).toLocaleDateString()}
-        </p>
-    </div>
-);
 
 const PostCard = ({ post }) => (
     <div className="flex bg-white border border-pink-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 mb-6">
@@ -134,10 +123,7 @@ const SearchResult = () => {
             setError(null);
             try {
                 let data;
-                if (type === 'vouchers') {
-                    setPageTitle(`Kết quả tìm kiếm Voucher ${queryParams.searchTerm ? `cho "${queryParams.searchTerm}"` : ''}`);
-                    data = await SearchAPI.searchVouchers(queryParams);
-                } else if (type === 'posts') {
+                if (type === 'posts') {
                     setPageTitle(`Kết quả tìm kiếm Bài đăng ${queryParams.searchTerm ? `cho "${queryParams.searchTerm}"` : ''}`);
                     data = await SearchAPI.searchPosts(queryParams);
                 } else if (type === 'users') {

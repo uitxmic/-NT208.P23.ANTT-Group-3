@@ -5,7 +5,6 @@ DROP PROCEDURE IF EXISTS fn_search_users_with_filters;$$
 CREATE PROCEDURE `fn_search_users_with_filters`(
     IN search_term VARCHAR(100),
     IN min_feedback DECIMAL(2, 1),
-    IN min_sold INT,
     IN sort_by VARCHAR(20)
 )
 BEGIN
@@ -28,8 +27,6 @@ BEGIN
         CASE 
             WHEN sort_by = 'feedback_desc' THEN -AvgRate
             WHEN sort_by = 'feedback_asc' THEN AvgRate
-            WHEN sort_by = 'sold_desc' THEN -SoldAmount
-            WHEN sort_by = 'sold_asc' THEN SoldAmount
             ELSE UserId
         END;
 END$$

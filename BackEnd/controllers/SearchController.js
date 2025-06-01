@@ -36,13 +36,19 @@ class SearchController {
     // [GET] /search/posts
     SearchPosts = async (req, res) => {
 
-        try {
-            const { query } = req.query;
-            if (!query) {
-                return res.status(400).json({ message: "Bad Request: query is required" });
-            }
+        const { searchTerm, category, minPrice, maxPrice, sortBy, start_day, end_day } = req.query;
 
-            const [results] = await this.pool.query('CALL fn_search_posts(?)', [query]);
+        try {
+            const [results] = await this.pool.query('CALL fn_search_posts_with_filters(?,?,?,?,?,?,?)',
+            [
+                searchTerm || '',
+                category || '',
+                minPrice || 0,
+                maxPrice || 99999,
+                sortBy || 'price_asc',
+                start_day || null,
+                end_day || null
+            ]);
             res.json(results[0]);
         } catch (error) {
             console.error('Query error:', error);
@@ -77,11 +83,10 @@ class SearchController {
 
         try{
             const[results] = await this.pool.query(
-                'CALL fn_search_users_with_filters(?, ?, ?, ?)',
+                'CALL fn_search_users_with_filters(?, ?, ?)',
                 [
                 searchTerm || '', 
                 minFeedback || null, 
-                minSold || null, 
                 sortBy || 'feedback_desc'
             ]
             );

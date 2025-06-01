@@ -81,14 +81,14 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 ### 3. Luồng mua Voucher
  Luồng thanh toán bằng số dư tài khoản
 
-  - Client gửi các thông tin như VoucherId, Quantity, TotalAmount về cho Server
-  - Server gọi API /trade/paymentbybalance với các trường Authorization và application/json với các thông tin vừa nhận được
-  - Server xác thực session người dùng và kiểm tra VoucherId hợp lệ
-  - Server gọi Stored Procedure fn_payment_by_userbalance(UserId, VoucherId)
-  - Server gửi SQL Script về cho database thực hiện câu kiểm tra số dư và UPDATE giao dịch
-  - Database gửi Response với out_message và out_id
-  - Server gửi TransactionId xác nhận thành công hoặc thông báo lỗi
-  - Client cập nhật lại trang thanh toán và chuyển hướng đến /profile
+  - Client gửi các thông tin như  cartItems (VoucherId, PostId, Amount, Quantity, UserIdSeller) về cho Server
+  - Server gọi API /trade/createCartTransaction  với các trường Authorization và application/json với các thông tin vừa nhận được
+  - Server xác thực session người dùng và kiểm tra cartItems là mảng không rỗng
+  - Server chuyển cartItems thành JSON string và lấy UserIdBuyer từ session
+  - Server gọi Stored Procedure fn_create_cart_transaction(cartData, UserIdBuyer)
+  - Database gửi Response với Message và LastTransactionId hoặc error
+  - Server gửi LastTransactionId  xác nhận thành công hoặc thông báo lỗi
+  - Client cập nhật lại trang thanh toán
 
  Luồng thanh toán bằng MoMo
 

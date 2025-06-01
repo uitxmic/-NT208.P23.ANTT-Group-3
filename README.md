@@ -67,7 +67,7 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - BackEnd tạo dựa vào ID hoặc UserId được database gửi về để tạo SessionId
 - FrontEnd dựa vào SessionId này để tạo Cookies
 ![Luồng Đăng nhập](./docs/flow/ThreadLogin.png)
-![Luồng Đăng ký](./docs/flow/ThreadSignUp.png)
+![Luồng Đăng ký](./docs/flow/ThreadSignUp.jpg)
 
 ### 2. Luồng đăng Voucher
 - Client gửi các thông tin như Tên Voucher, Loại Voucher, Ngày Hết hạn, Mã Voucher về cho Server

@@ -11,14 +11,46 @@ Link truy cập website: [https://www.voucherhub.id.vn](https://www.voucherhub.i
 
 ---
 
+## Sơ đồ kiến trúc tổng quan hệ thống
+![SystemDesign (1)](https://github.com/user-attachments/assets/e826c799-a8ea-4989-b12b-09c6f519da9b)
+- Kiến trúc hệ thống được chia làm 3 phần như sơ đồ trên:
+  + Client Side (Phía Client) bao gồm ứng dụng website sử dụng thư viện ReactJS
+  + Server Side (Phía Server) bao gồm hệ thống API được viết bằng NodeJS thông qua sử dụng ngôn ngữ Javascript, và MySQL.
+  + Third Party Services (Các dịch vụ của bên thứ ba) gồm dịch vụ SMTP của Gmail (Google) và dịch vụ thanh toán của Momo.
+- Truyền thông giữa các bên: 
+  + Client – Server:  
+     + Trao đổi dữ liệu giữa 2 bên diễn ra khi end user (người dùng cuối) tương tác với UI (User Interface) mà qua đó kích hoạt các lời gọi API được cung cấp bởi phía Server.
+     + Sử dụng các phương thức HTTP POST và HTTP GET.  
+  + Server – Third Party Services – Client:  
+     + Diễn ra khi phía Server muốn gửi mail cho phía Client và ngược lại.
+     + Sử dụng giao thức SMTP cho việc gửi và ở Client sử dụng POP3 hoặc IMAP cho việc nhận
+  + Client – Third Party Services:
+     + Diễn ra khi end user muốn sử dụng dịch vụ thanh toán được cung cấp bởi Momo Payment Gateway. Sử dụng phương thức HTTP GET.
+  + Server – Third Party Services: 
+     + Diễn ra khi server cần khởi tạo dịch vụ thanh toán cho client.
+     + Sử dụng phương thức HTTP POST.
+
 ## Tính năng chính
 
+- Đăng nhập/ Đăng ký:
+  + Phân luồng người dùng: Admin, User
+  + Quên mật khẩu
+  + Đổi mật khẩu
 - Đăng bài bán voucher: Người dùng có thể thêm và rao bán voucher của mình.
+  + Thay đổi giá
+  + Thay đổi hình
+  + Xem trạng thái các bài đăng
 - Mua voucher: Xem và mua các voucher đã được đăng bởi người khác.
+  + Mua Voucher với tiền nạp vào hệ thống hoặc bằng Momo
+  + Xác nhận giao dịch đã thành công.
 - Yêu cầu hoàn tiền: Hỗ trợ gửi yêu cầu hoàn tiền trong các giao dịch.
 - Lịch sử giao dịch: Theo dõi tất cả giao dịch đã thực hiện.
 - Gợi ý thông minh: Gợi ý bài đăng phù hợp với người dùng dựa trên lịch sử hoặc sở thích.
-
+- Tính năng dành cho Admin: Các chức năng dành cho người quản trị
+  + Tính năng quản lý người dùng
+  + Tính năng xem biểu đồ giao dịch
+  + Tính năng kích hoạt bài đăng, vô hiệu hóa bài đăng
+  + Tính năng Chấp nhận hoàn tiền, Từ chối hoàn tiền
 ---
 
 ## Công nghệ sử dụng
@@ -106,7 +138,6 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 ![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài
------ Quốc -------------
 Luồng Đăng bài
 
   - Người dùng sau khi đăng nhập, gửi POST request đến endpoint /posting/createPosting với dữ liệu bao gồm VoucherId, Postname, Content và JWT token trong header authorization PostingController.
@@ -133,8 +164,73 @@ Luồng thông báo (notification)
 
 
 
-### Giao diện trang chủ
-![Giao diện trang chủ](./docs/screenshots/homepage.png)
+## Giao diện của các chức năng chính
+
+Trang chủ
+![image](https://github.com/user-attachments/assets/5831a657-59a7-4998-9795-ff0135d82bfe)
+
+Đăng nhập
+![image](https://github.com/user-attachments/assets/9a0292fa-b10d-4f06-9e28-26c332cc8fe8)
+
+Yêu cầu quên mật khẩu:
+![image](https://github.com/user-attachments/assets/f2e607cc-a4c0-4d82-a043-38c8f617052b)
+
+Trang Quản lý bài đăng của User
+![image](https://github.com/user-attachments/assets/6140fdbc-357c-4dca-851b-3f8bb72484aa)
+
+Trang mua Voucher
+![image](https://github.com/user-attachments/assets/d4be2c91-71fa-4e76-80ef-db517e8083fd)
+
+Trang Quản lý mã giảm giá
+![image](https://github.com/user-attachments/assets/a435c9f4-e3e2-48da-8df7-f08176160f88)
+
+Trang thêm Voucher
+![image](https://github.com/user-attachments/assets/f4370b23-02a0-4e9b-857f-9b40c46fca05)
+
+Trang Quản lý các thông báo
+![image](https://github.com/user-attachments/assets/99cd5ad2-29a5-4a2c-8f70-3015537ca1e3)
+
+Trang Giỏ hàng
+![image](https://github.com/user-attachments/assets/8f80ad7a-1132-4bbe-bb37-632d2cb11221)
+
+Trang Lịch sử giao dịch
+![image](https://github.com/user-attachments/assets/d2a06d04-c7d6-4338-9ba7-a79c2280cda0)
+
+Trang Profile
+![image](https://github.com/user-attachments/assets/911a8f22-c485-42c3-9184-08b8c3e4e62d)
+
+
+Trang dành cho Admin
+![image](https://github.com/user-attachments/assets/0e2c48c2-ab87-4f94-ba0f-35c1f3fde941)
+
+Trang quản lý bài đăng cho Admin
+![image](https://github.com/user-attachments/assets/8267fc7a-5db8-4b28-af9d-7fda1bdab177)
+
+Trang quản lý người dùng dành cho Admin
+![image](https://github.com/user-attachments/assets/8bb5ad20-4878-4ed1-8041-efed983efa63)
+
+Trang quản lý giao dịch cho Admin
+![image](https://github.com/user-attachments/assets/4c0b7e77-d2b3-4539-9803-a6c2aecd5276)
+
+## Các phần cộng điểm
+- Host lên được Internet:
+  + Sử dụng VPS của Vietnix
+  + Sử dụng domain từ iNET
+  + Dùng nginx để host
+![image](https://github.com/user-attachments/assets/4faf44a3-3db5-4343-bd25-a72e14aada73)
+  + File cấu hình Nginx
+![image](https://github.com/user-attachments/assets/819e9720-400f-4495-98a9-7ca8f105b7f8)
+
+- Google PageSpeed
+  + SEO Xanh
+  + Tuy nhiên Performance chỉ 55, lý do trang Home đang có khá nhiều hiệu ứng (transition, gọi nhiều API, có hình ảnh mock-up ở LandingPage, ...)
+![image](https://github.com/user-attachments/assets/96ae699b-9c22-4274-bfe2-c61f80756a2a)
+
+- Video giới thiệu trang web:
+  + Video trailer: https://www.tiktok.com/@dyff5hja2xeb/video/7510990677174455560
+  + Video phỏng vấn: https://www.tiktok.com/@dyff5hja2xeb/video/7510989647057636615
+
+
 
 ## Kết luận
 

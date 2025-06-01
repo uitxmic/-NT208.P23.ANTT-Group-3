@@ -17,7 +17,7 @@ function Home() {
                 <div className="flex flex-col md:flex-row items-center justify-center">
                   <div className="md:w-1/2 flex justify-center">
                     <img
-                      src="public\vouchertop.jpg"
+                      src="/vouchertop.jpg"
                       alt="Phone Mockup"
                       className="w-64 md:w-80"
                     />

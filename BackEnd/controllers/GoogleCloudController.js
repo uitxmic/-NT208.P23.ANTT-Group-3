@@ -38,6 +38,8 @@ class GoogleCloudController {
       return res.status(400).json({ error: 'Token ID is required' });
     }
 
+    console.log('Received token ID:', tokenId);
+
     try {
       const ticket = await this.client.verifyIdToken({
         idToken: tokenId,

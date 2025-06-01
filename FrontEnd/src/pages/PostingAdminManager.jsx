@@ -11,21 +11,14 @@ const VoucherManagement = () => {
 
     // Fetch vouchers from API
     const fetchVouchers = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục');
-            setLoading(false);
-            return;
-        }
-
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/posting/getAllPostingsForAdmin`, {
                 method: 'GET',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -48,15 +41,14 @@ const VoucherManagement = () => {
 
     // Handle Activate Voucher
     const handleActivateVoucher = async (postId) => {
-        const token = localStorage.getItem('access_token');
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/posting/activePosting`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ PostId: postId }),
             });
 
@@ -76,15 +68,14 @@ const VoucherManagement = () => {
     };
 
     const handleDeactivateVoucher = async (postId) => {
-        const token = localStorage.getItem('access_token');
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/posting/deactivePosting`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ PostId: postId }),
             });
             if (!response.ok) {

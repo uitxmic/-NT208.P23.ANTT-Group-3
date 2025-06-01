@@ -20,7 +20,9 @@ const NotifDetail = () => {
                 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
                 const NotifId = parseInt(notifId, 10);
                 console.log('Fetching notification with ID:', NotifId);
-                const response = await axios.get(`${API_BASE_URL}/notification/getNotiById/${NotifId}`);
+                const response = await axios.get(`${API_BASE_URL}/notification/getNotiById/${NotifId}`, {
+                    withCredentials: true
+                });
                 const data = response.data;
                 console.log('Response data:', data);
                 setTransactionId(data.transaction_id);
@@ -43,14 +45,13 @@ const NotifDetail = () => {
 
     const handleConfirmReceipt = async () => {
         try {
-            const token = localStorage.getItem('access_token');
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/completeTransaction`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ TransactionId: TransactionId }),
             });
 
@@ -71,14 +72,13 @@ const NotifDetail = () => {
 
     const handleRefundRequest = async () => {
         try {
-            const token = localStorage.getItem('access_token');
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/requestRefund`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ TransactionId: TransactionId }),
             });
 
@@ -124,7 +124,7 @@ const NotifDetail = () => {
                         <img
                             src={notif.VouImg}
                             alt={notif.noti_title || 'Hình ảnh thông báo'}
-                            className="w-full h-auto object-cover rounded-md mb-4 max-h-96"
+                            className="w-full h-auto object-contain rounded-md mb-4"
                         />
                     )}
                     <p className="text-gray-600 mb-4">

@@ -11,6 +11,15 @@ BEGIN
          'UserName', U.Username,
          'AvgRate', U.AvgRate,
          'SoldAmount', U.SoldAmount,
+         'ProductAmount', (
+            SELECT COUNT(*) 
+            FROM Post P2 
+            WHERE P2.UserId = P.UserId 
+            AND P2.IsVerified IS TRUE 
+            AND P2.IsActive IS TRUE 
+            AND P2.Quantity > 0 
+            AND P2.Price > 0
+         ),
          'PostName', P.PostName,
          'VouImg', P.VouImg,
          'Content', P.Content,
@@ -38,4 +47,4 @@ END $$
 
 DELIMITER ;
 
-CALL fn_get_posting_by_post_id(22);
+CALL fn_get_posting_by_post_id(54);

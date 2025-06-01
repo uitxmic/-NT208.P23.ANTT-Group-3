@@ -13,14 +13,6 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [momoQRCodeUrl, setMomoQRCodeUrl] = useState(null);
 
-  const token = localStorage.getItem('access_token');
-  if (!token) {
-    setError('Vui lòng đăng nhập để tiếp tục');
-    setTimeout(() => navigate('/login'), 2000);
-    setLoading(false);
-    return;
-  }
-
   const cartItems = Array.isArray(state?.items)
     ? state.items
     : state?.voucher
@@ -46,15 +38,15 @@ const Payment = () => {
     return cartItems.reduce((total, item) => total + (item.amount * item.quantity), 0);
   };
 
-  async function getMomoQRCodeUrl(userId, token) {
+  async function getMomoQRCodeUrl(userId) {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE_URL}/payment/create-payment-voucher`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token,
         },
+        credentials: 'include',
         body: JSON.stringify({
           cartData: cartItems.map(item => ({
             VoucherId: item.voucherId,
@@ -85,9 +77,9 @@ const Payment = () => {
       const response = await fetch(`${API_BASE_URL}/cart/updateCart`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({
           ItemId: itemId,
           Quantity: quantity,
@@ -120,9 +112,9 @@ const Payment = () => {
         const response = await fetch(`${API_BASE_URL}/trade/createCartTransaction`, {
           method: 'POST',
           headers: {
-            Authorization: `${token}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({
             cartItems: cartItems.map(item => ({
               VoucherId: item.voucherId,
@@ -156,8 +148,8 @@ const Payment = () => {
       } else if (paymentMethod === 'bank') {
         setSuccess('Vui lòng hoàn tất thanh toán bằng tài khoản ngân hàng.');
       } else if (paymentMethod === 'momo') {
-        const userId = JSON.parse(atob(token.split('.')[1])).userId;
-        const qrCodeUrl = await getMomoQRCodeUrl(userId, token);
+        const userId = JSON.parse(atob(document.cookie.split('; ').find(row => row.startsWith('session_id')).split('=')[1])).userId;
+        const qrCodeUrl = await getMomoQRCodeUrl(userId);
         if (qrCodeUrl) {
           window.open(qrCodeUrl, '_blank');
           setSuccess('Vui lòng quét mã QR bằng ứng dụng MoMo để hoàn tất thanh toán.');

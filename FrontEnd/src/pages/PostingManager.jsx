@@ -1,17 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { jwtDecode } from 'jwt-decode';
 
-
-const getUserIdFromToken = (token) => {
-  try {
-    const decoded = jwtDecode(token);
-    return decoded.userId;
-  } catch (error) {
-    console.error('Invalid token:', error);
-    return null;
-  }
-};
 
 const PostManager = () => {
   const [postname, setPostname] = useState('');
@@ -21,7 +10,6 @@ const PostManager = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [token, setToken] = useState(localStorage.getItem('access_token'));
   const [voucher, setVoucher] = useState([]);
   const [selectedVoucherId, setSelectedVoucherId] = useState('');
   const [price, setPrice] = useState('');
@@ -40,43 +28,42 @@ const PostManager = () => {
 
   const fetchVoucher = async () => {
     try {
-      const UserId = getUserIdFromToken(token);
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/voucher/getVoucherByUserId/${UserId}`, {
+      const response = await fetch(`${API_BASE_URL}/voucher/getVoucherByUserId`, {
         method: 'GET',
-        headers: { Authorization: `${token}` },
+        credentials: 'include', // Use session-based authentication
       });
-      if (!response.ok) throw new Error('Failed to fetch voucher ID');
+
+      if (!response.ok) {
+        throw new Error('Unable to fetch vouchers.');
+      }
+
       const data = await response.json();
       setVoucher(data);
-    } catch (error) {
-      setError(error.message || 'An error occurred while fetching voucher ID.');
+    } catch (err) {
+      setError(err.message || 'An error occurred while fetching vouchers.');
     }
   };
 
   const fetchPosts = async () => {
     try {
-      const UserId = getUserIdFromToken(token);
-      if (!UserId) {
-        setError('Invalid token. UserId not found.');
-        return;
-      }
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/posting/getPostingsByUserId/${UserId}`, {
-        method: 'GET',
-        headers: { Authorization: `${token}` },
-      });
-      if (!response.ok) throw new Error('Failed to fetch posts');
-      const data = await response.json();
-      setPosts(data);
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/posting/getPostingsByUserId`, {
+            method: 'GET',
+            credentials: 'include', // Use session-based authentication
+        });
+        if (!response.ok) throw new Error('Failed to fetch posts');
+        const data = await response.json();
+        setPosts(data);
     } catch (error) {
-      setError(error.message || 'An error occurred while fetching posts.');
+        setError(error.message || 'An error occurred while fetching posts.');
     }
   };
 
+
   useEffect(() => {
-    fetchPosts();
     fetchVoucher();
+    fetchPosts();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -85,16 +72,8 @@ const PostManager = () => {
     setSuccess('');
     setLoading(true);
 
-    const UserId = getUserIdFromToken(token);
-    if (!UserId) {
-      setError('Invalid token. UserId not found.');
-      setLoading(false);
-      return;
-    }
-
     const formData = {
       VoucherId: selectedVoucherId,
-      UserId: UserId,
       Postname: postname,
       Content: description,
       VouImg: image || 'https://example.com/default-image.jpg',
@@ -108,8 +87,8 @@ const PostManager = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `${token}`,
         },
+        credentials: 'include', // Use session-based authentication
         body: JSON.stringify(formData),
       });
       if (!response.ok) throw new Error('Failed to create post');
@@ -146,9 +125,9 @@ const PostManager = () => {
               <div className="bg-white p-4 rounded-lg shadow">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">Danh sách Voucher</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {voucher.map((item) => (
+                  {voucher.map((item, index) => (
                     <div
-                      key={item.VoucherId}
+                      key={`${item.VoucherId}-${index}`}
                       className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition"
                       onClick={() => handleVoucherSelect(item)}
                     >
@@ -176,8 +155,8 @@ const PostManager = () => {
                 <p className="text-sm text-gray-600">Chưa có bài đăng nào.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {posts.map((post) => (
-                    <div key={post.PostId} className="border rounded-lg p-3">
+                  {posts.map((post, index) => (
+                    <div key={`${post.PostId}-${index}`} className="border rounded-lg p-3">
                       {post.VoucherImage && (
                         <img
                           src={post.VoucherImage}
@@ -190,12 +169,12 @@ const PostManager = () => {
                       <p className="text-xs text-blue-500">{post.Label}</p>
                       <p
                         className={`text-xs font-semibold ${post.IsActive === 1 && post.IsVerified === 1
-                            ? 'text-green-500' // Active
-                            : post.IsActive === 0 && post.IsVerified === 1
-                              ? 'text-red-500' // Inactive
-                              : post.IsActive === 0 && post.IsVerified === 0
-                                ? 'text-yellow-500' // Pending
-                                : 'text-gray-500' // Default case, if any
+                          ? 'text-green-500' // Active
+                          : post.IsActive === 0 && post.IsVerified === 1
+                            ? 'text-red-500' // Inactive
+                            : post.IsActive === 0 && post.IsVerified === 0
+                              ? 'text-yellow-500' // Pending
+                              : 'text-gray-500' // Default case, if any
                           }`}
                       >
                         {post.IsActive === 1 && post.IsVerified === 1
@@ -236,13 +215,15 @@ const PostManager = () => {
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label htmlFor="voucher" className="block text-sm font-medium text-gray-600 mb-1">
-                    Voucher
+                    Tên Voucher
                   </label>
                   <select
                     id="voucher"
                     value={selectedVoucherId}
                     onChange={(e) => {
-                      const selected = voucher.find((v) => v.VoucherId === e.target.value);
+                      const selectedValue = e.target.value;
+                      const numericVoucherId = Number(selectedValue);
+                      const selected = voucher.find((v) => v.VoucherId === numericVoucherId);
                       if (selected) {
                         handleVoucherSelect(selected);
                       } else {
@@ -262,8 +243,8 @@ const PostManager = () => {
                     </option>
                     <option value="new">Tạo voucher mới</option>
                     {Array.isArray(voucher) && voucher.length > 0 ? (
-                      voucher.map((item) => (
-                        <option key={item.VoucherId} value={item.VoucherId}>
+                      voucher.map((item, index) => (
+                        <option key={`${item.VoucherId}-${index}`} value={item.VoucherId}>
                           {item.VoucherName}
                         </option>
                       ))
@@ -280,7 +261,7 @@ const PostManager = () => {
                   <input
                     type="text"
                     id="postname"
-                    value={postname}
+                    value={postname || ''} // Default to an empty string
                     onChange={(e) => setPostname(e.target.value)}
                     className="w-full p-2 border rounded bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     placeholder="Nhập tên bài đăng"
@@ -294,7 +275,7 @@ const PostManager = () => {
                   </label>
                   <textarea
                     id="description"
-                    value={description}
+                    value={description || ''} // Default to an empty string
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full p-2 border rounded bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     placeholder="Nhập nội dung bài đăng"
@@ -333,8 +314,8 @@ const PostManager = () => {
                       <option value="" disabled>
                         Chọn số lượng
                       </option>
-                      {Array.from({ length: quantity }, (_, i) => i + 1).map((num) => (
-                        <option key={num} value={num}>
+                      {Array.from({ length: quantity }, (_, i) => i + 1).map((num, index) => (
+                        <option key={`${num}-${index}`} value={num}>
                           {num}
                         </option>
                       ))}
@@ -349,7 +330,7 @@ const PostManager = () => {
                   <input
                     type="url"
                     id="imageUrl"
-                    value={image}
+                    value={image || ''} // Default to an empty string
                     onChange={(e) => setImage(e.target.value)}
                     className="w-full p-2 border rounded bg-gray-50 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     placeholder="Nhập URL hình ảnh"

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const VoucherDetail = () => {
     const { voucherId } = useParams();
@@ -8,30 +10,25 @@ const VoucherDetail = () => {
     const [voucher, setVoucher] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedVoucherCode, setSelectedVoucherCode] = useState(''); // State để lưu mã voucher được chọn
+    const [showConfirmModal, setShowConfirmModal] = useState(false); // State cho modal xác nhận
 
     const fetchVoucherDetail = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Vui lòng đăng nhập để tiếp tục.');
-            return;
-        }
-
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/voucher/getVoucherDetail/${voucherId}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
 
             const data = await response.json();
 
             if (response.ok && data.message === 'Success' && Array.isArray(data.data) && data.data.length > 0) {
-                const voucherData = data.data[0]; // vì trả về là mảng có 1 phần tử
+                const voucherData = data.data[0];
 
-                // Tách ảnh đầu tiên từ chuỗi VouImg
                 let firstImageUrl = 'https://via.placeholder.com/150';
                 if (voucherData.VouImg) {
                     const imageUrls = voucherData.VouImg.split(',').map(url => url.trim()).filter(Boolean);
@@ -40,10 +37,19 @@ const VoucherDetail = () => {
                     }
                 }
 
+                const voucherCodes = voucherData.VoucherCode
+                    ? voucherData.VoucherCode.split(',').map(code => code.trim()).filter(Boolean)
+                    : [];
+
                 setVoucher({
                     ...voucherData,
                     _displayImgUrl: firstImageUrl,
+                    voucherCodes,
                 });
+
+                if (voucherCodes.length > 0) {
+                    setSelectedVoucherCode(voucherCodes[0]);
+                }
             } else {
                 setError(data.message || 'Không tìm thấy thông tin voucher');
             }
@@ -52,6 +58,62 @@ const VoucherDetail = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleUseVoucher = async () => {
+        if (!selectedVoucherCode) {
+            alert('Vui lòng chọn một mã voucher để sử dụng.');
+            return;
+        }
+
+        // Hiển thị modal xác nhận
+        setShowConfirmModal(true);
+    };
+
+    const confirmUseVoucher = async () => {
+        setShowConfirmModal(false);
+
+        try {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/voucher/useVoucher`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    VoucherCode: selectedVoucherCode,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.message === 'Success') {
+                toast.success('Sử dụng voucher thành công!', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    style: {
+                        backgroundColor: '#4CAF50',
+                        color: '#FFFFFF',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    },
+                });
+                setTimeout(() => navigate('/user-vouchers'), 3000);
+            } else {
+                alert(data.message || 'Không thể sử dụng voucher');
+            }
+        } catch (err) {
+            alert('Đã xảy ra lỗi khi sử dụng voucher: ' + (err.message || 'Lỗi không xác định'));
+        }
+    };
+
+    const cancelUseVoucher = () => {
+        setShowConfirmModal(false); // Đóng modal khi hủy
     };
 
     useEffect(() => {
@@ -101,8 +163,7 @@ const VoucherDetail = () => {
                             <img
                                 src={voucher._displayImgUrl}
                                 alt={voucher.VoucherName}
-                                className="w-full max-w-md h-72 object-cover rounded-lg border border-gray-200"
-                            />
+                                className="w-full h-auto object-contain rounded-md mb-4" />
                         ) : (
                             <div className="w-full max-w-md h-72 bg-gray-100 flex items-center justify-center rounded-lg border border-gray-200">
                                 <span className="text-gray-500 text-lg">Không có hình ảnh</span>
@@ -119,26 +180,25 @@ const VoucherDetail = () => {
                             <div className="space-y-2 text-gray-700">
                                 <p>
                                     <span className="font-semibold text-gray-800">Mã voucher:</span>{' '}
-                                    <div className="relative max-h-20 overflow-hidden" id="voucher-code">
-                                        <span className="text-blue-600 break-words">{voucher.VoucherCode || 'Không có'}</span>
-                                        {voucher.VoucherCode && voucher.VoucherCode.length > 50 && (
-                                            <button
-                                                className="absolute bottom-0 right-0 text-sm text-blue-500 bg-white px-1"
-                                                onClick={() => {
-                                                    const el = document.getElementById('voucher-code');
-                                                    if (el.classList.contains('max-h-20')) {
-                                                        el.classList.remove('max-h-20');
-                                                        el.classList.add('max-h-full');
-                                                    } else {
-                                                        el.classList.add('max-h-20');
-                                                        el.classList.remove('max-h-full');
-                                                    }
-                                                }}
-                                            >
-
-                                            </button>
-                                        )}
-                                    </div>
+                                    {voucher.voucherCodes && voucher.voucherCodes.length > 0 ? (
+                                        <select
+                                            value={selectedVoucherCode}
+                                            onChange={(e) => setSelectedVoucherCode(e.target.value)}
+                                            className="border border-gray-300 rounded-lg p-1 text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            {voucher.voucherCodes.map((code, index) => (
+                                                <option key={index} value={code}>
+                                                    {code}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <span className="text-gray-500">Không có mã</span>
+                                    )}
+                                </p>
+                                <p>
+                                    <span className="font-semibold text-gray-800">Số lượng còn lại:</span>{' '}
+                                    {voucher.Amount || 'Không xác định'}
                                 </p>
                                 <p>
                                     <span className="font-semibold text-gray-800">Danh mục:</span>{' '}
@@ -166,7 +226,7 @@ const VoucherDetail = () => {
                         <div className="mt-6 flex flex-col md:flex-row gap-4">
                             <button
                                 className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-sm"
-                                onClick={() => alert(`Sử dụng voucher: ${voucher.VoucherCode}`)}
+                                onClick={handleUseVoucher}
                             >
                                 Sử dụng ngay
                             </button>
@@ -180,6 +240,32 @@ const VoucherDetail = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal xác nhận tùy chỉnh */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Xác nhận sử dụng voucher</h3>
+                        <p className="text-gray-700 mb-6">Bạn muốn sử dụng mã voucher này chứ: <span className="font-medium text-blue-600">{selectedVoucherCode}</span>?</p>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                                onClick={confirmUseVoucher}
+                            >
+                                OK
+                            </button>
+                            <button
+                                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
+                                onClick={cancelUseVoucher}
+                            >
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <ToastContainer /> {/* Thêm ToastContainer để hiển thị thông báo */}
         </Layout>
     );
 };

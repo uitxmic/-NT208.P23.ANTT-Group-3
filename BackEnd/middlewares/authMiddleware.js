@@ -1,22 +1,23 @@
-// middlewares/authMiddleware.js
-
-const jwt = require('jsonwebtoken');
+//middlewares/authMiddleware.js
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const express = require('express');
+const app = express();
+const parserCookie = cookieParser();
+app.use(parserCookie);
 
 const authMiddleware = (req, res, next) => {
-    const token = req.headers['authorization'];
-
-    if (!token) {
-        return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+        console.error('No session or user found in session');
+        return res.redirect('/users/login');
     }
 
     try {
-        const secretKey = process.env.JWT_SECRET;
-        const decoded = jwt.verify(token, secretKey);
-        req.user = decoded;
+        // Attach user information from session to the request object
+        req.user = req.session.user;
         next();
     } catch (err) {
-        console.error('Authorization error:', err);
+        console.error('Error in authMiddleware:', err);
         return res.status(403).json({ error: 'Unauthorized' });
     }
 };

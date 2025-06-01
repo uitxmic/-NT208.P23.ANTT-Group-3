@@ -106,7 +106,14 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 ### 4. Luồng đăng bài
 ----- Quốc -------------
 ![Luồng Đăng bài](./docs/flows/ThreadCreatePost.jpg)
-
+  - Người dùng sau khi đăng nhập, gửi POST request đến endpoint /posting/createPosting với dữ liệu bao gồm VoucherId, Postname, Content và JWT token trong header authorization PostingController.
+  - Request được định tuyến qua BackEnd/routes/posting.js posting.js:12 , trước tiên phải qua middleware xác thực posting.js.
+  - Phương thức CreatePosting của PostingController sẽ thực hiện 3 bước cơ bản:
+    1. Kiểm tra Authorization: thông qua kiểm tra sự tồn tại JWT token và xác thực bằng cách giải mã token để lấy UserId trong PostingController.js    
+    2. Validation data: Kiểm tra các trường bắt buộc gồm VoucherId, Postname, Content
+    3. Gọi procedure fn_create_post thực thi với các tham số đã validate từ bước 2.
+  - Procedure fn_create_post nhận các tham số đầu vào từ các trường từ middleware, sau đó thực hiện chức năng insert bài đăng mới vào bảng Post với ngày đăng là ngay thời điểm tạo, trạng thái mặc định là active, đồng thời trả về thông báo thành công kèm ID của post vừa tạo.
+  - Controller trả kết quả từ procedure cho client hoặc thông báo lỗi nếu có exception. 
 ### 5. Luồng yêu cầu hoàn tiền
 -------- Khôi Lê ----------
 ![Luồng Yêu cầu hoàn tiền](./docs/flows/ThreadRequestRefund.jpg)

@@ -45,21 +45,16 @@ class PostingController {
 
 
     // [GET] /posting/getPostingsByUserId
-    GetPostingsByUserId = async (req, res) => {;
-        if (!req.session) {
-            return res.status(401).json({ message: "Unauthorized: No session found" });
-        }
-
+    GetPostingsByUserId = async (req, res) => {
         try {
             if (!req.session) {
-                return res.status(401).json({ message: "Unauthorized: No session found" });
+                console.error('GetPostingsByUserId: No session found');
             }
 
             const UserId = req.session.user.UserId;
 
             const [results] = await this.connection.query(`CALL fn_show_post_info_by_id(?)`, [UserId]);
             res.json(results[0]);
-
         } catch (err) {
             console.error('Error getting postings:', err);
             return res.status(500).json({ error: 'Error getting postings' });

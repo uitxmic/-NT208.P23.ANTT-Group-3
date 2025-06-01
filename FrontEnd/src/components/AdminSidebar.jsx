@@ -54,16 +54,6 @@ const AdminSidebar = ({ language }) => {
         </li>
         <li className="mb-4">
           <Link
-            to="/admin/voucher-manager"
-            className={`flex items-center p-2 rounded-lg ${
-              location.pathname === '/admin/voucher-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <FaBox className="mr-2" /> {text.voucherManager}
-          </Link>
-        </li>
-        <li className="mb-4">
-          <Link
             to="/admin/user-manager"
             className={`flex items-center p-2 rounded-lg ${
               location.pathname === '/admin/user-manager' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'

@@ -55,7 +55,7 @@ function AppRoutes() {
 
         if (!response.ok) {
           if (response.status === 401) {
-            if (!["/login", "/signup", "/"].includes(currentPath)) {
+            if (!["/login", "/signup", "/", "/forgot-password"].includes(currentPath)) {
               navigate('/');
             }
           } else {

@@ -1,12 +1,10 @@
 const { initConnection } = require('../middlewares/dbConnection');
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 class UsersController {
     constructor() {
-        this.initConnection();
         this.transporter = null;
         this.initMailer();
         this.init();
@@ -46,6 +44,7 @@ class UsersController {
     // [POST] /users/forgot-password
     ForgotPassword = async (req, res) => {
         const { email } = req.body;
+        console.log(`Received forgot password request for email: ${email}`);
 
         if (!email) {
             return res.status(400).json({ message: 'Email là bắt buộc.' });
@@ -225,22 +224,9 @@ class UsersController {
     // /users/getUserById
     GetUserById = async (req, res) => {
         let userId;
-        let token = req.headers.authorization;
-        let userId;
-
-        // Kiểm tra token
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
-        }
-
-        // Xử lý Bearer token
-        if (token.startsWith('Bearer ')) {
-            token = token.slice(7, token.length);
-        }
-        if (!req.session.user) {
+        if (!req.session || !req.session.user) {
             return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-
         try {
             // Trường hợp 1: ID được truyền qua URL params (xem profile người khác)
             if (req.params && req.params.id) {
@@ -249,11 +235,9 @@ class UsersController {
                     return res.status(400).json({ error: 'Invalid userId, must be a number' });
                 }
             }
-            // Trường hợp 2: Dùng ID từ token (xem profile bản thân)
+            // Trường hợp 2: Dùng ID từ session (xem profile bản thân)
             else {
-                const secretKey = process.env.JWT_SECRET;
-                const decoded = jwt.verify(token, secretKey);
-                userId = decoded.userId;
+                userId = req.session.user.UserId;
             }
 
             // Gọi stored procedure để lấy thông tin người dùng
@@ -267,31 +251,6 @@ class UsersController {
             }
         }
         catch (error) {
-            console.error('Error in GetUserById:', error);
-            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                return res.status(401).json({ message: "Invalid or expired token", details: error.message });
-            }
-            res.status(500).json({ error: 'Internal server error', details: error.message });
-        }
-    }
-        try {
-            if (req.params && req.params.id) {
-                userId = req.params.id;
-                if (isNaN(userId)) {
-                    return res.status(400).json({ error: 'Invalid userId, must be a number' });
-                }
-            } else {
-                userId = req.session.user.UserId;
-            }
-
-            const [results] = await this.connection.query('CALL fn_get_user_by_id(?)', [parseInt(userId)]);
-
-            if (results[0] && results[0].length > 0) {
-                res.json(results[0]);
-            } else {
-                return res.status(404).json({ message: "User not found" });
-            }
-        } catch (error) {
             console.error('Error in GetUserById:', error);
             res.status(500).json({ error: 'Internal server error', details: error.message });
         }
@@ -388,11 +347,6 @@ class UsersController {
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
             if (results[0][0] && results[0][0].Message == "Change Password Successfully") {
-                return res.json({ 'Message': results[0][0].Message });
-            }
-            else {
-                return res.status(401).json({ error: 'UserId or OldPassword is incorrect' });
-            if (results[0][0] && results[0][0].Message === "Change Password Successfully") {
                 return res.json({ 'Message': results[0][0].Message });
             } else {
                 return res.status(401).json({ error: 'OldPassword is incorrect' });

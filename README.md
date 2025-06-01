@@ -81,18 +81,19 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 ### 3. Luồng mua Voucher
  Luồng thanh toán bằng số dư tài khoản
 
-  - Client gửi các thông tin như VoucherId, Quantity, TotalAmount về cho Server
-  - Server gọi API /trade/paymentbybalance với các trường Authorization và application/json với các thông tin vừa nhận được
-  - Server xác thực session người dùng và kiểm tra VoucherId hợp lệ
-  - Server gọi Stored Procedure fn_payment_by_userbalance(UserId, VoucherId)
+  - Client gửi các thông tin như cartItems (VoucherId, PostId, Amount, Quantity, UserIdSeller) về cho Server
+  - Server gọi API /trade/createCartTransaction với các trường Authorization và application/json với các thông tin vừa nhận được
+  - Server xác thực session người dùng và kiểm tra cartItems là không rỗng
+  - Server chuyển cartItems thành JSON string và lấy UserIdBuyer từ session
+  - Server gọi Stored Procedure fn_create_cart_transaction(cartData, UserIdBuyer)
   - Server gửi SQL Script về cho database thực hiện câu kiểm tra số dư và UPDATE giao dịch
-  - Database gửi Response với out_message và out_id
+  - Database gửi Response với Message và LastTransactionId hoặc error
   - Server gửi TransactionId xác nhận thành công hoặc thông báo lỗi
-  - Client cập nhật lại trang thanh toán và chuyển hướng đến /profile
+  - Client cập nhật lại trang thanh toán dựa trên kết quả nhận được
 
  Luồng thanh toán bằng MoMo
 
-  - Client gửi các thông tin như VoucherId, Amount, OrderInfo về cho Server
+  - Client gửi các thông tin như cartItems (VoucherId, PostId, Amount, Quantity, UserIdSeller) về cho Server
   - Server gọi API /payment/momo/create_payment với các trường Authorization và application/json với các thông tin vừa nhận được
   - Server tạo requestBody với signature và gửi yêu cầu đến MoMo Payment Gateway
   - MoMo Gateway xử lý thanh toán và người dùng thực hiện thanh toán trên ứng dụng MoMo
@@ -100,8 +101,8 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
   - Server nhận IPN, xác minh signature và gọi SP fn_create_momo_cart_transaction
   - Database thực hiện INSERT Transaction, UPDATE Quantity Post, UPDATE VoucherOwned
   - Server gửi response 204 No Content cho MoMo để xác nhận đã nhận IPN
-  - Client được chuyển hướng về /profile và cập nhật lại danh sách voucher
-![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
+  - Client cập nhật lại trang thanh toán dựa trên kết quả nhận được
+![Luồng Mua Voucher](./docs/flows/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài
 ----- Quốc -------------

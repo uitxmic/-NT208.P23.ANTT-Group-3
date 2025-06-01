@@ -45,8 +45,18 @@ const SellerPost = () => {
 
                 console.log('Seller Posts Response:', response.data);
                 const data = response.data;
-                if (data && data[0] && Array.isArray(data[0].result) && data[0].result.length > 0) {
-                    setPosts(data[0].result);
+                let allPosts = [];
+
+                if (Array.isArray(data)) {
+                    data.forEach(item => {
+                        if (item && Array.isArray(item.result) && item.result.length > 0) {
+                            allPosts = allPosts.concat(item.result);
+                        }
+                    });
+                }
+
+                if (allPosts.length > 0) {
+                    setPosts(allPosts);
                 } else {
                     setPosts([]);
                 }

@@ -1,26 +1,14 @@
-const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class TradeController {
   constructor() {
-    this.initConnection();
+    this.init();
   }
 
-  async initConnection() {
-    try {
-      this.connection = await mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
-      });
-
-      console.log('Connected to the database (async)');
-    } catch (err) {
-      console.error('Database connection error:', err);
-    }
+  async init() {
+    this.connection = await initConnection();
   }
+
   // [Get] /trade
   Get20LastestPosts = async (req, res) => {
     try {
@@ -36,10 +24,9 @@ class TradeController {
   // [UPDATE] /trade/paymentbybalance
   PaymentByBalance = async (req, res) => {
     const { VoucherId } = req.body;
-    const token = req.headers['authorization']?.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized: No session found" });
     }
 
     if (!VoucherId) {
@@ -47,9 +34,7 @@ class TradeController {
     }
 
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserId = decode.userId;
+      const UserId = req.session.user.UserId;
 
       const [result] = await this.connection.execute('CALL fn_payment_by_userbalance(?, ?)', [UserId, VoucherId]);
 
@@ -69,19 +54,16 @@ class TradeController {
   // [POST] /trade/createTransaction
   CreateTransaction = async (req, res) => {
     const { VoucherId, PostId, Amount, Quantity, UserIdSeller } = req.body;
-    const token = req.headers['authorization'];
 
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized: No session found" });
     }
 
     if (!VoucherId || !PostId || !Amount || !UserIdSeller) {
       return res.status(400).json({ error: 'All fields are required' });
     }
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserIdBuyer = decode.userId;
+      const UserIdBuyer = req.session.user.UserId;
       console.log('UserIdBuyer:', UserIdBuyer);
       console.log('VoucherId:', VoucherId);
       console.log('PostId:', PostId);
@@ -108,10 +90,8 @@ class TradeController {
   CreateFreeTransaction = async (req, res) => {
     const { VoucherId, PostId, Amount, Quantity, UserIdSeller } = req.body;
 
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized: No session found" });
     }
 
     if (!VoucherId || !PostId || !UserIdSeller) {
@@ -119,9 +99,7 @@ class TradeController {
     }
 
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserIdBuyer = decode.userId;
+      const UserIdBuyer = req.session.user.UserId;
 
       console.log('UserIdBuyer:', UserIdBuyer);
       console.log('VoucherId:', VoucherId);
@@ -151,10 +129,9 @@ class TradeController {
 
   CreateCartTransaction = async (req, res) => {
     const { cartItems } = req.body;
-    const token = req.headers['authorization'];
 
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized: No session found" });
     }
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
@@ -162,9 +139,7 @@ class TradeController {
     }
 
     try {
-      const secretKey = process.env.JWT_SECRET;
-      const decode = jwt.verify(token, secretKey);
-      const UserIdBuyer = decode.userId;
+      const UserIdBuyer = req.session.user.UserId;
 
       console.log('UserIdBuyer:', UserIdBuyer);
       console.log('Cart Items:', cartItems);
@@ -200,25 +175,10 @@ class TradeController {
 
   // [GET] /trade/getTransactionForAdmin
   GetTransactionForAdmin = async (req, res) => {
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
+      return res.status(401).json({ error: 'Unauthorized: No session or not admin' });
     }
-
-    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-    if (userRoleId != 1) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserRoleId = decode.userRoleId;
-      if (UserRoleId != 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-
       const [results] = await this.connection.query('CALL fn_get_all_transaction_for_admin()');
       res.json(results[0]); // Chỉ trả về kết quả SELECT
     } catch (error) {
@@ -232,24 +192,17 @@ class TradeController {
     if (!TransactionId) {
       return res.status(400).json({ error: 'TransactionId is required in request body' });
     }
-
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ error: 'Unauthorized: No session found' });
     }
-
     try {
-
       const [results] = await this.connection.query('CALL fn_complete_transaction(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;
-      console.log('Id:', Id);
-      console.log('Message:', message);
       if (Id !== -1)
         return res.status(200).json({ message: 'Success' });
       else
-        return res.status(400).json({ error: message.error });
+        return res.status(400).json({ error: message });
     } catch (error) {
       console.error('Query error:', error);
       res.status(500).json({ error: 'Database query error', details: error.message });
@@ -262,15 +215,10 @@ class TradeController {
     if (!TransactionId) {
       return res.status(400).json({ error: 'TransactionId is required in request body' });
     }
-
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ error: 'Unauthorized: No session found' });
     }
-
     try {
-
       const [results] = await this.connection.query('CALL fn_request_refund(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;
@@ -292,32 +240,13 @@ class TradeController {
     if (!TransactionId) {
       return res.status(400).json({ error: 'TransactionId is required in request body' });
     }
-
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
+      return res.status(401).json({ error: 'Unauthorized: No session or not admin' });
     }
-
-    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-    if (userRoleId != 1) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserRoleId = decode.userRoleId;
-      if (UserRoleId != 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-
       const [results] = await this.connection.query('CALL fn_accept_refund(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;
-      console.log('Id:', Id);
-      console.log('Message:', message);
       if (Id !== -1)
         return res.status(200).json({ message: 'Success' });
       else
@@ -334,32 +263,13 @@ class TradeController {
     if (!TransactionId) {
       return res.status(400).json({ error: 'TransactionId is required in request body' });
     }
-
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
+      return res.status(401).json({ error: 'Unauthorized: No session or not admin' });
     }
-
-    const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-    if (userRoleId != 1) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserRoleId = decode.userRoleId;
-      if (UserRoleId != 1) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-
       const [results] = await this.connection.query('CALL fn_reject_refund(?)', [TransactionId]);
       const message = results[0][0]?.Message;
       const Id = results[0][0]?.Id;
-      console.log('Id:', Id);
-      console.log('Message:', message);
       if (Id !== -1)
         return res.status(200).json({ message: 'Success' });
       else
@@ -372,19 +282,15 @@ class TradeController {
 
   // [GET] /trade/getTransactionByUserId
   GetTransactionByUserId = async (req, res) => {
-    const token = req.headers['authorization'];
-
     // Get query parameters for search and sorting
     const { search = '', sortColumn = 'CreateAt', sortOrder = 'DESC' } = req.query;
 
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!req.session || !req.session.user) {
+      return res.status(401).json({ message: "Unauthorized: No session found" });
     }
 
     try {
-      var secretKey = process.env.JWT_SECRET;
-      var decode = jwt.verify(token, secretKey);
-      var UserId = decode.userId;
+      const UserId = req.session.user.UserId;
 
       const [results] = await this.connection.query('CALL fn_get_transaction_history_by_id(?, ?, ?, ?)', [UserId, search, sortColumn, sortOrder]);
       res.json(results[0]); // Chỉ trả về kết quả SELECT
@@ -393,6 +299,22 @@ class TradeController {
       res.status(500).json({ error: 'Database query error', details: error.message });
     }
   }
+
+  // Example method refactored to use session-based authentication
+  GetTradeHistory = async (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ message: "Unauthorized: No session found" });
+    }
+
+    try {
+        const UserId = req.session.user.UserId;
+        const [results] = await this.connection.query('CALL fn_get_trade_history(?)', [UserId]);
+        res.json(results[0]);
+    } catch (error) {
+        console.error('Query error:', error);
+        res.status(500).json({ error: 'Database query error', details: error.message });
+    }
+};
 }
 
 module.exports = new TradeController;

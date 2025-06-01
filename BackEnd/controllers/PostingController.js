@@ -1,43 +1,36 @@
-const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class PostingController {
-    constructor() {
-        this.initConnection();
+    constructor(){
+        this.init();
+    }
+     
+    async init(){
+        this.connection = await initConnection();
     }
 
-    async initConnection() {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-        } catch (err) {
-            console.error('Database connection error:', err);
+    // Add this method to close the connection
+    async closeConnection() {
+        if (this.connection) {
+            await this.connection.end();
+            console.log('Database connection closed');
         }
     }
 
     // [POST] /posting/createPosting
     CreatePosting = async (req, res) => {
-        const { VoucherId, Postname, Content, VouImg, Price, Quantity } = req.body;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized', id: '-1' });
+        if (!req.session) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
+
+        const { VoucherId, Postname, Content, VouImg, Price, Quantity } = req.body;
 
         if (!VoucherId || !Postname || !Content) {
             return res.status(400).json({ error: 'VoucherId, Postname, and Content are required in request body', id: '-1' });
         }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const UserId = decoded.userId;
+            const UserId = req.session.UserId;
 
             const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content, VouImg, Price, Quantity]);
 
@@ -49,29 +42,19 @@ class PostingController {
         }
     }
 
-    // [GET] /posting/getPostingsByUserId/:UserId
+
+
+    // [GET] /posting/getPostingsByUserId
     GetPostingsByUserId = async (req, res) => {
-        const { UserId } = req.params;
-        const token = req.headers['authorization'];
-
-        if (!UserId) {
-            return res.status(400).json({ error: 'UserId is required in request params' });
-        }
-
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const RequestUserId = decoded.userId;
-
-            if (RequestUserId != UserId) {
-
-                return res.status(403).json({ error: 'Unauthorized. Your UserId is not allowed' });
+            if (!req.session) {
+                console.error('GetPostingsByUserId: No session found');
             }
 
+            const UserId = req.session.user.UserId;
+
             const [results] = await this.connection.query(`CALL fn_show_post_info_by_id(?)`, [UserId]);
-
             res.json(results[0]);
-
         } catch (err) {
             console.error('Error getting postings:', err);
             return res.status(500).json({ error: 'Error getting postings' });
@@ -81,11 +64,6 @@ class PostingController {
     // [GET] /posting/getAllPostings 
     GetAllPostings = async (req, res) => {
         const { page, limit } = req.query;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
 
         try {
             const [results] = await this.connection.query(`CALL fn_get_all_post(?, ?)`, [page, limit]);
@@ -98,19 +76,35 @@ class PostingController {
         }
     }
 
+
     GetAllFreePostings = async (req, res) => {
         const { page, limit } = req.query;
-        const token = req.headers['authorization'];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
 
         try {
             const [results] = await this.connection.query(`CALL fn_get_all_free_post(?, ?)`, [page, limit]);
 
             res.json(results[0]);
 
+        } catch (err) {
+            console.error('Error getting postings:', err);
+            return res.status(500).json({ error: 'Error getting postings' });
+        }
+    }
+
+    GetAllSellerPostings = async (req, res) => {
+        const { page, limit } = req.query;
+        const { UserId } = req.params;
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ error: 'Unauthorized: No session found' });
+        }
+
+        if (!UserId) {
+            return res.status(400).json({ error: 'UserId is required in request params' });
+        }
+
+        try {
+            const [results] = await this.connection.query(`CALL fn_get_all_seller_post_by_sellerId(?, ?, ?)`, [UserId, page, limit]);
+            res.json(results[0]);
         } catch (err) {
             console.error('Error getting postings:', err);
             return res.status(500).json({ error: 'Error getting postings' });
@@ -199,14 +193,10 @@ class PostingController {
     // [PATCH] /posting/activePosting
     ActivePosting = async (req, res) => {
         const { PostId } = req.body;
-        const token = req.headers['authorization'];
-
-        const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-        if (!token || userRoleId !== 1) {
+        // Kiểm tra session và quyền admin
+        if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
             return res.status(401).json({ error: 'You are not admin and do not have right to do this' });
         }
-
 
         if (!PostId) {
             return res.status(400).json({ error: 'PostId is required in request body' });
@@ -214,9 +204,7 @@ class PostingController {
 
         try {
             const [results] = await this.connection.query(`CALL fn_active_post(?)`, [PostId]);
-
             res.json(results[0]);
-
         } catch (err) {
             console.error('Error activating posting:', err);
             return res.status(500).json({ error: 'Error activating posting' });
@@ -261,14 +249,10 @@ class PostingController {
 
     // [GET] /posting/getAllPostingsForAdmin
     GetAllPostingsForAdmin = async (req, res) => {
+        if (!req.session || !req.session.user || req.session.user.UserRoleId !== 1) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
         try {
-            const token = req.headers['authorization'];
-            const userRoleId = JSON.parse(atob(token.split('.')[1])).userRoleId;
-
-            if (!token && userRoleId !== 1) {
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-
             const [results] = await this.connection.query(`CALL fn_get_all_post_for_admin()`);
             res.json(results[0]);
 

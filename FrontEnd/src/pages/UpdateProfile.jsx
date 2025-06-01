@@ -19,16 +19,9 @@ const UpdateProfile = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = localStorage.getItem('access_token');
-                if (!token) {
-                    navigate('/login');
-                    return;
-                }
                 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
                 const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
-                    headers: {
-                        Authorization: `${token}`,
-                    },
+                    credentials: 'include',
                 });
                 if (!response.ok) {
                     throw new Error('Không thể tải dữ liệu người dùng.');
@@ -64,22 +57,14 @@ const UpdateProfile = () => {
         setSuccess(null);
 
         try {
-            const token = localStorage.getItem('access_token');
-            if (!token) {
-                setError('Vui lòng đăng nhập để tiếp tục.');
-                setTimeout(() => navigate('/login'), 2000);
-                setLoading(false);
-                return;
-            }
-
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             // Replace with your actual update endpoint
             const response = await fetch(`${API_BASE_URL}/users/updateUser`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(formData),
             });
 

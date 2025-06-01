@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { FaShoppingCart, FaGift, FaWallet, FaCog } from 'react-icons/fa'; // Import icons
+import { FaShoppingCart, FaGift, FaWallet, FaCog } from 'react-icons/fa';
 
 const Notification = () => {
-    const [selectedType, setSelectedType] = useState(null);
+    const navigate = useNavigate();
+    const [selectedType, setSelectedType] = useState('orders');
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -21,23 +23,14 @@ const Notification = () => {
         setNotifications([]);
 
         try {
-            const token = localStorage.getItem('access_token');
-            if (!token) {
-                throw new Error('Vui lòng đăng nhập để xem thông báo.');
-            }
-
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}${route}`, {
                 method: 'GET',
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
-
-            if (!response.ok) {
-                throw new Error('Không thể tải thông báo.');
-            }
 
             const data = await response.json();
             setNotifications(Array.isArray(data) ? data : []);
@@ -48,9 +41,18 @@ const Notification = () => {
         }
     };
 
+    useEffect(() => {
+        const selectedCategory = categories.find((category) => category.type === selectedType);
+        if (selectedCategory) {
+            fetchNotifications(selectedCategory.route);
+        }
+    }, [selectedType]);
+
     const handleCategoryClick = (category) => {
+        if (selectedType === category.type) {
+            return;
+        }
         setSelectedType(category.type);
-        fetchNotifications(category.route);
     };
 
     return (
@@ -96,6 +98,11 @@ const Notification = () => {
                                 <div
                                     key={notif.noti_id}
                                     className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                                    onClick={() => {
+                                        if (notif.noti_type === 'order') {
+                                            navigate(`/notification/${notif.noti_id}`);
+                                        }
+                                    }}
                                 >
                                     <div className="flex items-start space-x-4">
                                         {notif.image_url ? (

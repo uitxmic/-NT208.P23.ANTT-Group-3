@@ -1,8 +1,7 @@
 const axios = require('axios');
 const crypto = require('crypto');
-const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
-const jwt = require('jsonwebtoken');
+const { initConnection } = require('../middlewares/dbConnection');
 dotenv.config();
 
 
@@ -18,21 +17,11 @@ class MomoPaymentController {
         this.ipnUrl = " http://127.0.0.1:3000/payment/momo/ipn";
         this.orderInfo = "pay with MoMo";
         this.requestType = "captureWallet";
-        this.initConnection();
+        this.init();
     }
-
-    async initConnection() {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+    
+    async init() {
+        this.connection = await initConnection();
     }
 
     generateSignature(params) {

@@ -1,52 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { SearchAPI } from '../components/SearchFilterModal'; // Import SearchAPI
+import { SearchAPI } from '../components/SearchFilterModal';
 import Layout from '../components/Layout';
 
-// Components con để hiển thị từng loại kết quả (bạn cần tạo các component này)
 const VoucherCard = ({ voucher }) => (
-    <div className="border p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-        <h3 className="text-xl font-semibold text-blue-600">{voucher.VoucherName}</h3>
-        <p className="text-gray-700">Nhãn: {voucher.Label}</p>
-        <p className="text-gray-600">Giá: {voucher.Price ? `${voucher.Price.toLocaleString()} đ` : 'N/A'}</p>
-        <p className="text-sm text-gray-500">Người đăng: {voucher.Username}</p>
-        <p className={`text-sm ${new Date(voucher.Expire) < new Date() ? 'text-red-500' : 'text-green-500'}`}>
+    <div className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-lg transition-all duration-300">
+        <h3 className="text-xl font-semibold text-indigo-600 mb-2">{voucher.VoucherName}</h3>
+        <p className="text-gray-700 mb-1">Nhãn: {voucher.Label}</p>
+        <p className="text-gray-600 mb-1">Giá: {voucher.Price ? `${voucher.Price.toLocaleString()} đ` : 'N/A'}</p>
+        <p className="text-sm text-gray-500 mb-1">Người đăng: {voucher.Username}</p>
+        <p className={`text-sm font-medium ${new Date(voucher.Expire) < new Date() ? 'text-red-600' : 'text-green-600'}`}>
             Hết hạn: {new Date(voucher.Expire).toLocaleDateString()}
         </p>
-        {/* Thêm Link đến trang chi tiết voucher nếu có */}
-        {/* <Link to={`/vouchers/${voucher.VoucherId}`} className="text-blue-500 hover:underline">Xem chi tiết</Link> */}
     </div>
 );
 
 const PostCard = ({ post }) => (
-    <div className="flex bg-white border border-pink-200 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out mb-6">
-        {/* Left Column: Image */}        <div className="w-1/3 pr-4 flex-shrink-0">
+    <div className="flex bg-white border border-pink-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 mb-6">
+        <div className="w-1/3 pr-4 flex-shrink-0">
             <img 
                 src={post.VouImg || 'https://via.placeholder.com/300x200.png?text=Post+Image'} 
-                alt={post.Postname || 'Hình ảnh bài đăng'}
-                className="w-full h-48 object-cover rounded-md shadow-sm"
+                alt=""
+                className="w-full h-48 object-cover rounded-l-lg"
             />
         </div>
-
-        {/* Right Column: Content */}
-        <div className="w-2/3 flex flex-col justify-between">
+        <div className="w-2/3 p-4 flex flex-col justify-between">
             <div>
                 <h3 className="text-xl lg:text-2xl font-semibold text-pink-600 mb-2 hover:text-pink-700 transition-colors">
                     {post.Postname}
                 </h3>
                 <div 
-                    className="text-gray-700 text-sm lg:text-base mb-3 prose prose-sm max-h-24 overflow-hidden relative leading-relaxed"
+                    className="text-gray-700 text-sm lg:text-base mb-3 prose prose-sm max-h-24 overflow-hidden"
                     dangerouslySetInnerHTML={{ __html: post.Content ? post.Content.substring(0, 250) + (post.Content.length > 250 ? '...' : '') : '' }} 
                 />
             </div>
             <div>
                 <div className="text-xs text-gray-500 mb-1">
                     <span>Người đăng: </span>
-                    <span className="font-medium text-pink-500 hover:underline">
-                        {/* Optional: Link to user profile if available */}
-                        {/* <Link to={`/profile/${post.UserId}`}>{post.Username}</Link> */}
-                        {post.Username}
-                    </span>
+                    <span className="font-medium text-pink-500 hover:underline">{post.Username}</span>
                 </div>
                 <div className="text-xs text-gray-500 mb-3">
                     <span>Ngày đăng: </span>
@@ -54,7 +45,7 @@ const PostCard = ({ post }) => (
                 </div>
                 <Link 
                     to={`/postdetail/${post.PostId}`} 
-                    className="inline-block bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300 text-xs lg:text-sm shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75"
+                    className="inline-block bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300 text-sm"
                 >
                     Đọc thêm
                 </Link>
@@ -75,46 +66,47 @@ const UserCard = ({ user }) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(balance);
     };
 
-    const avatarUrl = user.AvatarUrl || 'https://via.placeholder.com/150?text=User';
+    const avatarUrl = user.AvatarUrl || 'https://via.placeholder.com/150?text=';
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-center max-w-sm mx-auto transform hover:scale-105 transition-transform duration-300">
+        <div className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col items-center w-full min-h-[400px]">
             <img
                 src={avatarUrl}
-                alt={user.Username}
-                className="w-24 h-24 rounded-full mb-4 object-cover transition-transform duration-300 hover:scale-110"
+                alt=""
+                className="w-24 h-24 rounded-full mb-4 object-cover border-2 border-indigo-100"
             />
-            <h3 className="text-xl font-bold text-purple-700 mb-2">{user.Username}</h3>
-            <div className="text-gray-700 text-sm space-y-2 w-full">
+            <h3 className="text-xl font-bold text-indigo-700 mb-3">{user.Username}</h3>
+            <div className="text-gray-700 text-sm space-y-3 w-full">
                 <div className="flex justify-between">
-                    <span className="font-medium">Họ tên:</span>
+                    <span className="font-medium text-gray-600">Họ tên:</span>
                     <span>{user.Fullname || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="font-medium">Email:</span>
+                    <span className="font-medium text-gray-600">Email:</span>
                     <span>{user.Email}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="font-medium">Số dư:</span>
+                    <span className="font-medium text-gray-600">Số dư:</span>
                     <span>{formatBalance(user.Balance)}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="font-medium">Số điện thoại:</span>
+                    <span className="font-medium text-gray-600">Số điện thoại:</span>
                     <span>{user.PhoneNumber || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="font-medium">Xếp hạng trung bình:</span>
+                    <span className="font-medium text-gray-600">Xếp hạng:</span>
                     <span>{formatAvgRate(user.AvgRate)}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="font-medium">Trạng thái xác thực:</span>
-                    <span className={user.IsVerified ? 'text-green-500' : 'text-red-500'}>
+                    <span className="font-medium text-gray-600">Xác thực:</span>
+                    <span className={user.IsVerified ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
                         {user.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
                     </span>
                 </div>
             </div>
-            <Link to={user.UserId ? `/profile/${user.UserId}` : '#'}
-                className={`mt-4 text-purple-500 hover:text-purple-700 text-sm font-medium transition-colors duration-200 ${!user.UserId ? 'pointer-events-none opacity-50' : ''}`}
+            <Link 
+                to={user.UserId ? `/profile/${user.UserId}` : '#'}
+                className={`mt-4 inline-block bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300 text-sm ${!user.UserId ? 'pointer-events-none opacity-50' : ''}`}
             >
                 Xem hồ sơ
             </Link>
@@ -122,14 +114,12 @@ const UserCard = ({ user }) => {
     );
 };
 
-
 const SearchResult = () => {
-    const { type } = useParams(); // 'vouchers', 'posts', 'users'
+    const { type } = useParams();
     const location = useLocation();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [searchParamsString, setSearchParamsString] = useState('');
     const [pageTitle, setPageTitle] = useState('Kết quả tìm kiếm');
 
     useEffect(() => {
@@ -138,7 +128,6 @@ const SearchResult = () => {
         for (const [key, value] of params.entries()) {
             queryParams[key] = value;
         }
-        setSearchParamsString(location.search); // Lưu lại để dùng cho dependency array
 
         const fetchResults = async () => {
             setLoading(true);
@@ -152,7 +141,7 @@ const SearchResult = () => {
                     setPageTitle(`Kết quả tìm kiếm Bài đăng ${queryParams.searchTerm ? `cho "${queryParams.searchTerm}"` : ''}`);
                     data = await SearchAPI.searchPosts(queryParams);
                 } else if (type === 'users') {
-                     setPageTitle(`Kết quả tìm kiếm Người dùng ${queryParams.searchTerm ? `cho "${queryParams.searchTerm}"` : ''}`);
+                    setPageTitle(`Kết quả tìm kiếm Người dùng ${queryParams.searchTerm ? `cho "${queryParams.searchTerm}"` : ''}`);
                     data = await SearchAPI.searchUsers(queryParams);
                 } else {
                     throw new Error('Loại tìm kiếm không hợp lệ.');
@@ -167,46 +156,60 @@ const SearchResult = () => {
         };
 
         fetchResults();
-    }, [type, location.search]); // Sử dụng location.search để theo dõi thay đổi của query params
+    }, [type, location.search]);
 
     if (loading) {
         return (
             <Layout>
-                <div className="container mx-auto p-4 text-center">
-                    <svg className="animate-spin h-8 w-8 text-gray-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                    </svg>
-                    <p className="mt-2 text-gray-600">Đang tải kết quả...</p>
+                <div className="container mx-auto p-6 flex justify-center items-center min-h-screen">
+                    <div className="flex flex-col items-center gap-4">
+                        <svg className="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <p className="text-lg text-gray-700">Đang tải kết quả...</p>
+                    </div>
                 </div>
             </Layout>
         );
     }
 
     if (error) {
-        return <Layout><div className="container mx-auto p-4 text-center text-red-500">Lỗi: {error}</div></Layout>;
+        return (
+            <Layout>
+                <div className="container mx-auto p-6 flex justify-center items-center min-h-screen">
+                    <div className="bg-red-100 border-l-4 border-red-500 p-4 rounded-lg">
+                        <p className="text-red-700 font-medium">Lỗi: {error}</p>
+                    </div>
+                </div>
+            </Layout>
+        );
     }
 
     const renderResults = () => {
         if (results.length === 0) {
-            return <p className="text-center text-gray-500">Không tìm thấy kết quả nào phù hợp.</p>;
+            return (
+                <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg">Không tìm thấy kết quả nào phù hợp.</p>
+                </div>
+            );
         }
 
         if (type === 'vouchers') {
             return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {results.map((voucher) => <VoucherCard key={voucher.VoucherId} voucher={voucher} />)}
                 </div>
             );
         } else if (type === 'posts') {
             return (
-                <div className="space-y-6">
+                <div className="space-y-6 max-w-4xl mx-auto">
                     {results.map((post) => <PostCard key={post.PostId} post={post} />)}
                 </div>
             );
         } else if (type === 'users') {
             return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                     {results.map((user) => <UserCard key={user.UserId} user={user} />)}
                 </div>
             );
@@ -216,8 +219,8 @@ const SearchResult = () => {
 
     return (
         <Layout>
-            <div className="container mx-auto p-4 md:p-6">
-                <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">{pageTitle}</h1>
+            <div className="container mx-auto px-4 py-8 md:px-6 lg:py-12 max-w-6xl">
+                <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">{pageTitle}</h1>
                 {renderResults()}
             </div>
         </Layout>

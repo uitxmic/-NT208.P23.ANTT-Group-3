@@ -56,6 +56,95 @@ Backend chạy tại: http://localhost:3000
 ### 1. 🗂️ Cấu trúc cơ sở dữ liệu (Database Schema)
 ![Cấu trúc CSDL](./docs/database-schema.png)
 ### 🔄 Luồng hoạt động chính
-![Luồng hoạt động](./docs/flow-diagram.png)
+
+Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub:
+
+#### 🔐 1. Luồng Đăng ký / Đăng nhập
+- Người dùng truy cập trang đăng ký hoặc đăng nhập.
+- Gửi các thông tin đăng nhập (username, password), hoặc đăng ký (username, fullname, password, email, phonenumber)
+- BackEnd gửi SQL Script về database thực thi
+- Database gửi response về BackEnd.
+- BackEnd tạo dựa vào ID hoặc UserId được database gửi về để tạo SessionId
+- FrontEnd dựa vào SessionId này để tạo Cookies
+![Luồng Đăng nhập](./docs/flows/ThreadLogin.jpg)
+![Luồng Đăng ký](./docs/flows/ThreadSignUp.jpg)
+
+### 2. Luồng đăng Voucher
+- Client gửi các thông tin như Tên Voucher, Loại Voucher, Ngày Hết hạn, Mã Voucher về cho Server
+- Server gọi API /voucher/addVoucher với các trường Authorization và application/json với các thông tin vừa nhận được
+- Server gửi SQL Script về cho database thực hiện câu INSERT INTO
+- Database gửi Response
+- Server gửi Id xác nhận thành công
+- Client cập nhật lại trang Voucher
+![Luồng Thêm Voucher](./docs/flows/ThreadAddVoucher.jpg)
+
+### 3. Luồng mua Voucher
+
+----- Chiến -----------
+![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.jpg)
+
+### 4. Luồng đăng bài
+----- Quốc -------------
+![Luồng Đăng bài](./docs/flows/ThreadCreatePost.jpg)
+
+### 5. Luồng yêu cầu hoàn tiền
+-------- Khôi Lê ----------
+![Luồng Yêu cầu hoàn tiền](./docs/flows/ThreadRequestRefund.jpg)
+
+
+
+
 ### 🖥️ Giao diện trang chủ
 ![Giao diện trang chủ](./docs/screenshots/homepage.png)
+
+## ✅ Kết luận
+
+VoucherHub là nền tảng giao dịch voucher trực tuyến được phát triển với mục tiêu tạo ra một hệ sinh thái an toàn, minh bạch và thuận tiện cho người dùng trao đổi mã giảm giá. Với kiến trúc tách biệt Frontend (ReactJS) và Backend (NodeJS), cùng hệ quản trị cơ sở dữ liệu MySQL, hệ thống đảm bảo tính mở rộng, dễ bảo trì và hiệu suất cao.
+
+Các tính năng cốt lõi như đăng bài, mua voucher, quản lý giao dịch, yêu cầu hoàn tiền và gợi ý thông minh giúp người dùng có trải nghiệm đầy đủ từ A-Z trong quy trình mua bán voucher.
+
+---
+
+## 🚀 Hướng phát triển trong tương lai
+
+Trong các giai đoạn tiếp theo, nhóm định hướng mở rộng hệ thống theo các hướng sau:
+
+- 🔐 **Tăng cường bảo mật:**
+  - Áp dụng xác thực 2 lớp (2FA)
+  - Mã hóa dữ liệu nhạy cảm và log hành vi người dùng đáng ngờ
+
+- 📱 **Phát triển ứng dụng di động:**
+  - Xây dựng ứng dụng di động sử dụng React Native để phục vụ người dùng trên cả iOS và Android
+
+- 🤖 **Ứng dụng AI và machine learning:**
+  - Gợi ý bài đăng tốt hơn dựa trên lịch sử hành vi
+  - Phân tích xu hướng mua bán voucher theo thời gian thực
+
+- 🌐 **Tích hợp cổng thanh toán đa dạng:**
+  - Thêm các cổng thanh toán như ZaloPay, VNPAY,...
+
+- 💬 **Tính năng chat giữa người mua và người bán:**
+  - Tạo kênh liên lạc trực tiếp, tăng mức độ tin tưởng giữa hai bên
+
+- 📊 **Trang quản trị nâng cao cho admin:**
+  - Thống kê giao dịch, quản lý người dùng, kiểm duyệt bài đăng hiệu quả hơn
+
+---
+
+> Cảm ơn bạn đã quan tâm đến dự án VoucherHub! Mọi góp ý hoặc đóng góp đều được chào đón 🙌
+
+## 📋 Bảng phân chia công việc
+
+| Thành viên                | MSSV     | Công việc cụ thể |
+|---------------------------|----------|------------------|
+| Trưởng nhóm              | [MSSV]   | - Thiết kế API, xử lý logic giao dịch, tích hợp MySQL<br>- Quản lý phân công công việc |
+| Nguyễn Trần Minh Khôi    | 23520780 | - Xây dựng cấu trúc MVC cho BackEnd<br>- Tạo các bảng quảng cáo ở trang LandingPage, tạo Navbar cơ bản<br>- Tạo trang đăng bài, danh sách các Voucher, tạo bài đăng<br>- Làm các ô bài đăng, phân trang, chia các bài đăng theo Category ở trang Cửa hàng<br>- Call API Momo để cho người dùng nạp tiền vào hệ thống và thanh toán bằng Momo<br>- Làm trang Profile và tính năng chỉnh sửa hồ sơ<br>- Làm tính năng thêm Voucher (Add Voucher) bằng form và bằng Excel <br> - Làm tính năng gợi ý các bài đăng dựa trên Category và Transaction History và call API OpenAI <br> - Làm các tính năng của Admin như quản lý bài đăng, quản lý người dùng, quản lý giao dịch,... |
+| [Tên thành viên 3]       | [MSSV]   | - Thiết kế và tối ưu CSDL MySQL<br>- Tạo sơ đồ ERD và xử lý truy vấn SQL |
+| [Tên thành viên 4]       | [MSSV]   | - Viết test case<br>- Kiểm tra tính năng như đăng nhập, mua bán, hoàn tiền |
+
+
+
+> 📌 Ghi chú:
+> - Nhóm sử dụng GitHub để quản lý mã nguồn và chia nhánh theo từng chức năng.
+> - Phân công công việc được điều chỉnh linh hoạt theo tiến độ thực tế.
+

@@ -55,21 +55,14 @@ const News = () => {
   const [error, setError] = useState('');
 
   const fetchNews = async () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      setError('Vui lòng đăng nhập để xem tin tức.');
-      setLoading(false);
-      return;
-    }
-
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE_URL}/news/getAllNews`, {
         method: 'GET',
         headers: {
-          Authorization: `${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {

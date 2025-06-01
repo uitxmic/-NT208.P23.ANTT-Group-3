@@ -1,28 +1,13 @@
-const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class NewsController{
     constructor(){
-        this.initConnection();
+        this.init();
     }
 
-    async initConnection(){
-        try{
-           this.pool = mysql.createPool({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            waitForConnections: true,
-            connectionLimit: 5,
-            queueLimit: 0,
-           });
-
-           console.log('Connected to the database (async)');
-        } catch(err){
-            console.error('Database connecting error:', err);
-        }
+    async init(){
+        this.connection = await initConnection();
     }
 
     // [GET] /news
@@ -38,18 +23,21 @@ class NewsController{
 
     // [GET] /news/:PostId
     GetNewsById = async (req, res) => {
-        const { PostId } = req.params;
-
-        if (!PostId) {
-            return res.status(400).json({ error: 'PostId is required in request params' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
 
         try {
-            const [results] = await this.pool.query('CALL fn_get_news_by_id(?)', [PostId]);
+            const { newsId } = req.params;
+            if (!newsId) {
+                return res.status(400).json({ message: "Bad Request: newsId is required" });
+            }
+
+            const [results] = await this.pool.query('CALL fn_get_news_by_id(?)', [newsId]);
             res.json(results[0]);
         } catch (error) {
-            console.error('Error getting news by ID:', error);
-            res.status(500).json({ error: 'Error getting news by ID' });
+            console.error('Query error:', error);
+            res.status(500).json({ error: 'Database query error', details: error.message });
         }
     }
 
@@ -83,10 +71,9 @@ class NewsController{
     // [PUT] /news/update
     UpdateNews = async (req, res) => {
         const { PostId, VoucherId, Postname, Content } = req.body;
-        const token = req.headers['authorization'];
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
 
         if (!PostId || !Postname || !Content) {
@@ -106,11 +93,10 @@ class NewsController{
 
     // [PUT] /news/deactivate
     DeactivateNews = async (req, res) => {
-        const { PostId } = req.body;
-        const token = req.headers['authorization'];
+        const { PostId } = req.body;;
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
 
         if (!PostId) {
@@ -129,10 +115,9 @@ class NewsController{
     // [PUT] /news/activate
     ActivateNews = async (req, res) => {
         const { PostId } = req.body;
-        const token = req.headers['authorization'];
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
 
         if (!PostId) {

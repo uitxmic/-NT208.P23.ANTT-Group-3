@@ -1,10 +1,13 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Home from "../pages/Home";
 import Log_in from "../pages/Log_in";
 import Sign_up from "../pages/Sign_up";
 import PostManager from "../pages/PostingManager";
 import PostingPage from "../pages/PostingPage";
 import PostDetail from "../pages/PostDetail";
+import SellerPost from "../pages/SellerPost";
 import UserVoucherList from "../pages/Valid_user's_voucher";
 import VoucherDetail from "../pages/VoucherDetail";
 import Payment from "../pages/Payment";
@@ -27,13 +30,52 @@ import UpdateProfile from "../pages/UpdateProfile";
 import ChangePassword from "../pages/ChangePassword";
 import PurchaseHistory from "../pages/PurchaseHistory";
 import UserDetail from "../pages/UserDetail";
+import ForgotPassword from "../pages/ForgetPassword";
 
 function AppRoutes() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Ensure login and signup routes are accessible without session check
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const currentPath = location.pathname;
+
+        // Exclude login and signup routes from session validation
+        if (["/login", "/signup"].includes(currentPath)) {
+          return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/session/userId`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            if (!["/login", "/signup", "/", "/forgot-password"].includes(currentPath)) {
+              navigate('/');
+            }
+          } else {
+            console.error('Error checking session:', response.statusText);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+
+    checkSession();
+  }, [navigate, location.pathname]);
+
   return (
     <Routes>
-      {/* Các route không cần Layout */}
+      {/* Allow login and signup routes without session */}
       <Route path="/login" element={<Log_in />} />
       <Route path="/signup" element={<Sign_up />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       {/* Các route sử dụng Layout */}
       <Route
         path="/*"
@@ -43,6 +85,7 @@ function AppRoutes() {
               <Route path="/" element={<Home />} />
               <Route path="/posting-manager" element={<PostManager />} />
               <Route path="/shop-vouchers" element={<PostingPage />} />
+              <Route path="/seller-post/:UserId" element={<SellerPost />} />
               <Route path="/user-vouchers" element={<UserVoucherList />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/profile" element={<UserProfile />} />

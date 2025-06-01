@@ -125,6 +125,7 @@ const Log_in = () => {
       googleLoginFailed: 'Đăng nhập bằng Google thất bại',
       noAccount: 'Chưa có tài khoản?',
       signUp: 'Đăng Ký',
+      forgotPassword: 'Quên mật khẩu?',
     } : {
       title: 'Login',
       username: 'Username',
@@ -138,6 +139,7 @@ const Log_in = () => {
       googleLoginFailed: 'Google login failed',
       noAccount: "Don't have an account?",
       signUp: 'Sign Up',
+      forgotPassword: 'Forgot Password?',
     };
   };
 
@@ -243,16 +245,24 @@ const Log_in = () => {
                 />
               </div>
 
+              {/* Liên kết "Quên mật khẩu" */}
+              <div className="mb-4 text-right">
+                <Link to="/forgot-password" className="text-blue-500 hover:underline text-sm">
+                  {text.forgotPassword}
+                </Link>
+              </div>
+
               <button
                 type="submit"
-                className={`w-full p-3 rounded-lg text-white transition duration-300 ${
-                  loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-                }`}
+                className={`w-full p-3 rounded-lg text-white transition duration-300 ${loading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+                  }`}
                 disabled={loading}
               >
                 {loading ? text.loggingIn : text.button}
               </button>
             </form>
+
+
 
             {/* Nút Đăng nhập với Google */}
             <div className="mt-4 flex justify-center">

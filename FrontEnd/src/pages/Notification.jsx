@@ -50,7 +50,7 @@ const Notification = () => {
 
     const handleCategoryClick = (category) => {
         if (selectedType === category.type) {
-            return; // Không làm gì nếu danh mục đã được chọn
+            return;
         }
         setSelectedType(category.type);
     };

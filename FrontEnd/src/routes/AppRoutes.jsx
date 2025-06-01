@@ -30,6 +30,7 @@ import UpdateProfile from "../pages/UpdateProfile";
 import ChangePassword from "../pages/ChangePassword";
 import PurchaseHistory from "../pages/PurchaseHistory";
 import UserDetail from "../pages/UserDetail";
+import ForgotPassword from "../pages/ForgetPassword";
 
 function AppRoutes() {
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ function AppRoutes() {
       {/* Allow login and signup routes without session */}
       <Route path="/login" element={<Log_in />} />
       <Route path="/signup" element={<Sign_up />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       {/* Các route sử dụng Layout */}
       <Route
         path="/*"

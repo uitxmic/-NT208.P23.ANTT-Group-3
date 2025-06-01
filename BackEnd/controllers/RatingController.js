@@ -1,33 +1,19 @@
-const mysql = require('mysql2/promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class RatingController {
     constructor() {
-        this.initConnection();
+        this.init();
     }
 
-    async initConnection() {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-            console.log('Connected to the database (async)');
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+    async init() {
+        this.connection = await initConnection();
     }
 
     // [Post] /rating/addRating
     AddRating = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: 'Unauthorized: No session found' });
         }
         try {
             const { PostId, Vote, Rating, TransactionId, UserIdseller} = req.body;

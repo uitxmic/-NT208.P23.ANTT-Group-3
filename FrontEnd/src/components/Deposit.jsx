@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Thư viện để giải mã JWT
 
 const Deposit = () => {
     const [amount, setAmount] = useState('');
@@ -19,47 +18,32 @@ const Deposit = () => {
         setError('');
 
         try {
-
-            const token = localStorage.getItem('access_token');
-            if (!token) {
-                setError('Vui lòng đăng nhập để thực hiện giao dịch');
-                return;
-            }
-
-            console.log(token);
-            const decoded = jwtDecode(token);
-            const userId = decoded.userId; // Giả định token chứa userId
-            console.log(userId); // Log userId để kiểm tra
-
-
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/payment/create-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token,
                 },
+                credentials: 'include', // Use session-based authentication
                 body: JSON.stringify({
                     amount: parseInt(amount),
-                    UserId: userId, // Gửi userId trong body
                 }),
             });
 
             const data = await response.json();
-            console.log(data); // Log phản hồi từ server để kiểm traq
-            const payURL = data.payUrl; // Giả định rằng phản hồi chứa URL thanh toán
-
             if (response.ok) {
-                console.log('Payment URL:', payURL); 
-                window.open(payURL, '_blank'); 
+                const payURL = data.payUrl;
+                window.location.href = payURL;
             } else {
-                setError(data.message || 'Có lỗi xảy ra khi tạo thanh toán');
+                throw new Error(data.message || 'Failed to create payment');
             }
         } catch (err) {
-            console.error('Error during fetch:', err);
-            setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
+            setError(err.message || 'An error occurred while creating payment');
+
         } finally {
+
             setLoading(false);
+
         }
     };
 

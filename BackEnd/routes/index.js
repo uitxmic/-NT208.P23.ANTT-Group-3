@@ -10,11 +10,8 @@ const searchRouter = require('./search');
 const newsRouter = require('./news');
 const cartRouter = require('./cart');
 const ratingRouter = require('./rating');
-<<<<<<< HEAD
 const express = require('express');
-=======
 const sessionRoutes = require('./session');
->>>>>>> b23a94d46100393196f47205102e169bb2f6574d
 
 function routes(app) {
 

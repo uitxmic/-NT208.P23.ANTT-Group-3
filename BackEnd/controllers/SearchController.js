@@ -35,9 +35,6 @@ class SearchController {
 
     // [GET] /search/posts
     SearchPosts = async (req, res) => {
-        if (!req.session || !req.session.user) {
-            return res.status(401).json({ message: "Unauthorized: No session found" });
-        }
 
         try {
             const { query } = req.query;

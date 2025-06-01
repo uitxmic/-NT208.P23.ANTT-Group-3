@@ -51,7 +51,7 @@ class PostingController {
                 console.error('GetPostingsByUserId: No session found');
             }
 
-            const UserId = req.session.user.UserId;
+            const UserId = req.session.user.userId;
 
             const [results] = await this.connection.query(`CALL fn_show_post_info_by_id(?)`, [UserId]);
             res.json(results[0]);

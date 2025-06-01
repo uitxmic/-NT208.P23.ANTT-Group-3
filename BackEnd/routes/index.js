@@ -44,9 +44,9 @@ function routes(app) {
 
     app.use('/api', apiRouter);
 
-    app.use('/rating', ratingRouter);
+    apiRouter.use('/rating', ratingRouter);
 
-    app.use('/session', sessionRoutes);
+    apiRouter.use('/session', sessionRoutes);
 
 }
 module.exports = routes;

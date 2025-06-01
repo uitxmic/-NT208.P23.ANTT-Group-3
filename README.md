@@ -92,15 +92,17 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 
  Luồng thanh toán bằng MoMo
 
-  - Client gửi các thông tin như VoucherId, Amount, OrderInfo về cho Server
-  - Server gọi API /payment/momo/create_payment với các trường Authorization và application/json với các thông tin vừa nhận được
-  - Server tạo requestBody với signature và gửi yêu cầu đến MoMo Payment Gateway
-  - MoMo Gateway xử lý thanh toán và người dùng thực hiện thanh toán trên ứng dụng MoMo
-  - MoMo gửi Redirect về /momo/redirect/voucher và IPN POST đến /momo/ipn
-  - Server nhận IPN, xác minh signature và gọi SP fn_create_momo_cart_transaction
-  - Database thực hiện INSERT Transaction, UPDATE Quantity Post, UPDATE VoucherOwned
-  - Server gửi response 204 No Content cho MoMo để xác nhận đã nhận IPN
-  - Client được chuyển hướng về /profile và cập nhật lại danh sách voucher
+  - Client gửi các thông tin như  cartItems (VoucherId, PostId, Amount, Quantity, UserIdSeller) về cho Server
+  - Server gọi API /payment/momo/create-payment-voucher với các trường Authorization và application/json với các thông tin vừa nhận được
+  - erver xác thực cartData, userIdBuyer, kiểm tra thông tin voucher/post (số lượng, giá) và tính totalAmount. Tạo extraData chứa cartData và userIdBuyer.
+  - Gọi MomoPaymentController để tạo requestBody MoMo với totalAmount, orderInfo, extraData và gửi yêu cầu đến MoMo API. Server trả về payUrl từ MoMo cho Client.
+  - MoMo xử lý giao dịch.
+  - Redirect: Chuyển hướng trình duyệt người dùng về /momo/redirect/voucher. Server xử lý và chuyển hướng Client về trang thông báo/hồ sơ.
+  - IPN (quan trọng): Gửi thông báo POST không đồng bộ đến /momo/ipn. Server xác minh IPN, kiểm tra resultCode (thành công = 0).
+  - Server gọi Stored Procedure fn_create_momo_cart_transaction(in_cart_data, in_UserIdBuyer)
+  - Database gửi Response với Message và LastTransactionId hoặc error
+  - Server gửi HTTP 204 No Content về MoMo để xác nhận đã xử lý IPN.
+  - Cập nhật trạng thái trang (thông báo thành công/lỗi) và chuyển hướng người dùng dựa trên phản hồi redirect hoặc kết quả IPN.
 ![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài

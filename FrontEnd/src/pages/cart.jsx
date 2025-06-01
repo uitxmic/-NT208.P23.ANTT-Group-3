@@ -10,9 +10,6 @@ function CartPage() {
   const [selectedItems, setSelectedItems] = useState(new Set()); // State cho các mục được chọn
   const navigate = useNavigate(); // Thêm dòng này vào đầu function CartPage
 
-  // Lấy token từ localStorage
-  const token = localStorage.getItem("access_token");
-
   // Lấy giỏ hàng khi load trang
   useEffect(() => {
     fetchCart();
@@ -23,51 +20,50 @@ function CartPage() {
     setLoading(true);
     setError(null);
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/cart/getCart`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
-      const data = await response.json();
-      console.log("Giỏ hàng:", data);
-      setCartItems(data);
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/cart/getCart`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        });
+        if (!response.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
+        const data = await response.json();
+        console.log("Giỏ hàng:", data);
+        setCartItems(data);
     } catch (err) {
-      setError(err.message || "Lỗi khi lấy giỏ hàng!");
+        setError(err.message || "Lỗi khi lấy giỏ hàng!");
     }
     setLoading(false);
-  };
+};
 
   // Cập nhật số lượng hoặc xóa sản phẩm
   const handleUpdate = async (itemId, quantity) => {
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-      const response = await fetch(`${API_BASE_URL}/cart/updateCart`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ItemId: itemId,
-          Quantity: quantity,
-        }),
-      });
-      if (!response.ok) throw new Error("Cập nhật giỏ hàng thất bại!");
-      fetchCart(); // Tải lại giỏ hàng sau khi cập nhật
-      // Nếu xóa sản phẩm, cũng xóa khỏi danh sách selectedItems
-      if (quantity === 0) {
-        setSelectedItems(prevSelected => {
-          const newSelected = new Set(prevSelected);
-          newSelected.delete(itemId);
-          return newSelected;
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_BASE_URL}/cart/updateCart`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                ItemId: itemId,
+                Quantity: quantity,
+            }),
         });
-      }
+        if (!response.ok) throw new Error("Cập nhật giỏ hàng thất bại!");
+        fetchCart();
+        if (quantity === 0) {
+            setSelectedItems(prevSelected => {
+                const newSelected = new Set(prevSelected);
+                newSelected.delete(itemId);
+                return newSelected;
+            });
+        }
     } catch (err) {
-      alert(err.message || "Cập nhật giỏ hàng thất bại!");
+        alert(err.message || "Cập nhật giỏ hàng thất bại!");
     }
   };
 

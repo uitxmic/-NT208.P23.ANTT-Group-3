@@ -9,20 +9,14 @@ const TransactionManagerAdmin = () => {
     const [error, setError] = useState(null);
 
     const fetchTransactions = async () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            setError('Bạn không phải là Admin, không thể truy cập trang này');
-            setLoading(false);
-            return;
-        }
-
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/getTransactionForAdmin`, {
                 method: 'GET',
                 headers: {
-                    Authorization: `${token}`,
+                    'Content-Type': 'application/json',
                 },
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -47,20 +41,14 @@ const TransactionManagerAdmin = () => {
     };
 
     const handleCompleteTransaction = async (transactionId) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            toast.error('Bạn không có quyền thực hiện hành động này.');
-            return;
-        }
-
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/completeTransaction`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ TransactionId: transactionId }),
             });
 
@@ -84,19 +72,14 @@ const TransactionManagerAdmin = () => {
     };
 
     const handleAcceptRefund = async (transactionId) => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            toast.error('Bạn không có quyền thực hiện hành động này.');
-            return;
-        }
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/acceptRefund`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ TransactionId: transactionId }),
             });
 
@@ -129,19 +112,14 @@ const TransactionManagerAdmin = () => {
     };
 
     const handleRejectRefund = async (transactionId) => {   
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            toast.error('Bạn không có quyền thực hiện hành động này.');
-            return;
-        }
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/trade/rejectRefund`, {
                 method: 'PATCH',
                 headers: {
-                    Authorization: `${token}`,
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ TransactionId: transactionId }),
             });
             if (!response.ok) {

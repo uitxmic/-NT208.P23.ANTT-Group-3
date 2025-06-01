@@ -1,13 +1,17 @@
+require('dotenv').config();
 const { createServer } = require('node:http');
 const hbs = require('express-handlebars');
 const routes = require('./routes/index');
-require('dotenv').config();
+const cookieParser = require("cookie-parser");
 const cors = require('cors');
+const sessionMiddleware = require('./middlewares/init.redis');
+const closeConnection = require('./middlewares/dbConnection').closeConnection;
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'https://ripe-phones-play.loca.lt'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Đảm bảo gửi và nhận cookie
 };
 
 const express = require('express');
@@ -18,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
+app.use(sessionMiddleware);
 
 //Template engine
 app.engine('hbs', hbs.engine({
@@ -37,6 +42,13 @@ if (typeof routes === 'function') {
 } else {
   console.error('Routes is not a function');
 }
+
+process.on('SIGINT', async () => {
+  console.log('Received SIGINT. Closing server...');
+  await closeConnection();
+  console.log('Database connection closed.');
+  process.exit(0);
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://${hostname}:${port}/`);

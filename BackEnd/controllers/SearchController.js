@@ -1,29 +1,13 @@
-const mysql = require('mysql2/promise');
-const { parse } = require('path');
-const { start } = require('repl');
 require('dotenv').config();
+const { initConnection } = require('../middlewares/dbConnection');
 
 class SearchController {
     constructor() {
-        this.initConnection();
+        this.init();
     }
 
-    async initConnection() {
-        try {
-            this.pool = await mysql.createPool({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0,
-            });
-            // console[test] = await this.pool.query('SELECT 1');
-            console.log('Database pool connection success.');
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+    async init() {
+        this.connection = await initConnection();
     }
 
     // [GET] /search/vouchers
@@ -51,24 +35,21 @@ class SearchController {
 
     // [GET] /search/posts
     SearchPosts = async (req, res) => {
-        const { searchTerm, minInteractions, minDaysPosted, maxDaysPosted, sortBy, startDate, endDate } = req.query;
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
+        }
 
         try {
-            const [results] = await this.pool.query(
-                'CALL fn_search_posts_with_filters(?, ?, ?, ?, ?, ?)',
-                [
-                    searchTerm || '',
-                    minDaysPosted || null,
-                    maxDaysPosted || null,
-                    sortBy || 'date_asc',
-                    startDate || null,
-                    endDate || null
-                ]
-            );
+            const { query } = req.query;
+            if (!query) {
+                return res.status(400).json({ message: "Bad Request: query is required" });
+            }
+
+            const [results] = await this.pool.query('CALL fn_search_posts(?)', [query]);
             res.json(results[0]);
         } catch (error) {
-            console.error('Error searching posts:', error);
-            res.status(500).json({ error: 'Error searching posts' });
+            console.error('Query error:', error);
+            res.status(500).json({ error: 'Database query error', details: error.message });
         }
     };
 

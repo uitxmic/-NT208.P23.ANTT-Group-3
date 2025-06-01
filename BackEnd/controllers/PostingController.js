@@ -30,7 +30,7 @@ class PostingController {
         }
 
         try {
-            const UserId = req.session.UserId;
+            const UserId = req.session.user.UserId;
 
             const [results] = await this.connection.query(`CALL fn_create_post(?, ?, ?, ?, ?, ?, ?)`, [VoucherId, UserId, Postname, Content, VouImg, Price, Quantity]);
 
@@ -51,7 +51,8 @@ class PostingController {
                 console.error('GetPostingsByUserId: No session found');
             }
 
-            const UserId = req.session.user.userId;
+            const UserId = req.session.user.UserId;
+            console.log('GetPostingsByUserId: UserId:', UserId);
 
             const [results] = await this.connection.query(`CALL fn_show_post_info_by_id(?)`, [UserId]);
             res.json(results[0]);

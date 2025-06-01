@@ -10,10 +10,10 @@ router.get('/login', usersController.GetLogin);
 router.post('/login', usersController.PostLogin);
 router.use('/createUser', usersController.CreateUser);
 
-
+router.use('/forgot-password', usersController.ForgotPassword);
 router.use('/changePassword', usersController.ChangePassword);
 router.use('/userbalance', usersController.GetUserBalance);
 router.use('/updateUser', usersController.UpdateUser);
-  
+
 
 module.exports = router;

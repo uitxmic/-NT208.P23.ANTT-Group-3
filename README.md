@@ -79,9 +79,29 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 ![Luồng Thêm Voucher](./docs/flows/ThreadAddVoucher.jpg)
 
 ### 3. Luồng mua Voucher
+- Luồng thanh toán bằng số dư tài khoản
 
------ Chiến -----------
-![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.jpg)
+ • Client gửi các thông tin như VoucherId, Quantity, TotalAmount về cho Server
+ • Server gọi API /trade/paymentbybalance với các trường Authorization và application/json với các thông tin vừa nhận được
+ • Server xác thực session người dùng và kiểm tra VoucherId hợp lệ
+ • Server gọi Stored Procedure fn_payment_by_userbalance(UserId, VoucherId)
+ • Server gửi SQL Script về cho database thực hiện câu kiểm tra số dư và UPDATE giao dịch
+ • Database gửi Response với out_message và out_id
+ • Server gửi TransactionId xác nhận thành công hoặc thông báo lỗi
+ • Client cập nhật lại trang thanh toán và chuyển hướng đến /profile
+
+- Luồng thanh toán bằng MoMo
+
+ • Client gửi các thông tin như VoucherId, Amount, OrderInfo về cho Server
+ • Server gọi API /payment/momo/create_payment với các trường Authorization và application/json với các thông tin vừa nhận được
+ • Server tạo requestBody với signature và gửi yêu cầu đến MoMo Payment Gateway
+ • MoMo Gateway xử lý thanh toán và người dùng thực hiện thanh toán trên ứng dụng MoMo
+ • MoMo gửi Redirect về /momo/redirect/voucher và IPN POST đến /momo/ipn
+ • Server nhận IPN, xác minh signature và gọi SP fn_create_momo_cart_transaction
+ • Database thực hiện INSERT Transaction, UPDATE Quantity Post, UPDATE VoucherOwned
+ • Server gửi response 204 No Content cho MoMo để xác nhận đã nhận IPN
+ • Client được chuyển hướng về /profile và cập nhật lại danh sách voucher
+![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài
 ----- Quốc -------------

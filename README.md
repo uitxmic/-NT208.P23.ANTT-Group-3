@@ -66,8 +66,8 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi response về BackEnd.
 - BackEnd tạo dựa vào ID hoặc UserId được database gửi về để tạo SessionId
 - FrontEnd dựa vào SessionId này để tạo Cookies
-![Luồng Đăng nhập](./docs/flows/ThreadLogin.jpg)
-![Luồng Đăng ký](./docs/flows/ThreadSignUp.jpg)
+![Luồng Đăng nhập](./docs/flow/ThreadLogin.png)
+![Luồng Đăng ký](./docs/flow/ThreadSignUp.jpg)
 
 ### 2. Luồng đăng Voucher
 - Client gửi các thông tin như Tên Voucher, Loại Voucher, Ngày Hết hạn, Mã Voucher về cho Server
@@ -76,32 +76,34 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi Response
 - Server gửi Id xác nhận thành công
 - Client cập nhật lại trang Voucher
-![Luồng Thêm Voucher](./docs/flows/ThreadAddVoucher.jpg)
+![Luồng Thêm Voucher](./docs/flow/ThreadAddVoucher.jpg)
 
 ### 3. Luồng mua Voucher
  Luồng thanh toán bằng số dư tài khoản
 
-  - Client gửi các thông tin như VoucherId, Quantity, TotalAmount về cho Server
-  - Server gọi API /trade/paymentbybalance với các trường Authorization và application/json với các thông tin vừa nhận được
-  - Server xác thực session người dùng và kiểm tra VoucherId hợp lệ
-  - Server gọi Stored Procedure fn_payment_by_userbalance(UserId, VoucherId)
-  - Server gửi SQL Script về cho database thực hiện câu kiểm tra số dư và UPDATE giao dịch
-  - Database gửi Response với out_message và out_id
-  - Server gửi TransactionId xác nhận thành công hoặc thông báo lỗi
-  - Client cập nhật lại trang thanh toán và chuyển hướng đến /profile
+  - Client gửi các thông tin như  cartItems (VoucherId, PostId, Amount, Quantity, UserIdSeller) về cho Server
+  - Server gọi API /trade/createCartTransaction  với các trường Authorization và application/json với các thông tin vừa nhận được
+  - Server xác thực session người dùng và kiểm tra cartItems là mảng không rỗng
+  - Server chuyển cartItems thành JSON string và lấy UserIdBuyer từ session
+  - Server gọi Stored Procedure fn_create_cart_transaction(cartData, UserIdBuyer)
+  - Database gửi Response với Message và LastTransactionId hoặc error
+  - Server gửi LastTransactionId  xác nhận thành công hoặc thông báo lỗi
+  - Client cập nhật lại trang thanh toán
 
  Luồng thanh toán bằng MoMo
 
-  - Client gửi các thông tin như VoucherId, Amount, OrderInfo về cho Server
-  - Server gọi API /payment/momo/create_payment với các trường Authorization và application/json với các thông tin vừa nhận được
-  - Server tạo requestBody với signature và gửi yêu cầu đến MoMo Payment Gateway
-  - MoMo Gateway xử lý thanh toán và người dùng thực hiện thanh toán trên ứng dụng MoMo
-  - MoMo gửi Redirect về /momo/redirect/voucher và IPN POST đến /momo/ipn
-  - Server nhận IPN, xác minh signature và gọi SP fn_create_momo_cart_transaction
-  - Database thực hiện INSERT Transaction, UPDATE Quantity Post, UPDATE VoucherOwned
-  - Server gửi response 204 No Content cho MoMo để xác nhận đã nhận IPN
-  - Client được chuyển hướng về /profile và cập nhật lại danh sách voucher
-![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
+  - Client gửi các thông tin như  cartItems (VoucherId, PostId, Amount, Quantity, UserIdSeller) về cho Server
+  - Server gọi API /payment/momo/create-payment-voucher với các trường Authorization và application/json với các thông tin vừa nhận được
+  - erver xác thực cartData, userIdBuyer, kiểm tra thông tin voucher/post (số lượng, giá) và tính totalAmount. Tạo extraData chứa cartData và userIdBuyer.
+  - Gọi MomoPaymentController để tạo requestBody MoMo với totalAmount, orderInfo, extraData và gửi yêu cầu đến MoMo API. Server trả về payUrl từ MoMo cho Client.
+  - MoMo xử lý giao dịch.
+  - Redirect: Chuyển hướng trình duyệt người dùng về /momo/redirect/voucher. Server xử lý và chuyển hướng Client về trang thông báo/hồ sơ.
+  - IPN (quan trọng): Gửi thông báo POST không đồng bộ đến /momo/ipn. Server xác minh IPN, kiểm tra resultCode (thành công = 0).
+  - Server gọi Stored Procedure fn_create_momo_cart_transaction(in_cart_data, in_UserIdBuyer)
+  - Database gửi Response với Message và LastTransactionId hoặc error
+  - Server gửi HTTP 204 No Content về MoMo để xác nhận đã xử lý IPN.
+  - Cập nhật trạng thái trang (thông báo thành công/lỗi) và chuyển hướng người dùng dựa trên phản hồi redirect hoặc kết quả IPN.
+![Luồng Thêm Voucher](./docs/flow/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài
 ----- Quốc -------------
@@ -126,7 +128,7 @@ Luồng thông báo (notification)
   - Sau khi nhận response thành công, frontend cập nhật state và render danh sách notification Notification.jsx:28-33 . Mỗi notification hiển thị title, content và timestamp.
 ### 5. Luồng yêu cầu hoàn tiền
 -------- Khôi Lê ----------
-![Luồng Yêu cầu hoàn tiền](./docs/flows/ThreadRequestRefund.jpg)
+![Luồng Yêu cầu hoàn tiền](./docs/flow/ThreadRequestRefund.jpg)
 
 
 

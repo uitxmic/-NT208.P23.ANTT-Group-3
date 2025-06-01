@@ -11,14 +11,46 @@ Link truy cập website: [https://www.voucherhub.id.vn](https://www.voucherhub.i
 
 ---
 
+## Sơ đồ kiến trúc tổng quan hệ thống
+![SystemDesign (1)](https://github.com/user-attachments/assets/e826c799-a8ea-4989-b12b-09c6f519da9b)
+- Kiến trúc hệ thống được chia làm 3 phần như sơ đồ trên:
+  + Client Side (Phía Client) bao gồm ứng dụng website sử dụng thư viện ReactJS
+  + Server Side (Phía Server) bao gồm hệ thống API được viết bằng NodeJS thông qua sử dụng ngôn ngữ Javascript, và MySQL.
+  + Third Party Services (Các dịch vụ của bên thứ ba) gồm dịch vụ SMTP của Gmail (Google) và dịch vụ thanh toán của Momo.
+- Truyền thông giữa các bên: 
+  + Client – Server:  
+     + Trao đổi dữ liệu giữa 2 bên diễn ra khi end user (người dùng cuối) tương tác với UI (User Interface) mà qua đó kích hoạt các lời gọi API được cung cấp bởi phía Server.
+     + Sử dụng các phương thức HTTP POST và HTTP GET.  
+  + Server – Third Party Services – Client:  
+     + Diễn ra khi phía Server muốn gửi mail cho phía Client và ngược lại.
+     + Sử dụng giao thức SMTP cho việc gửi và ở Client sử dụng POP3 hoặc IMAP cho việc nhận
+  + Client – Third Party Services:
+     + Diễn ra khi end user muốn sử dụng dịch vụ thanh toán được cung cấp bởi Momo Payment Gateway. Sử dụng phương thức HTTP GET.
+  + Server – Third Party Services: 
+     + Diễn ra khi server cần khởi tạo dịch vụ thanh toán cho client.
+     + Sử dụng phương thức HTTP POST.
+
 ## Tính năng chính
 
+- Đăng nhập/ Đăng ký:
+  + Phân luồng người dùng: Admin, User
+  + Quên mật khẩu
+  + Đổi mật khẩu
 - Đăng bài bán voucher: Người dùng có thể thêm và rao bán voucher của mình.
+  + Thay đổi giá
+  + Thay đổi hình
+  + Xem trạng thái các bài đăng
 - Mua voucher: Xem và mua các voucher đã được đăng bởi người khác.
+  + Mua Voucher với tiền nạp vào hệ thống hoặc bằng Momo
+  + Xác nhận giao dịch đã thành công.
 - Yêu cầu hoàn tiền: Hỗ trợ gửi yêu cầu hoàn tiền trong các giao dịch.
 - Lịch sử giao dịch: Theo dõi tất cả giao dịch đã thực hiện.
 - Gợi ý thông minh: Gợi ý bài đăng phù hợp với người dùng dựa trên lịch sử hoặc sở thích.
-
+- Tính năng dành cho Admin: Các chức năng dành cho người quản trị
+  + Tính năng quản lý người dùng
+  + Tính năng xem biểu đồ giao dịch
+  + Tính năng kích hoạt bài đăng, vô hiệu hóa bài đăng
+  + Tính năng Chấp nhận hoàn tiền, Từ chối hoàn tiền
 ---
 
 ## Công nghệ sử dụng
@@ -66,8 +98,8 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi response về BackEnd.
 - BackEnd tạo dựa vào ID hoặc UserId được database gửi về để tạo SessionId
 - FrontEnd dựa vào SessionId này để tạo Cookies
-![Luồng Đăng nhập](./docs/flow/ThreadLogin.png)
-![Luồng Đăng ký](./docs/flow/ThreadSignUp.jpg)
+![Luồng Đăng nhập](./docs/flows/ThreadLogin.png)
+![Luồng Đăng ký](./docs/flows/ThreadSignUp.jpg)
 
 ### 2. Luồng đăng Voucher
 - Client gửi các thông tin như Tên Voucher, Loại Voucher, Ngày Hết hạn, Mã Voucher về cho Server
@@ -76,7 +108,7 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi Response
 - Server gửi Id xác nhận thành công
 - Client cập nhật lại trang Voucher
-![Luồng Thêm Voucher](./docs/flow/ThreadAddVoucher.jpg)
+![Luồng Thêm Voucher](./docs/flows/ThreadAddVoucher.jpg)
 
 ### 3. Luồng mua Voucher
  Luồng thanh toán bằng số dư tài khoản
@@ -103,10 +135,9 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
   - Database gửi Response với Message và LastTransactionId hoặc error
   - Server gửi HTTP 204 No Content về MoMo để xác nhận đã xử lý IPN.
   - Cập nhật trạng thái trang (thông báo thành công/lỗi) và chuyển hướng người dùng dựa trên phản hồi redirect hoặc kết quả IPN.
-![Luồng Thêm Voucher](./docs/flow/ThreadBuyVoucher.png)
+![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài
------ Quốc -------------
 Luồng Đăng bài
 
   - Người dùng sau khi đăng nhập, gửi POST request đến endpoint /posting/createPosting với dữ liệu bao gồm VoucherId, Postname, Content và JWT token trong header authorization PostingController.
@@ -128,13 +159,78 @@ Luồng thông báo (notification)
   - Sau khi nhận response thành công, frontend cập nhật state và render danh sách notification Notification.jsx:28-33 . Mỗi notification hiển thị title, content và timestamp.
 ### 5. Luồng yêu cầu hoàn tiền
 -------- Khôi Lê ----------
-![Luồng Yêu cầu hoàn tiền](./docs/flow/ThreadRequestRefund.jpg)
+![Luồng Yêu cầu hoàn tiền](./docs/flows/ThreadRequestRefund.jpg)
 
 
 
 
-### Giao diện trang chủ
-![Giao diện trang chủ](./docs/screenshots/homepage.png)
+## Giao diện của các chức năng chính
+
+Trang chủ
+![image](https://github.com/user-attachments/assets/5831a657-59a7-4998-9795-ff0135d82bfe)
+
+Đăng nhập
+![image](https://github.com/user-attachments/assets/9a0292fa-b10d-4f06-9e28-26c332cc8fe8)
+
+Yêu cầu quên mật khẩu:
+![image](https://github.com/user-attachments/assets/f2e607cc-a4c0-4d82-a043-38c8f617052b)
+
+Trang Quản lý bài đăng của User
+![image](https://github.com/user-attachments/assets/6140fdbc-357c-4dca-851b-3f8bb72484aa)
+
+Trang mua Voucher
+![image](https://github.com/user-attachments/assets/d4be2c91-71fa-4e76-80ef-db517e8083fd)
+
+Trang Quản lý mã giảm giá
+![image](https://github.com/user-attachments/assets/a435c9f4-e3e2-48da-8df7-f08176160f88)
+
+Trang thêm Voucher
+![image](https://github.com/user-attachments/assets/f4370b23-02a0-4e9b-857f-9b40c46fca05)
+
+Trang Quản lý các thông báo
+![image](https://github.com/user-attachments/assets/99cd5ad2-29a5-4a2c-8f70-3015537ca1e3)
+
+Trang Giỏ hàng
+![image](https://github.com/user-attachments/assets/8f80ad7a-1132-4bbe-bb37-632d2cb11221)
+
+Trang Lịch sử giao dịch
+![image](https://github.com/user-attachments/assets/d2a06d04-c7d6-4338-9ba7-a79c2280cda0)
+
+Trang Profile
+![image](https://github.com/user-attachments/assets/911a8f22-c485-42c3-9184-08b8c3e4e62d)
+
+
+Trang dành cho Admin
+![image](https://github.com/user-attachments/assets/0e2c48c2-ab87-4f94-ba0f-35c1f3fde941)
+
+Trang quản lý bài đăng cho Admin
+![image](https://github.com/user-attachments/assets/8267fc7a-5db8-4b28-af9d-7fda1bdab177)
+
+Trang quản lý người dùng dành cho Admin
+![image](https://github.com/user-attachments/assets/8bb5ad20-4878-4ed1-8041-efed983efa63)
+
+Trang quản lý giao dịch cho Admin
+![image](https://github.com/user-attachments/assets/4c0b7e77-d2b3-4539-9803-a6c2aecd5276)
+
+## Các phần cộng điểm
+- Host lên được Internet:
+  + Sử dụng VPS của Vietnix
+  + Sử dụng domain từ iNET
+  + Dùng nginx để host
+![image](https://github.com/user-attachments/assets/4faf44a3-3db5-4343-bd25-a72e14aada73)
+  + File cấu hình Nginx
+![image](https://github.com/user-attachments/assets/819e9720-400f-4495-98a9-7ca8f105b7f8)
+
+- Google PageSpeed
+  + SEO Xanh
+  + Tuy nhiên Performance chỉ 55, lý do trang Home đang có khá nhiều hiệu ứng (transition, gọi nhiều API, có hình ảnh mock-up ở LandingPage, ...)
+![image](https://github.com/user-attachments/assets/96ae699b-9c22-4274-bfe2-c61f80756a2a)
+
+- Video giới thiệu trang web:
+  + Video trailer: https://www.tiktok.com/@dyff5hja2xeb/video/7510990677174455560
+  + Video phỏng vấn: https://www.tiktok.com/@dyff5hja2xeb/video/7510989647057636615
+
+
 
 ## Kết luận
 
@@ -179,7 +275,7 @@ Trong các giai đoạn tiếp theo, nhóm định hướng mở rộng hệ th�
 | Trưởng nhóm              | [MSSV]   | - Thiết kế API, xử lý logic giao dịch, tích hợp MySQL<br>- Quản lý phân công công việc |
 | Nguyễn Trần Minh Khôi    | 23520780 | - Xây dựng cấu trúc MVC cho BackEnd<br>- Tạo các bảng quảng cáo ở trang LandingPage, tạo Navbar cơ bản<br>- Tạo trang đăng bài, danh sách các Voucher, tạo bài đăng<br>- Làm các ô bài đăng, phân trang, chia các bài đăng theo Category ở trang Cửa hàng<br>- Call API Momo để cho người dùng nạp tiền vào hệ thống và thanh toán bằng Momo<br>- Làm trang Profile và tính năng chỉnh sửa hồ sơ<br>- Làm tính năng thêm Voucher (Add Voucher) bằng form và bằng Excel <br> - Làm tính năng gợi ý các bài đăng dựa trên Category và Transaction History và call API OpenAI <br> - Làm các tính năng của Admin như quản lý bài đăng, quản lý người dùng, quản lý giao dịch,... |
 | Phạm Tấn Gia Quốc        | 23521308 | - Thiết kế và tối ưu CSDL MySQL<br>- Tạo sơ đồ ERD và xử lý truy vấn SQL |
-| [Tên thành viên 4]       | [MSSV]   | - Viết test case<br>- Kiểm tra tính năng như đăng nhập, mua bán, hoàn tiền |
+| Võ Minh Chiến       | 23520184   | - Tính năng đăng nhập, đăng kí, quên mật khẩu<br>- Tính năng thanh toán với số dư tài khoản<br>- Tính năng thông báo và quản lý thông báo<br>- Trang chi tiết voucher và sử dụng mã voucher<br>- Trang chi tiết bài đăng và trang của người bán <br>- Thiết kế layout cho trang web (navbar, sidebar, footer)<br>- Mục flashsale<br>  |
 
 
 

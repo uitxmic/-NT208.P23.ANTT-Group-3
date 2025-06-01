@@ -8,6 +8,7 @@
     "express-session": "^1.18.1",
     "google-auth-library": "^9.15.1",
     "nodemailer": "^7.0.3",
+    "react-helmet": "^6.1.0",
     "react-slick": "^0.30.3",
     "react-toastify": "^11.0.5",
     "redis": "^4.7.0",

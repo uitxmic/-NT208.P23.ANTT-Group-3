@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Layout from '../components/Layout';
 import { FaStar, FaShoppingBag, FaBox, FaUserPlus, FaCalendarAlt } from 'react-icons/fa'; // Thêm biểu tượng khác
+import { Helmet } from 'react-helmet';
 
 const SellerPost = () => {
     const { UserId } = useParams();
@@ -89,6 +90,16 @@ const SellerPost = () => {
 
     return (
         <Layout>
+            <Helmet>
+                <title>Bài đăng của người bán | VoucherHub</title>
+                <meta name="description" content="Xem danh sách bài đăng, sản phẩm, voucher, coupon của người bán trên VoucherHub." />
+                <meta name="keywords" content="bài đăng người bán, sản phẩm, voucher, coupon, ưu đãi, voucherhub" />
+                <meta property="og:title" content="Bài đăng của người bán | VoucherHub" />
+                <meta property="og:description" content="Xem danh sách bài đăng, sản phẩm, voucher, coupon của người bán trên VoucherHub." />
+                <meta property="og:type" content="profile" />
+                <meta property="og:url" content={UserId ? `https://voucherhub.id.vn/seller/${UserId}` : "https://voucherhub.id.vn/seller"} />
+                <link rel="canonical" href={UserId ? `https://voucherhub.id.vn/seller/${UserId}` : "https://voucherhub.id.vn/seller"} />
+            </Helmet>
             <div className="container mx-auto px-4 py-8 pt-20">
                 {/* Seller Information Section */}
                 {posts.length > 0 && (

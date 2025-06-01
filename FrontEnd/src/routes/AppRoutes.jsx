@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Home from "../pages/Home";
+import Voucher from "../pages/Home";
 import Log_in from "../pages/Log_in";
 import Sign_up from "../pages/Sign_up";
 import PostManager from "../pages/PostingManager";
@@ -82,7 +82,7 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Voucher />} />
               <Route path="/posting-manager" element={<PostManager />} />
               <Route path="/shop-vouchers" element={<PostingPage />} />
               <Route path="/seller-post/:UserId" element={<SellerPost />} />

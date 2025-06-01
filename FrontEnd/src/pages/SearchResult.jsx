@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { SearchAPI } from '../components/SearchFilterModal';
 import Layout from '../components/Layout';
+import { Helmet } from "react-helmet";
 
 const VoucherCard = ({ voucher }) => (
     <div className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-white to-gray-50 shadow-md hover:shadow-lg transition-all duration-300">
@@ -218,12 +219,34 @@ const SearchResult = () => {
     };
 
     return (
-        <Layout>
-            <div className="container mx-auto px-4 py-8 md:px-6 lg:py-12 max-w-6xl">
-                <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">{pageTitle}</h1>
-                {renderResults()}
-            </div>
-        </Layout>
+        <>
+            <Helmet>
+                <title>Kết quả tìm kiếm voucher, mã giảm giá, coupon | VoucherHub</title>
+                <meta name="description" content="Tìm kiếm mã ưu đãi, coupon nhanh chóng, chính xác. Hàng ngàn ưu đãi hấp dẫn đang chờ bạn tại VoucherHub." />
+                <meta name="keywords" content="tìm kiếm mã ưu đãi, tìm coupon, tìm khuyến mãi, ưu đãi, thương hiệu" />
+                <meta property="og:title" content="Kết quả tìm kiếm voucher, mã giảm giá, coupon | VoucherHub" />
+                <meta property="og:description" content="Tìm kiếm voucher, mã giảm giá, coupon nhanh chóng, chính xác. Hàng ngàn voucher, coupon, mã giảm giá đang chờ bạn tại VoucherHub." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/search" />
+                <link rel="canonical" href="https://voucherhub.id.vn/search" />
+                {/* Schema SearchResultsPage */}
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "SearchResultsPage",
+                    "name": "Kết quả tìm kiếm voucher, mã giảm giá, coupon",
+                    "description": "Kết quả tìm kiếm voucher, mã giảm giá, coupon tại VoucherHub.",
+                    "url": "https://voucherhub.id.vn/search"
+                  }
+                `}</script>
+            </Helmet>
+            <Layout>
+                <div className="container mx-auto px-4 py-8 md:px-6 lg:py-12 max-w-6xl">
+                    <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">{pageTitle}</h1>
+                    {renderResults()}
+                </div>
+            </Layout>
+        </>
     );
 };
 

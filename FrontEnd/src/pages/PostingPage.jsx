@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 import Layout from '../components/Layout';
 
 const PostingPage = () => {
@@ -82,146 +83,168 @@ const PostingPage = () => {
     : vouchers;
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 py-10" style={{ paddingTop: '100px' }}>
+    <>
+      <Helmet>
+        <title>Danh sách voucher, mã giảm giá, coupon mới nhất | VoucherHub</title>
+        <meta name="description" content="Khám phá danh sách mã ưu đãi mới nhất, giá tốt mỗi ngày. Mua bán, trao đổi mã ưu đãi uy tín tại VoucherHub." />
+        <meta name="keywords" content="danh sách mã ưu đãi, ưu đãi mới, mua bán, trao đổi, coupon, thương hiệu" />
+        <meta property="og:title" content="Danh sách voucher, mã giảm giá, coupon mới nhất | VoucherHub" />
+        <meta property="og:description" content="Khám phá danh sách voucher, mã giảm giá, coupon mới nhất, giá tốt mỗi ngày. Mua bán, trao đổi voucher uy tín tại VoucherHub." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://voucherhub.id.vn/shop-vouchers" />
+        <link rel="canonical" href="https://voucherhub.id.vn/shop-vouchers" />
+        {/* Schema CollectionPage */}
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Danh sách voucher, mã giảm giá, coupon mới nhất",
+            "description": "Danh sách voucher, mã giảm giá, coupon mới nhất tại VoucherHub. Giá tốt mỗi ngày, top deal hot.",
+            "url": "https://voucherhub.id.vn/shop-vouchers"
+          }
+        `}</script>
+      </Helmet>
+      <Layout>
+        <div className="min-h-screen bg-gray-50 py-10" style={{ paddingTop: '100px' }}>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
-            CÁC VOUCHER HIỆN TẠI TRÊN HỆ THỐNG
-          </h1>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
+              CÁC VOUCHER HIỆN TẠI TRÊN HỆ THỐNG
+            </h1>
 
-          {/* Category Filter Bar */}
-          {!loading && categories.length > 0 && (
-            <div className="mb-8 flex flex-wrap justify-center gap-2 sm:gap-3">
-              <button
-                onClick={() => handleCategorySelect('All')}
-                className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ease-in-out
-                  ${(selectedCategory === 'All' || !selectedCategory) ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-              >
-                Tất cả
-              </button>
-              {categories.map(category => (
+            {/* Category Filter Bar */}
+            {!loading && categories.length > 0 && (
+              <div className="mb-8 flex flex-wrap justify-center gap-2 sm:gap-3">
                 <button
-                  key={category}
-                  onClick={() => handleCategorySelect(category)}
+                  onClick={() => handleCategorySelect('All')}
                   className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ease-in-out
-                    ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                  ${(selectedCategory === 'All' || !selectedCategory) ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                 >
-                  {category}
+                  Tất cả
                 </button>
-              ))}
-            </div>
-          )}
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl text-center font-medium">
-              {error}
-            </div>
-          )}
-
-          {/* Loading State */}
-          {loading ? (
-            <p className="text-center text-gray-600 text-lg">Đang tải Voucher...</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredVouchers.length > 0 ? (
-                filteredVouchers.map((voucher) => (
-                  <div
-                    key={voucher.PostId}
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-                    onClick={() => navigate(`/postdetail/${voucher.PostId}`)}
+                {categories.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => handleCategorySelect(category)}
+                    className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ease-in-out
+                    ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                   >
-                    {/* Voucher Image */}
-                    <div className="relative">
-                      <img
-                        src={voucher.VouImg || 'https://via.placeholder.com/300x150'}
-                        alt={voucher.PostName}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute bottom-3 right-3 bg-gray-900 bg-opacity-75 text-white text-sm font-medium px-3 py-1 rounded-full">
-                        Số lượng: {voucher.Quantity}
+                    {category}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl text-center font-medium">
+                {error}
+              </div>
+            )}
+
+            {/* Loading State */}
+            {loading ? (
+              <p className="text-center text-gray-600 text-lg">Đang tải Voucher...</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredVouchers.length > 0 ? (
+                  filteredVouchers.map((voucher) => (
+                    <div
+                      key={voucher.PostId}
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                      onClick={() => navigate(`/postdetail/${voucher.PostId}`)}
+                    >
+                      {/* Voucher Image */}
+                      <div className="relative">
+                        <img
+                          src={voucher.VouImg || 'https://via.placeholder.com/300x150'}
+                          alt={voucher.PostName}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="absolute bottom-3 right-3 bg-gray-900 bg-opacity-75 text-white text-sm font-medium px-3 py-1 rounded-full">
+                          Số lượng: {voucher.Quantity}
+                        </div>
+                      </div>
+
+                      {/* Voucher Details */}
+                      <div className="p-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-2 truncate">
+                          {voucher.PostName}
+                        </h2>
+                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                          {voucher.Content}
+                        </p>
+                        <p className="text-orange-600 font-semibold text-lg mb-2">
+                          Giá: {voucher.Price}.000 ₫
+                        </p>
+                        <p className="text-gray-500 text-sm mb-2">
+                          Hết hạn: {new Date(voucher.Expire).toLocaleDateString('vi-VN')}
+                        </p>
+                        <div className="flex items-center gap-4 mb-3">
+                          <span className="flex items-center text-green-600">
+                            ▲{' '}
+                            <span className="ml-1 text-gray-700 text-sm">
+                              {voucher.UpVote}
+                            </span>
+                          </span>
+                          <span className="flex items-center text-red-500">
+                            ▼{' '}
+                            <span className="ml-1 text-gray-700 text-sm">
+                              {voucher.DownVote ?? 0}
+                            </span>
+                          </span>
+                        </div>
+                        <div
+                          className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${!voucher.Active
+                            ? 'bg-green-100 text-white-700'
+                            : 'bg-red-100 text-white-700'
+                            }`}
+                        >
+                          {!voucher.Active ? 'Đang bán' : 'Không hoạt động'}
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <p className="text-center col-span-full text-gray-600 text-lg">
+                    {selectedCategory && selectedCategory !== 'All'
+                      ? `Không có voucher nào trong danh mục "${selectedCategory}".`
+                      : 'Không có voucher nào hiện tại.'}
+                  </p>
+                )}
+              </div>
+            )}
+            {/* Pagination Controls */}
+            {/* Show pagination if not loading AND ( (vouchers exist) OR (we are on page > 1, so "Prev" should be available) ) */}
+            {/* And hide if there's an auth error */}
+            {!loading && (vouchers.length > 0 || currentPage > 1) && !error.includes('Vui lòng đăng nhập') && (
+              <div className="mt-10 flex justify-center items-center space-x-4">
+                <button
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1 || loading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  Trang Trước
+                </button>
+                <span className="text-gray-700 font-medium px-3 py-2 bg-gray-100 rounded-md">
+                  Trang {currentPage}
+                </span>
+                <button
+                  onClick={handleNextPage}
+                  // Disable "Next" if loading, or if the current page has 0 vouchers (and it's not the first page loading attempt)
+                  // This implies if an empty page is loaded (not page 1), we can't go further.
+                  disabled={loading || (vouchers.length === 0 && currentPage > 1)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  Trang Kế
+                </button>
+              </div>
 
-                    {/* Voucher Details */}
-                    <div className="p-6">
-                      <h2 className="text-xl font-bold text-gray-900 mb-2 truncate">
-                        {voucher.PostName}
-                      </h2>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {voucher.Content}
-                      </p>
-                      <p className="text-orange-600 font-semibold text-lg mb-2">
-                        Giá: {voucher.Price}.000 ₫
-                      </p>
-                      <p className="text-gray-500 text-sm mb-2">
-                        Hết hạn: {new Date(voucher.Expire).toLocaleDateString('vi-VN')}
-                      </p>
-                      <div className="flex items-center gap-4 mb-3">
-                        <span className="flex items-center text-green-600">
-                          ▲{' '}
-                          <span className="ml-1 text-gray-700 text-sm">
-                            {voucher.UpVote}
-                          </span>
-                        </span>
-                        <span className="flex items-center text-red-500">
-                          ▼{' '}
-                          <span className="ml-1 text-gray-700 text-sm">
-                            {voucher.DownVote ?? 0}
-                          </span>
-                        </span>
-                      </div>
-                      <div
-                        className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${!voucher.Active
-                          ? 'bg-green-100 text-white-700'
-                          : 'bg-red-100 text-white-700'
-                          }`}
-                      >
-                        {!voucher.Active ? 'Đang bán' : 'Không hoạt động'}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center col-span-full text-gray-600 text-lg">
-                  {selectedCategory && selectedCategory !== 'All'
-                    ? `Không có voucher nào trong danh mục "${selectedCategory}".`
-                    : 'Không có voucher nào hiện tại.'}
-                </p>
-              )}
-            </div>
-          )}
-          {/* Pagination Controls */}
-          {/* Show pagination if not loading AND ( (vouchers exist) OR (we are on page > 1, so "Prev" should be available) ) */}
-          {/* And hide if there's an auth error */}
-          {!loading && (vouchers.length > 0 || currentPage > 1) && !error.includes('Vui lòng đăng nhập') && (
-            <div className="mt-10 flex justify-center items-center space-x-4">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1 || loading}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-              >
-                Trang Trước
-              </button>
-              <span className="text-gray-700 font-medium px-3 py-2 bg-gray-100 rounded-md">
-                Trang {currentPage}
-              </span>
-              <button
-                onClick={handleNextPage}
-                // Disable "Next" if loading, or if the current page has 0 vouchers (and it's not the first page loading attempt)
-                // This implies if an empty page is loaded (not page 1), we can't go further.
-                disabled={loading || (vouchers.length === 0 && currentPage > 1)}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-              >
-                Trang Kế
-              </button>
-            </div>
-
-          )}
+            )}
+          </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

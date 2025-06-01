@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 import Layout from '../components/Layout';
 
 const UserVoucherList = () => {
@@ -70,81 +71,103 @@ const UserVoucherList = () => {
   };
 
   return (
-    <Layout>
-      <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-        {/* Nội dung chính */}
-        <div className="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
-          <h1 className="text-4xl mt-5 font-extrabold text-gray-800 text-center mb-8 tracking-tight">
-            Các voucher của bạn
-          </h1>
+    <>
+      <Helmet>
+        <title>Voucher của tôi | Quản lý mã giảm giá, coupon đã mua | VoucherHub</title>
+        <meta name="description" content="Xem và quản lý các mã ưu đãi đã mua, đã nhận tại VoucherHub. Theo dõi trạng thái, hạn sử dụng, chi tiết từng mã cá nhân." />
+        <meta name="keywords" content="mã ưu đãi của tôi, quản lý mã ưu đãi, cá nhân, voucherhub" />
+        <link rel="canonical" href="https://voucherhub.id.vn/my-vouchers" />
+        <meta property="og:title" content="Voucher của tôi | Quản lý mã giảm giá, coupon đã mua | VoucherHub" />
+        <meta property="og:description" content="Xem và quản lý các voucher, mã giảm giá, coupon đã mua, đã nhận tại VoucherHub." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://voucherhub.id.vn/my-vouchers" />
+        <meta property="og:image" content="https://voucherhub.id.vn/og-my-vouchers.jpg" />
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Voucher của tôi | VoucherHub",
+            "description": "Xem và quản lý các voucher, mã giảm giá, coupon đã mua, đã nhận tại VoucherHub.",
+            "url": "https://voucherhub.id.vn/my-vouchers"
+          }
+        `}</script>
+      </Helmet>
+      <Layout>
+        <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+          {/* Nội dung chính */}
+          <div className="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
+            <h1 className="text-4xl mt-5 font-extrabold text-gray-800 text-center mb-8 tracking-tight">
+              Các voucher của bạn
+            </h1>
 
-          {/* Hiển thị lỗi nếu có */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-xl shadow-sm text-center font-medium">
-              {error}
-            </div>
-          )}
+            {/* Hiển thị lỗi nếu có */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-xl shadow-sm text-center font-medium">
+                {error}
+              </div>
+            )}
 
-          {/* Hiển thị loading */}
-          {loading ? (
-            <div className="text-center">
-              <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-              <p className="mt-2 text-gray-600">Loading vouchers...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {vouchers.length > 0 ? (
-                vouchers.map((voucher) => (
+            {/* Hiển thị loading */}
+            {loading ? (
+              <div className="text-center">
+                <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                <p className="mt-2 text-gray-600">Loading vouchers...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {vouchers.length > 0 ? (
+                  vouchers.map((voucher) => (
 
-                  <div
-                    key={voucher.VoucherId}
-                    className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-                    onClick={() => navigate(`/voucher-detail/${voucher.VoucherId}`)}
-                  >
-                    {/* Hình ảnh voucher */}
-                    <img
-                      src={voucher._displayImgUrl || 'https://via.placeholder.com/150'}
-                      alt={voucher.VoucherName}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                    {/* Thông tin voucher */}
-                    <h2 className="text-xl font-bold text-blue-800 truncate">Tên voucher: {voucher.VoucherName}</h2>
-                    <p className="text-gray-600 text-sm">
-                      <span className="font-semibold">Danh mục:</span> {voucher.Category}
-                    </p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      Hết hạn: {new Date(voucher.ExpirationDay).toLocaleDateString('vi-VN')}
-                    </p>
-                    <button
-                      className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                      onClick={() => alert(`Redeem voucher: ${voucher.VoucherCode}`)}
+                    <div
+                      key={voucher.VoucherId}
+                      className="bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                      onClick={() => navigate(`/voucher-detail/${voucher.VoucherId}`)}
                     >
-                      Đăng bán ngay
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center col-span-full text-gray-500 text-lg">
-                  No vouchers available.
-                </p>
-              )}
-            </div>
-          )}
+                      {/* Hình ảnh voucher */}
+                      <img
+                        src={voucher._displayImgUrl || 'https://via.placeholder.com/150'}
+                        alt={voucher.VoucherName}
+                        className="w-full h-48 object-cover rounded-lg mb-4"
+                      />
+                      {/* Thông tin voucher */}
+                      <h2 className="text-xl font-bold text-blue-800 truncate">Tên voucher: {voucher.VoucherName}</h2>
+                      <p className="text-gray-600 text-sm">
+                        <span className="font-semibold">Danh mục:</span> {voucher.Category}
+                      </p>
+                      <p className="text-gray-500 text-xs mt-1">
+                        Hết hạn: {new Date(voucher.ExpirationDay).toLocaleDateString('vi-VN')}
+                      </p>
+                      <button
+                        className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                        onClick={() => alert(`Redeem voucher: ${voucher.VoucherCode}`)}
+                      >
+                        Đăng bán ngay
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center col-span-full text-gray-500 text-lg">
+                    No vouchers available.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      {/* Button to add vouchers */}
-      <div className="fixed bottom-8 right-8">
-        <button
-          onClick={() => navigate('/add-voucher')}
-          className="bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
-          aria-label="Add voucher"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-      </div>
-    </Layout>
+        {/* Button to add vouchers */}
+        <div className="fixed bottom-8 right-8">
+          <button
+            onClick={() => navigate('/add-voucher')}
+            className="bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+            aria-label="Add voucher"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+      </Layout>
+    </>
   );
 };
 

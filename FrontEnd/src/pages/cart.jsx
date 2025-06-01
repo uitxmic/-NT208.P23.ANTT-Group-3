@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout"; // Import Layout
 import ErrorBoundary from "../components/ErrorBoundary"; // Import ErrorBoundary
 import { useNavigate } from "react-router-dom"; // Đã có ở đầu file
+import { Helmet } from "react-helmet";
 
 function CartPage() {
   const [cartItems, setCartItems] = useState([]);
@@ -105,139 +106,160 @@ function CartPage() {
     navigate('/payment', { state: { items } });
   };
 
-
   return (
-    <ErrorBoundary>
-      <Layout>
-        <div className="flex flex-col min-h-screen bg-pink-50">
-          <div className="flex flex-1" style={{ marginTop: '4rem', paddingBottom: itemsToPurchase.length > 0 ? '8rem' : '0' }}>
-            <main className="flex-1 p-6">
-              <h2 className="text-2xl font-bold mb-4">Giỏ hàng của bạn</h2>
-              {loading ? (
-                <div>Đang tải...</div>
-              ) : error ? (
-                <div className="text-red-500">{error}</div>
-              ) : cartItems.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="text-xl text-gray-500">Giỏ hàng trống.</p>
-                  {/* Bạn có thể thêm nút để điều hướng người dùng đến trang sản phẩm */}
-                </div>
-              ) : (
-                // Bảng giỏ hàng không còn nằm trong grid nữa
-                <div className="md:col-span-2">
-                  <table className="min-w-full bg-white rounded shadow">
-                    <thead>
-                      <tr>
-                        <th className="py-2 px-4 border-b w-12">Chọn</th>
-                        <th className="py-2 px-4 border-b">STT</th>
-                        <th className="py-2 px-4 border-b">Sản phẩm</th>
-                        <th className="py-2 px-4 border-b">Số lượng</th>
-                        <th className="py-2 px-4 border-b">Cập nhật</th>
-                        <th className="py-2 px-4 border-b">Xóa</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cartItems.map((item, idx) => (
-                        <tr key={item.ItemId + '-' + idx}>
-                          <td className="py-2 px-4 border-b text-center">
-                            <input
-                              type="checkbox"
-                              className="form-checkbox h-5 w-5 text-blue-600"
-                              checked={selectedItems.has(item.ItemId)}
-                              onChange={() => handleSelectItem(item.ItemId)}
-                            />
-                          </td>
-                          <td className="py-2 px-4 border-b text-center">{idx + 1}</td>
-                          <td className="py-2 px-4 border-b">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={item.VouImg || "https://via.placeholder.com/48"}
-                                alt={item.PostName}
-                                className="w-16 h-16 object-cover rounded border"
+    <>
+      <Helmet>
+        <title>Giỏ hàng | Thanh toán voucher, mã giảm giá, coupon | VoucherHub</title>
+        <meta name="description" content="Xem và quản lý giỏ hàng, thanh toán mã ưu đãi nhanh chóng, an toàn tại VoucherHub." />
+        <meta name="keywords" content="giỏ hàng, thanh toán mã ưu đãi, mua mã ưu đãi, voucherhub" />
+        <meta property="og:title" content="Giỏ hàng | Thanh toán voucher, mã giảm giá, coupon | VoucherHub" />
+        <meta property="og:description" content="Xem và quản lý giỏ hàng, thanh toán mã ưu đãi nhanh chóng, an toàn tại VoucherHub." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://voucherhub.id.vn/cart" />
+        <link rel="canonical" href="https://voucherhub.id.vn/cart" />
+        {/* Schema WebPage */}
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Giỏ hàng",
+            "description": "Xem và quản lý giỏ hàng, thanh toán mã ưu đãi tại VoucherHub.",
+            "url": "https://voucherhub.id.vn/cart"
+          }
+        `}</script>
+      </Helmet>
+      <ErrorBoundary>
+        <Layout>
+          <div className="flex flex-col min-h-screen bg-pink-50">
+            <div className="flex flex-1" style={{ marginTop: '4rem', paddingBottom: itemsToPurchase.length > 0 ? '8rem' : '0' }}>
+              <main className="flex-1 p-6">
+                <h2 className="text-2xl font-bold mb-4">Giỏ hàng của bạn</h2>
+                {loading ? (
+                  <div>Đang tải...</div>
+                ) : error ? (
+                  <div className="text-red-500">{error}</div>
+                ) : cartItems.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-xl text-gray-500">Giỏ hàng trống.</p>
+                    {/* Bạn có thể thêm nút để điều hướng người dùng đến trang sản phẩm */}
+                  </div>
+                ) : (
+                  // Bảng giỏ hàng không còn nằm trong grid nữa
+                  <div className="md:col-span-2">
+                    <table className="min-w-full bg-white rounded shadow">
+                      <thead>
+                        <tr>
+                          <th className="py-2 px-4 border-b w-12">Chọn</th>
+                          <th className="py-2 px-4 border-b">STT</th>
+                          <th className="py-2 px-4 border-b">Sản phẩm</th>
+                          <th className="py-2 px-4 border-b">Số lượng</th>
+                          <th className="py-2 px-4 border-b">Cập nhật</th>
+                          <th className="py-2 px-4 border-b">Xóa</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cartItems.map((item, idx) => (
+                          <tr key={item.ItemId + '-' + idx}>
+                            <td className="py-2 px-4 border-b text-center">
+                              <input
+                                type="checkbox"
+                                className="form-checkbox h-5 w-5 text-blue-600"
+                                checked={selectedItems.has(item.ItemId)}
+                                onChange={() => handleSelectItem(item.ItemId)}
                               />
-                              <div>
-                                <div className="font-semibold">{item.PostName}</div>
-                                <div className="text-sm text-gray-500">
-                                  {item.Price > 0
-                                    ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.Price * 1000)
-                                    : '0 ₫'}
+                            </td>
+                            <td className="py-2 px-4 border-b text-center">{idx + 1}</td>
+                            <td className="py-2 px-4 border-b">
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={item.VouImg || "https://via.placeholder.com/48"}
+                                  alt={item.PostName}
+                                  className="w-16 h-16 object-cover rounded border"
+                                />
+                                <div>
+                                  <div className="font-semibold">{item.PostName}</div>
+                                  <div className="text-sm text-gray-500">
+                                    {item.Price > 0
+                                      ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.Price * 1000)
+                                      : '0 ₫'}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="py-2 px-4 border-b text-center">{item.Quantity}</td>
-                          <td className="py-2 px-4 border-b text-center">
-                            <button
-                              className="px-2 py-1 bg-blue-500 text-white rounded mr-2"
-                              onClick={() => handleUpdate(item.ItemId, 1)}
-                            >
-                              +
-                            </button>
-                            <button
-                              className="px-2 py-1 bg-blue-500 text-white rounded"
-                              onClick={() => handleUpdate(item.ItemId, -1)}
-                            >
-                              -
-                            </button>
-                          </td>
-                          <td className="py-2 px-4 border-b text-center">
-                            <button
-                              className="px-4 py-1 bg-red-500 text-white rounded"
-                              onClick={() => handleUpdate(item.ItemId, 0)}
-                            >
-                              Xóa
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </main>
-          </div>
-
-          {/* Khung hiển thị các mục đã chọn - CỐ ĐỊNH Ở CUỐI TRANG */}
-          {itemsToPurchase.length > 0 && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t shadow-lg z-50">
-              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex-grow">
-                  <h3 className="text-lg font-semibold">
-                    Đã chọn: {itemsToPurchase.length} sản phẩm
-                  </h3>
-                  {/* Optional: Hiển thị danh sách sản phẩm đã chọn nếu muốn, nhưng có thể làm thanh cố định quá lớn */}
-                  {/* <ul className="text-sm">
-                    {itemsToPurchase.slice(0, 2).map(item => ( // Hiển thị 2 sản phẩm đầu tiên ví dụ
-                      <li key={item.ItemId} className="truncate">
-                        {item.PostName} (SL: {item.Quantity})
-                      </li>
-                    ))}
-                    {itemsToPurchase.length > 2 && <li>... và {itemsToPurchase.length - 2} sản phẩm khác</li>}
-                  </ul> */}
-                </div>
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="text-right">
-                    <span className="text-gray-600">Tổng tiền: {''}
-                      <span className="text-orange-600 font-bold mt-2">
-                        {calculateTotalPrice() > 0
-                          ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(calculateTotalPrice() * 1000)
-                          : '0 ₫'}
-                      </span>
-                    </span>
+                            </td>
+                            <td className="py-2 px-4 border-b text-center">{item.Quantity}</td>
+                            <td className="py-2 px-4 border-b text-center">
+                              <button
+                                className="px-2 py-1 bg-blue-500 text-white rounded mr-2"
+                                onClick={() => handleUpdate(item.ItemId, 1)}
+                              >
+                                +
+                              </button>
+                              <button
+                                className="px-2 py-1 bg-blue-500 text-white rounded"
+                                onClick={() => handleUpdate(item.ItemId, -1)}
+                              >
+                                -
+                              </button>
+                            </td>
+                            <td className="py-2 px-4 border-b text-center">
+                              <button
+                                className="px-4 py-1 bg-red-500 text-white rounded"
+                                onClick={() => handleUpdate(item.ItemId, 0)}
+                              >
+                                Xóa
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  <button
-                    onClick={handleBuyNow}
-                    className="w-full sm:w-auto bg-green-600 text-white py-2 px-6 rounded hover:bg-green-700 transition-colors text-lg font-semibold"
-                  >
-                    Mua ngay ({itemsToPurchase.length})
-                  </button>
+                )}
+              </main>
+            </div>
+
+            {/* Khung hiển thị các mục đã chọn - CỐ ĐỊNH Ở CUỐI TRANG */}
+            {itemsToPurchase.length > 0 && (
+              <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t shadow-lg z-50">
+                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex-grow">
+                    <h3 className="text-lg font-semibold">
+                      Đã chọn: {itemsToPurchase.length} sản phẩm
+                    </h3>
+                    {/* Optional: Hiển thị danh sách sản phẩm đã chọn nếu muốn, nhưng có thể làm thanh cố định quá lớn */}
+                    {/* <ul className="text-sm">
+                      {itemsToPurchase.slice(0, 2).map(item => ( // Hiển thị 2 sản phẩm đầu tiên ví dụ
+                        <li key={item.ItemId} className="truncate">
+                          {item.PostName} (SL: {item.Quantity})
+                        </li>
+                      ))}
+                      {itemsToPurchase.length > 2 && <li>... và {itemsToPurchase.length - 2} sản phẩm khác</li>}
+                    </ul> */}
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="text-right">
+                      <span className="text-gray-600">Tổng tiền: {''}
+                        <span className="text-orange-600 font-bold mt-2">
+                          {calculateTotalPrice() > 0
+                            ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(calculateTotalPrice() * 1000)
+                            : '0 ₫'}
+                        </span>
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleBuyNow}
+                      className="w-full sm:w-auto bg-green-600 text-white py-2 px-6 rounded hover:bg-green-700 transition-colors text-lg font-semibold"
+                    >
+                      Mua ngay ({itemsToPurchase.length})
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      </Layout>
-    </ErrorBoundary>
+            )}
+          </div>
+        </Layout>
+      </ErrorBoundary>
+    </>
   );
 }
 

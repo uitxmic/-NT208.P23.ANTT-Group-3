@@ -15,6 +15,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { Helmet } from "react-helmet";
 
 ChartJS.register(
     CategoryScale,
@@ -232,105 +233,127 @@ const Admin = () => {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-100" style={{ paddingTop: '64px' }}>
-            {/* Navbar */}
-            <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow z-50 flex items-center px-4">
-                {/* Sidebar Toggle Button */}
-                <button
-                    className="p-2 bg-white rounded-full shadow-md mr-4"
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                >
-                    <svg
-                        className="w-6 h-6 text-gray-700"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
+        <>
+            <Helmet>
+                <title>Admin Dashboard | Quản trị hệ thống voucher, mã giảm giá, coupon | VoucherHub</title>
+                <meta name="description" content="Trang quản trị hệ thống, thống kê giao dịch, quản lý người dùng, mã ưu đãi cho admin tại VoucherHub." />
+                <meta name="keywords" content="admin dashboard, quản trị viên, quản lý hệ thống, quản lý mã ưu đãi, thống kê giao dịch, voucherhub" />
+                <meta property="og:title" content="Admin Dashboard | Quản trị hệ thống voucher, mã giảm giá, coupon | VoucherHub" />
+                <meta property="og:description" content="Trang quản trị hệ thống, thống kê giao dịch, quản lý người dùng, mã ưu đãi cho admin tại VoucherHub." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/admin" />
+                <link rel="canonical" href="https://voucherhub.id.vn/admin" />
+                {/* Schema WebPage */}
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Admin Dashboard",
+                    "description": "Trang quản trị hệ thống, thống kê giao dịch, quản lý người dùng, mã ưu đãi cho admin tại VoucherHub.",
+                    "url": "https://voucherhub.id.vn/admin"
+                  }
+                `}</script>
+            </Helmet>
+            <div className="flex min-h-screen bg-gray-100" style={{ paddingTop: '64px' }}>
+                {/* Navbar */}
+                <nav className="fixed top-0 left-0 w-full h-16 bg-white shadow z-50 flex items-center px-4">
+                    {/* Sidebar Toggle Button */}
+                    <button
+                        className="p-2 bg-white rounded-full shadow-md mr-4"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-                <span className="text-xl font-bold text-gray-800">Admin Dashboard</span>
-            </nav>
+                        <svg
+                            className="w-6 h-6 text-gray-700"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <span className="text-xl font-bold text-gray-800">Admin Dashboard</span>
+                </nav>
 
-            {/* Sidebar */}
-            <div
-                className={`fixed top-16 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    }`}
-                style={{ height: sidebarHeight }}
-            >
-                <ErrorBoundary>
-                    <AdminSidebar language={language} />
-                </ErrorBoundary>
-            </div>
-
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                {/* Mobile Sidebar Toggle Button */}
-                <button
-                    className="fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-md md:hidden"
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                {/* Sidebar */}
+                <div
+                    className={`fixed top-16 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                        }`}
+                    style={{ height: sidebarHeight }}
                 >
-                    <svg
-                        className="w-6 h-6 text-gray-700"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
+                    <ErrorBoundary>
+                        <AdminSidebar language={language} />
+                    </ErrorBoundary>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 flex flex-col">
+                    {/* Mobile Sidebar Toggle Button */}
+                    <button
+                        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-md md:hidden"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+                        <svg
+                            className="w-6 h-6 text-gray-700"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
 
-                {/* Content Area */}
-                <main className="flex-1 p-4 md:p-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Tổng quan Admin</h1>
+                    {/* Content Area */}
+                    <main className="flex-1 p-4 md:p-8">
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Tổng quan Admin</h1>
 
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
-                        <div className="bg-white p-4 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                            <h2 className="text-lg md:text-xl font-semibold text-gray-700">Số lượng giao dịch</h2>
-                            <p className="text-2xl md:text-3xl font-bold text-blue-600">{stats.transactions}</p>
-                        </div>
-                        <div className="bg-white p-4 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                            <h2 className="text-lg md:text-xl font-semibold text-gray-700">Số lượng người dùng</h2>
-                            <p className="text-2xl md:text-3xl font-bold text-green-600">{stats.users}</p>
-                        </div>
-                    </div>
-
-                    {/* Transaction Chart */}
-                    <div className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-                            <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-2 sm:mb-0">Biểu đồ giao dịch</h2>
-                            <div className="flex flex-wrap gap-2">
-                                <div className="flex items-center space-x-1">
-                                    <span className="text-sm text-gray-600">Thời gian:</span>
-                                    <button onClick={() => handleTimeScaleChange('day')} className={`px-3 py-1 text-sm rounded ${chartTimeScale === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Ngày</button>
-                                    <button onClick={() => handleTimeScaleChange('month')} className={`px-3 py-1 text-sm rounded ${chartTimeScale === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Tháng</button>
-                                    <button onClick={() => handleTimeScaleChange('year')} className={`px-3 py-1 text-sm rounded ${chartTimeScale === 'year' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Năm</button>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                    <span className="text-sm text-gray-600">Kiểu:</span>
-                                    <button onClick={() => handleDisplayTypeChange('line')} className={`px-3 py-1 text-sm rounded ${chartDisplayType === 'line' ? 'bg-green-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Line</button>
-                                    <button onClick={() => handleDisplayTypeChange('bar')} className={`px-3 py-1 text-sm rounded ${chartDisplayType === 'bar' ? 'bg-green-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Bar</button>
-                                </div>
+                        {/* Stats Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-700">Số lượng giao dịch</h2>
+                                <p className="text-2xl md:text-3xl font-bold text-blue-600">{stats.transactions}</p>
+                            </div>
+                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-700">Số lượng người dùng</h2>
+                                <p className="text-2xl md:text-3xl font-bold text-green-600">{stats.users}</p>
                             </div>
                         </div>
-                        <div className="relative h-72 md:h-96"> {/* Ensure container has height */}
-                            <canvas id="transactionChart" ref={chartRef} className="w-full h-full"></canvas>
-                        </div>
-                    </div>
 
-                    {/* Logout Button */}
-                    <button
-                        onClick={handleLogout}
-                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    >
-                        Đăng xuất
-                    </button>
-                </main>
+                        {/* Transaction Chart */}
+                        <div className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-2 sm:mb-0">Biểu đồ giao dịch</h2>
+                                <div className="flex flex-wrap gap-2">
+                                    <div className="flex items-center space-x-1">
+                                        <span className="text-sm text-gray-600">Thời gian:</span>
+                                        <button onClick={() => handleTimeScaleChange('day')} className={`px-3 py-1 text-sm rounded ${chartTimeScale === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Ngày</button>
+                                        <button onClick={() => handleTimeScaleChange('month')} className={`px-3 py-1 text-sm rounded ${chartTimeScale === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Tháng</button>
+                                        <button onClick={() => handleTimeScaleChange('year')} className={`px-3 py-1 text-sm rounded ${chartTimeScale === 'year' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Năm</button>
+                                    </div>
+                                    <div className="flex items-center space-x-1">
+                                        <span className="text-sm text-gray-600">Kiểu:</span>
+                                        <button onClick={() => handleDisplayTypeChange('line')} className={`px-3 py-1 text-sm rounded ${chartDisplayType === 'line' ? 'bg-green-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Line</button>
+                                        <button onClick={() => handleDisplayTypeChange('bar')} className={`px-3 py-1 text-sm rounded ${chartDisplayType === 'bar' ? 'bg-green-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>Bar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="relative h-72 md:h-96"> {/* Ensure container has height */}
+                                <canvas id="transactionChart" ref={chartRef} className="w-full h-full"></canvas>
+                            </div>
+                        </div>
+
+                        {/* Logout Button */}
+                        <button
+                            onClick={handleLogout}
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        >
+                            Đăng xuất
+                        </button>
+                    </main>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

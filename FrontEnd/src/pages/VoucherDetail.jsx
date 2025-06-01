@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Helmet } from "react-helmet";
 
 const VoucherDetail = () => {
     const { voucherId } = useParams();
@@ -154,119 +155,142 @@ const VoucherDetail = () => {
     }
 
     return (
-        <Layout>
-            <div className="container mx-auto px-4 py-8 pt-16 max-w-5xl">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-xl shadow-md p-6">
-                    {/* Cột trái: Hình ảnh */}
-                    <div className="flex justify-center items-center">
-                        {voucher._displayImgUrl ? (
-                            <img
-                                src={voucher._displayImgUrl}
-                                alt={voucher.VoucherName}
-                                className="w-full h-auto object-contain rounded-md mb-4" />
-                        ) : (
-                            <div className="w-full max-w-md h-72 bg-gray-100 flex items-center justify-center rounded-lg border border-gray-200">
-                                <span className="text-gray-500 text-lg">Không có hình ảnh</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Cột phải: Thông tin và nút */}
-                    <div className="flex flex-col justify-between">
-                        <div className="space-y-4">
-                            <h2 className="text-3xl font-bold text-gray-800">
-                                {voucher.VoucherName || 'Tên không xác định'}
-                            </h2>
-                            <div className="space-y-2 text-gray-700">
-                                <p>
-                                    <span className="font-semibold text-gray-800">Mã voucher:</span>{' '}
-                                    {voucher.voucherCodes && voucher.voucherCodes.length > 0 ? (
-                                        <select
-                                            value={selectedVoucherCode}
-                                            onChange={(e) => setSelectedVoucherCode(e.target.value)}
-                                            className="border border-gray-300 rounded-lg p-1 text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            {voucher.voucherCodes.map((code, index) => (
-                                                <option key={index} value={code}>
-                                                    {code}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <span className="text-gray-500">Không có mã</span>
-                                    )}
-                                </p>
-                                <p>
-                                    <span className="font-semibold text-gray-800">Số lượng còn lại:</span>{' '}
-                                    {voucher.Amount || 'Không xác định'}
-                                </p>
-                                <p>
-                                    <span className="font-semibold text-gray-800">Danh mục:</span>{' '}
-                                    {voucher.Category || 'Không xác định'}
-                                </p>
-                                <p>
-                                    <span className="font-semibold text-gray-800">Ngày hết hạn:</span>{' '}
-                                    {voucher.ExpirationDay && !isNaN(new Date(voucher.ExpirationDay).getTime())
-                                        ? new Date(voucher.ExpirationDay).toLocaleDateString('vi-VN')
-                                        : 'Không xác định'}
-                                </p>
-                                <p>
-                                    <span className="font-semibold text-gray-800">Giá trị:</span>{' '}
-                                    {voucher.Value
-                                        ? new Intl.NumberFormat('vi-VN', {
-                                            style: 'currency',
-                                            currency: 'VND',
-                                        }).format(voucher.Value)
-                                        : 'Không xác định'}
-                                </p>
-                            </div>
+        <>
+            <Helmet>
+                <title>Chi tiết voucher | Mã giảm giá, coupon hot | VoucherHub</title>
+                <meta name="description" content="Xem chi tiết mã ưu đãi hot nhất, đầy đủ thông tin, điều kiện sử dụng, giá tốt mỗi ngày tại VoucherHub." />
+                <meta name="keywords" content="chi tiết mã ưu đãi, voucher hot, giá rẻ, mua bán, coupon, thương hiệu" />
+                <meta property="og:title" content="Chi tiết voucher | VoucherHub" />
+                <meta property="og:description" content="Xem chi tiết voucher, mã giảm giá, coupon hot nhất. Đầy đủ thông tin, điều kiện sử dụng, giá tốt mỗi ngày tại VoucherHub." />
+                <meta property="og:type" content="product" />
+                <meta property="og:url" content={`https://voucherhub.id.vn/voucher-detail/${voucherId}`} />
+                <link rel="canonical" href={`https://voucherhub.id.vn/voucher-detail/${voucherId}`} />
+                {/* Schema Product */}
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "Product",
+                    "name": "Voucher chi tiết",
+                    "description": "Chi tiết voucher, mã giảm giá, coupon hot nhất tại VoucherHub.",
+                    "brand": {"@type": "Brand", "name": "VoucherHub"},
+                    "offers": {"@type": "Offer", "priceCurrency": "VND", "availability": "https://schema.org/InStock"}
+                  }
+                `}</script>
+            </Helmet>
+            <Layout>
+                <div className="container mx-auto px-4 py-8 pt-16 max-w-5xl">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-xl shadow-md p-6">
+                        {/* Cột trái: Hình ảnh */}
+                        <div className="flex justify-center items-center">
+                            {voucher._displayImgUrl ? (
+                                <img
+                                    src={voucher._displayImgUrl}
+                                    alt={voucher.VoucherName}
+                                    className="w-full h-auto object-contain rounded-md mb-4" />
+                            ) : (
+                                <div className="w-full max-w-md h-72 bg-gray-100 flex items-center justify-center rounded-lg border border-gray-200">
+                                    <span className="text-gray-500 text-lg">Không có hình ảnh</span>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Nút thao tác */}
-                        <div className="mt-6 flex flex-col md:flex-row gap-4">
-                            <button
-                                className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-sm"
-                                onClick={handleUseVoucher}
-                            >
-                                Sử dụng ngay
-                            </button>
-                            <button
-                                className="w-full bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 transition-colors font-semibold shadow-sm"
-                                onClick={() => navigate('/user-vouchers')}
-                            >
-                                Quay lại
-                            </button>
+                        {/* Cột phải: Thông tin và nút */}
+                        <div className="flex flex-col justify-between">
+                            <div className="space-y-4">
+                                <h2 className="text-3xl font-bold text-gray-800">
+                                    {voucher.VoucherName || 'Tên không xác định'}
+                                </h2>
+                                <div className="space-y-2 text-gray-700">
+                                    <p>
+                                        <span className="font-semibold text-gray-800">Mã voucher:</span>{' '}
+                                        {voucher.voucherCodes && voucher.voucherCodes.length > 0 ? (
+                                            <select
+                                                value={selectedVoucherCode}
+                                                onChange={(e) => setSelectedVoucherCode(e.target.value)}
+                                                className="border border-gray-300 rounded-lg p-1 text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                {voucher.voucherCodes.map((code, index) => (
+                                                    <option key={index} value={code}>
+                                                        {code}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <span className="text-gray-500">Không có mã</span>
+                                        )}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold text-gray-800">Số lượng còn lại:</span>{' '}
+                                        {voucher.Amount || 'Không xác định'}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold text-gray-800">Danh mục:</span>{' '}
+                                        {voucher.Category || 'Không xác định'}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold text-gray-800">Ngày hết hạn:</span>{' '}
+                                        {voucher.ExpirationDay && !isNaN(new Date(voucher.ExpirationDay).getTime())
+                                            ? new Date(voucher.ExpirationDay).toLocaleDateString('vi-VN')
+                                            : 'Không xác định'}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold text-gray-800">Giá trị:</span>{' '}
+                                        {voucher.Value
+                                            ? new Intl.NumberFormat('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND',
+                                            }).format(voucher.Value)
+                                            : 'Không xác định'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Nút thao tác */}
+                            <div className="mt-6 flex flex-col md:flex-row gap-4">
+                                <button
+                                    className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-sm"
+                                    onClick={handleUseVoucher}
+                                >
+                                    Sử dụng ngay
+                                </button>
+                                <button
+                                    className="w-full bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 transition-colors font-semibold shadow-sm"
+                                    onClick={() => navigate('/user-vouchers')}
+                                >
+                                    Quay lại
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Modal xác nhận tùy chỉnh */}
-            {showConfirmModal && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Xác nhận sử dụng voucher</h3>
-                        <p className="text-gray-700 mb-6">Bạn muốn sử dụng mã voucher này chứ: <span className="font-medium text-blue-600">{selectedVoucherCode}</span>?</p>
-                        <div className="flex justify-center gap-4">
-                            <button
-                                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-                                onClick={confirmUseVoucher}
-                            >
-                                OK
-                            </button>
-                            <button
-                                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
-                                onClick={cancelUseVoucher}
-                            >
-                                Hủy
-                            </button>
+                {/* Modal xác nhận tùy chỉnh */}
+                {showConfirmModal && (
+                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4">Xác nhận sử dụng voucher</h3>
+                            <p className="text-gray-700 mb-6">Bạn muốn sử dụng mã voucher này chứ: <span className="font-medium text-blue-600">{selectedVoucherCode}</span>?</p>
+                            <div className="flex justify-center gap-4">
+                                <button
+                                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                                    onClick={confirmUseVoucher}
+                                >
+                                    OK
+                                </button>
+                                <button
+                                    className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
+                                    onClick={cancelUseVoucher}
+                                >
+                                    Hủy
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            <ToastContainer /> {/* Thêm ToastContainer để hiển thị thông báo */}
-        </Layout>
+                <ToastContainer /> {/* Thêm ToastContainer để hiển thị thông báo */}
+            </Layout>
+        </>
     );
 };
 

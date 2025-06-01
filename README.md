@@ -179,7 +179,7 @@ Trong các giai đoạn tiếp theo, nhóm định hướng mở rộng hệ th�
 | Trưởng nhóm              | [MSSV]   | - Thiết kế API, xử lý logic giao dịch, tích hợp MySQL<br>- Quản lý phân công công việc |
 | Nguyễn Trần Minh Khôi    | 23520780 | - Xây dựng cấu trúc MVC cho BackEnd<br>- Tạo các bảng quảng cáo ở trang LandingPage, tạo Navbar cơ bản<br>- Tạo trang đăng bài, danh sách các Voucher, tạo bài đăng<br>- Làm các ô bài đăng, phân trang, chia các bài đăng theo Category ở trang Cửa hàng<br>- Call API Momo để cho người dùng nạp tiền vào hệ thống và thanh toán bằng Momo<br>- Làm trang Profile và tính năng chỉnh sửa hồ sơ<br>- Làm tính năng thêm Voucher (Add Voucher) bằng form và bằng Excel <br> - Làm tính năng gợi ý các bài đăng dựa trên Category và Transaction History và call API OpenAI <br> - Làm các tính năng của Admin như quản lý bài đăng, quản lý người dùng, quản lý giao dịch,... |
 | Phạm Tấn Gia Quốc        | 23521308 | - Thiết kế và tối ưu CSDL MySQL<br>- Tạo sơ đồ ERD và xử lý truy vấn SQL |
-| [Tên thành viên 4]       | [MSSV]   | - Viết test case<br>- Kiểm tra tính năng như đăng nhập, mua bán, hoàn tiền |
+| Võ Minh Chiến       | 23520184   | - Tính năng đăng nhập, đăng kí, quên mật khẩu<br>- Tính năng thanh toán với số dư tài khoản<br>- Tính năng thông báo và quản lý thông báo<br>- Trang chi tiết voucher và sử dụng mã voucher<br>- Trang chi tiết bài đăng và trang của người bán <br>- Thiết kế layout cho trang web (navbar, sidebar, footer)<br>- Mục flashsale<br>  |
 
 
 

@@ -66,8 +66,8 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi response về BackEnd.
 - BackEnd tạo dựa vào ID hoặc UserId được database gửi về để tạo SessionId
 - FrontEnd dựa vào SessionId này để tạo Cookies
-![Luồng Đăng nhập](./docs/flow/ThreadLogin.png)
-![Luồng Đăng ký](./docs/flow/ThreadSignUp.jpg)
+![Luồng Đăng nhập](./docs/flows/ThreadLogin.png)
+![Luồng Đăng ký](./docs/flows/ThreadSignUp.jpg)
 
 ### 2. Luồng đăng Voucher
 - Client gửi các thông tin như Tên Voucher, Loại Voucher, Ngày Hết hạn, Mã Voucher về cho Server
@@ -76,7 +76,7 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi Response
 - Server gửi Id xác nhận thành công
 - Client cập nhật lại trang Voucher
-![Luồng Thêm Voucher](./docs/flow/ThreadAddVoucher.jpg)
+![Luồng Thêm Voucher](./docs/flows/ThreadAddVoucher.jpg)
 
 ### 3. Luồng mua Voucher
  Luồng thanh toán bằng số dư tài khoản
@@ -103,7 +103,7 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
   - Database gửi Response với Message và LastTransactionId hoặc error
   - Server gửi HTTP 204 No Content về MoMo để xác nhận đã xử lý IPN.
   - Cập nhật trạng thái trang (thông báo thành công/lỗi) và chuyển hướng người dùng dựa trên phản hồi redirect hoặc kết quả IPN.
-![Luồng Thêm Voucher](./docs/flow/ThreadBuyVoucher.png)
+![Luồng Thêm Voucher](./docs/flows/ThreadBuyVoucher.png)
 
 ### 4. Luồng đăng bài
 ----- Quốc -------------
@@ -128,7 +128,7 @@ Luồng thông báo (notification)
   - Sau khi nhận response thành công, frontend cập nhật state và render danh sách notification Notification.jsx:28-33 . Mỗi notification hiển thị title, content và timestamp.
 ### 5. Luồng yêu cầu hoàn tiền
 -------- Khôi Lê ----------
-![Luồng Yêu cầu hoàn tiền](./docs/flow/ThreadRequestRefund.jpg)
+![Luồng Yêu cầu hoàn tiền](./docs/flows/ThreadRequestRefund.jpg)
 
 
 

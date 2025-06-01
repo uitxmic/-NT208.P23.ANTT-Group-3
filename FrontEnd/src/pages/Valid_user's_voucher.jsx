@@ -10,20 +10,14 @@ const UserVoucherList = () => {
 
   // Hàm lấy danh sách voucher từ API
   const fetchVouchers = async () => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      navigate('/login'); // Chuyển hướng nếu chưa đăng nhập
-      return;
-    }
-
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_BASE_URL}/voucher/getValidUserVoucher`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {

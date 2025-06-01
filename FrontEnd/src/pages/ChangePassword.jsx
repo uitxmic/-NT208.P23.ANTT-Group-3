@@ -47,21 +47,15 @@ const ChangePassword = () => {
         }
 
         try {
-            const token = localStorage.getItem('access_token');
-
             const hashedOldPassword = await hashPassword(OldPassword);
 
-            if (!token) {
-                toast.error('Vui lòng đăng nhập để thay đổi mật khẩu.');
-                return;
-            }
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${API_BASE_URL}/users/changePassword`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
+                credentials: 'include',
                 body: JSON.stringify({ OldPassword: OldPassword, NewPassword: NewPassword }),
             });
 
@@ -70,7 +64,6 @@ const ChangePassword = () => {
             }
 
             const data = await response.json();
-            console.log(data.Message === 'Change Password Successfully');
             if (data) {
                 setSuccess('Mật khẩu đã được thay đổi thành công.');
                 setTimeout(() => {

@@ -8,20 +8,11 @@ const UserBalance = ({ setBalance }) => {
 
   useEffect(() => {
     const fetchBalance = async () => {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        setError('');
-        return;
-      }
-
       try {
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_BASE_URL}/users/userbalance`, {
           method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+          credentials: 'include', // Use session-based authentication
         });
 
         if (!response.ok) {

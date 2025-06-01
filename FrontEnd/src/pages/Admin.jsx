@@ -38,7 +38,6 @@ const Admin = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [language, setLanguage] = useState('vi');
     const [sidebarHeight, setSidebarHeight] = useState('calc(100vh - 64px)'); // Chiều cao mặc định
-    const accessToken = localStorage.getItem('access_token');
 
     const [chartTimeScale, setChartTimeScale] = useState('day'); // Thay đổi theo nhu cầu (day, week, month)
     const [chartDisplayType, setChartDisplayType] = useState('bar'); // Thay đổi theo nhu cầu (line, bar)
@@ -55,24 +54,31 @@ const Admin = () => {
     });
 
     useEffect(() => {
-        console.log('Access Token:', accessToken);
-        const userRoleId = JSON.parse(atob(accessToken.split('.')[1])).userRoleId;
-        if (!userRoleId || userRoleId !== 1) {
-            alert('Bạn không có quyền truy cập trang này!');
-            navigate('/login');
-        } else {
-            setUser(userRoleId);
-            // Dữ liệu giả lập cho stats
+        const fetchUserRoleAndData = async () => {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+            // Check session and role
+            const roleResponse = await fetch(`${API_BASE_URL}/session/userRoleId`, {
+                method: 'GET',
+                credentials: 'include',
+            });
 
-            const fetchAndProcessTransactionData = async () => {
+            let userRoleId = null;
+            if (roleResponse.ok) {
+                const data = await roleResponse.json();
+                userRoleId = Number(data.UserRoleId);
+            } else {
+                console.error('Failed to fetch user role');
+            }
+            if (!userRoleId || userRoleId !== 1) {
+                alert('Bạn không có quyền truy cập trang này!');
+                navigate('/login');
+            } else {
+                setUser(userRoleId);
+                // Fetch admin stats and chart data
                 try {
-                    // Giả lập dữ liệu giao dịch
-                    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
                     const response = await fetch(`${API_BASE_URL}/trade/getTransactionForAdmin`, {
                         method: 'GET',
-                        headers: {
-                            Authorization: `${accessToken}`,
-                        },
+                        credentials: 'include'
                     });
 
                     if (!response.ok) {
@@ -89,9 +95,9 @@ const Admin = () => {
                             if (chartTimeScale === 'day') {
                                 key = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
                             } else if (chartTimeScale === 'month') {
-                                key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+                                key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
                             } else if (chartTimeScale === 'year') {
-                                key = dateObj.getFullYear().toString(); // YYYY
+                                key = dateObj.getFullYear().toString();
                             }
                             acc[key] = (acc[key] || 0) + 1;
                             return acc;
@@ -123,14 +129,13 @@ const Admin = () => {
                                 backgroundColor: chartDisplayType === 'bar' ? 'rgba(54, 162, 235, 0.5)' : 'rgba(255, 99, 132, 0.2)',
                                 borderColor: chartDisplayType === 'bar' ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)',
                                 borderWidth: 1,
-                                fill: chartDisplayType === 'line', // Fill for line chart
+                                fill: chartDisplayType === 'line',
                             }]
                         });
 
-                        setStats({ transactions: data.length, users: data[0].TotalUser }); // Giả lập số lượng người dùng bằng số lượng giao dịch
+                        setStats({ transactions: data.length, users: data[0].TotalUser });
                     }
-                }
-                catch (error) {
+                } catch (error) {
                     console.error('Error fetching transaction data:', error);
                     setDynamicChartData({
                         labels: [],
@@ -143,20 +148,20 @@ const Admin = () => {
                         }]
                     });
                 }
-            };
-            fetchAndProcessTransactionData();
-        }
-    }, [navigate, accessToken, chartTimeScale, chartDisplayType]);
-
-
-
+            }
+        };
+        fetchUserRoleAndData();
+    }, [navigate, chartTimeScale, chartDisplayType]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+        fetch(`${API_BASE_URL}/session`, {
+        method: 'DELETE',
+        credentials: 'include',
+        }).then(() => {
         navigate('/login');
+        });
     };
-
 
     // useEffect này dùng để khởi tạo và cập nhật biểu đồ
     useEffect(() => {

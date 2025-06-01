@@ -5,10 +5,12 @@ const tradeRouter = require('./trade');
 const notificationRouter = require('./notification');
 const googlecloud = require('./googlecloud');
 const momoPayment = require('./payment');
+const authMiddleware = require('../middlewares/authMiddleware');
 const searchRouter = require('./search');
 const newsRouter = require('./news');
 const cartRouter = require('./cart');
 const ratingRouter = require('./rating');
+const sessionRoutes = require('./session');
 
 function routes(app) {
     app.get('/test', (req, res) => {
@@ -37,6 +39,8 @@ function routes(app) {
     app.use('/cart', cartRouter);
 
     app.use('/rating', ratingRouter);
+
+    app.use('/session', sessionRoutes);
 
 }
 module.exports = routes;

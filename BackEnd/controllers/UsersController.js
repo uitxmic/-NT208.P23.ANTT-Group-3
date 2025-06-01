@@ -1,29 +1,17 @@
-const mysql = require('mysql2/promise');
+const { initConnection } = require('../middlewares/dbConnection');
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 class UsersController {
     constructor() {
-        this.initConnection();
         this.transporter = null;
         this.initMailer();
+        this.init();
     }
 
-    async initConnection() {
-        try {
-            this.connection = await mysql.createConnection({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-            console.log('Connected to the database (async)');
-        } catch (err) {
-            console.error('Database connection error:', err);
-        }
+    async init() {
+        this.connection = await initConnection();
     }
 
     initMailer() {
@@ -56,6 +44,7 @@ class UsersController {
     // [POST] /users/forgot-password
     ForgotPassword = async (req, res) => {
         const { email } = req.body;
+        console.log(`Received forgot password request for email: ${email}`);
 
         if (!email) {
             return res.status(400).json({ message: 'Email là bắt buộc.' });
@@ -218,23 +207,15 @@ class UsersController {
 
     // [Get] /users/getUsers
     GetAllUser = async (req, res) => {
+        if (!req.session.user || req.session.user.UserRoleId !== 1) {
+            return res.status(403).json({ message: "Forbidden: You do not have permission to access this resource" });
+        }
+
         try {
             const { sortBy = 'UserId', sortOrder = 'DESC', searchTerm = '' } = req.query;
-            const token = req.headers.authorization;
-            if (!token) {
-                return res.status(401).json({ message: "Unauthorized: No token provided" });
-            }
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userRoleId = decoded.userRoleId;
-            if (userRoleId != 1) {
-                return res.status(403).json({ message: "Forbidden: You do not have permission to access this resource" });
-            }
-
             const [results] = await this.connection.query('CALL fn_get_all_user_for_admin(?, ?, ?)', [sortBy, sortOrder, searchTerm]);
-            res.json(results[0]); // Chỉ trả về kết quả SELECT
-        }
-        catch (error) {
+            res.json(results[0]);
+        } catch (error) {
             console.error('Query error:', error);
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
@@ -243,18 +224,9 @@ class UsersController {
     // /users/getUserById
     GetUserById = async (req, res) => {
         let userId;
-        let token = req.headers.authorization;
-
-        // Kiểm tra token
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No session found" });
         }
-
-        // Xử lý Bearer token
-        if (token.startsWith('Bearer ')) {
-            token = token.slice(7, token.length);
-        }
-
         try {
             // Trường hợp 1: ID được truyền qua URL params (xem profile người khác)
             if (req.params && req.params.id) {
@@ -263,11 +235,9 @@ class UsersController {
                     return res.status(400).json({ error: 'Invalid userId, must be a number' });
                 }
             }
-            // Trường hợp 2: Dùng ID từ token (xem profile bản thân)
+            // Trường hợp 2: Dùng ID từ session (xem profile bản thân)
             else {
-                const secretKey = process.env.JWT_SECRET;
-                const decoded = jwt.verify(token, secretKey);
-                userId = decoded.userId;
+                userId = req.session.user.UserId;
             }
 
             // Gọi stored procedure để lấy thông tin người dùng
@@ -282,9 +252,6 @@ class UsersController {
         }
         catch (error) {
             console.error('Error in GetUserById:', error);
-            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                return res.status(401).json({ message: "Invalid or expired token", details: error.message });
-            }
             res.status(500).json({ error: 'Internal server error', details: error.message });
         }
     }
@@ -329,16 +296,27 @@ class UsersController {
 
         try {
             const [results] = await this.connection.query('CALL fn_login(?, ?)', [Username, hashedPassword]);
-            if (results[0][0] && results[0][0].Message == "Login Successful") {
-                const access_token = jwt.sign({
-                    userId: results[0][0].UserId,
-                    username: Username,
-                    email: results[0][0].Email,
-                    userRoleId: results[0][0].UserRoleId,
-                },
-                    process.env.JWT_SECRET,
-                    { expiresIn: process.env.JWT_EXPIRE });
-                return res.json({ state: "success", access_token: access_token });
+            if (results[0][0] && results[0][0].Message == "Login Successful"){
+
+                console.log("Login successful");
+
+                // Lưu thông tin người dùng vào session
+                req.session.user = {
+                    UserId: results[0][0].UserId || '',
+                    Username: Username || '',
+                    Email: results[0][0].Email || '',
+                    UserRoleId: results[0][0].UserRoleId || ''
+                };
+
+                res.cookie('session_id', req.sessionID, {
+                    maxAge: 1000 * 60 * 60, // 1 hour
+                    httpOnly: true, // Đảm bảo cookie chỉ truy cập được từ server
+                    sameSite: 'Lax', // Cho phép cookie được gửi trong các yêu cầu cùng site
+                });
+                console.log("Session ID:", req.sessionID);
+                console.log("Session user:", req.session.user);
+
+                res.send("Đăng nhập thành công!");
             }
             else {
                 return res.status(401).json({ error: 'Username or Password is incorrect' });
@@ -352,28 +330,26 @@ class UsersController {
     // [POST] /users/changePassword
     ChangePassword = async (req, res) => {
         const { OldPassword, NewPassword } = req.body;
-        const token = req.headers['authorization']?.split(" ")[1];
 
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized' });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ error: 'Unauthorized: No active session' });
         }
+
         if (!OldPassword || !NewPassword) {
-            return res.status(400).json({ error: 'UserId, OldPassword, and NewPassword are required in request body' });
+            return res.status(400).json({ error: 'OldPassword and NewPassword are required in request body' });
         }
-        var hashedOldPassword = this.hashPassword(OldPassword);
-        var hashedNewPassword = this.hashPassword(NewPassword);
+
+        const hashedOldPassword = this.hashPassword(OldPassword);
+        const hashedNewPassword = this.hashPassword(NewPassword);
 
         try {
-            var secretKey = process.env.JWT_SECRET;
-            var decode = jwt.verify(token, secretKey);
-            var Username = decode.username;
+            const Username = req.session.user.Username;
 
             const [results] = await this.connection.query('CALL fn_change_password(?, ?, ?)', [Username, hashedOldPassword, hashedNewPassword]);
             if (results[0][0] && results[0][0].Message == "Change Password Successfully") {
                 return res.json({ 'Message': results[0][0].Message });
-            }
-            else {
-                return res.status(401).json({ error: 'UserId or OldPassword is incorrect' });
+            } else {
+                return res.status(401).json({ error: 'OldPassword is incorrect' });
             }
         } catch (error) {
             console.error('Error changing password:', error);
@@ -383,16 +359,12 @@ class UsersController {
 
     // [GET] /users/getUserBalance
     GetUserBalance = async (req, res) => {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized: No active session" });
         }
 
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
+            const userId = req.session.user.UserId;
 
             const [result] = await this.connection.execute("CALL fn_get_user_balance(?)", [userId]);
 
@@ -410,17 +382,12 @@ class UsersController {
     // [PATCH] /users/updateUser
     UpdateUser = async (req, res) => {
         const { Fullname, Email, PhoneNumber } = req.body;
-        const token = req.headers.authorization;
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({ message: "Unauthorized : No active session" });
         }
-
+        const userId = req.session.user.UserId;
+                
         try {
-            const secretKey = process.env.JWT_SECRET;
-            const decoded = jwt.verify(token, secretKey);
-            const userId = decoded.userId;
-
             const [results] = await this.connection.query('CALL fn_update_user(?, ?, ?, ?)', [userId, Fullname, Email, PhoneNumber]);
             res.json(results[0]);
         } catch (error) {
@@ -428,7 +395,29 @@ class UsersController {
             res.status(500).json({ error: 'Database query error', details: error.message });
         }
     }
+
+    // [GET] /users/session
+    GetSession = async (req, res) =>
+        {
+            const sessionId = req.cookies['session_id'];
+    
+            if (!sessionId) {
+                return res.status(400).json({ error: 'Session ID is required' });
+            }
+    
+            this.redisClient.get(`sess:${sessionId}`, (err, sessionData) => {
+                if (err) {
+                    console.error('Error fetching session:', err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                if (sessionData) {
+                    const session = JSON.parse(sessionData);
+                    res.json({ session });
+                } else {
+                    res.status(404).json({ error: 'Session not found' });
+                }
+            });
+        }
 }
 
 module.exports = new UsersController;
-

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Deposit from '../components/Deposit';
-import { jwtDecode } from 'jwt-decode';
 import Layout from '../components/Layout';
 
 const Profile = () => {
@@ -15,21 +14,10 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('access_token');
-        console.log('Token:', token);
-        if (!token) {
-          setError('Vui lòng đăng nhập để tiếp tục.');
-          setTimeout(() => navigate('/login'), 2000);
-          return;
-        }
-
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_BASE_URL}/users/getUserById`, {
           method: 'GET',
-          headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'application/json',
-          },
+          credentials: 'include', // Use session-based authentication
         });
 
         if (!response.ok) {
@@ -53,6 +41,7 @@ const Profile = () => {
         console.error('Lỗi khi lấy thông tin hồ sơ:', err);
         setError(err.message || 'Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.');
         setLoading(false);
+        setTimeout(() => navigate('/login'), 2000);
       }
     };
 

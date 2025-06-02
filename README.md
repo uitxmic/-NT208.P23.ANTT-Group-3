@@ -272,15 +272,7 @@ Trong các giai đoạn tiếp theo, nhóm định hướng mở rộng hệ th�
 
 | Thành viên                | MSSV     | Công việc cụ thể |
 |---------------------------|----------|------------------|
-| Lê Đăng Khoi              | 23520766   | - Cấu hình front end sử dụng reactjs và tailwind<br>
-- Cấu hình session để lưu phiên làm việc của user<br>
-- Cấu hình lại kết nối db<br>
-- Trang giỏ hàng<br>
-- Chức năng đánh giá post và người bán<br>
-- Chức năng redirect cho người dùng chưa đăng nhập<br>
-- Tạo, quản lí bộ dữ liệu voucher và post<br>
-- SEO<br>
-- Tái cấu trúc final project|
+| Lê Đăng Khoi              | 23520766   | - Cấu hình front end sử dụng reactjs và tailwind<br>- Cấu hình session để lưu phiên làm việc của user<br>- Cấu hình lại kết nối db<br>- Trang giỏ hàng<br>- Chức năng đánh giá post và người bán<br>- Chức năng redirect cho người dùng chưa đăng nhập<br>- Tạo, quản lí bộ dữ liệu voucher và post<br>- SEO<br>- Tái cấu trúc final project|
 | Nguyễn Trần Minh Khôi    | 23520780 | - Xây dựng cấu trúc MVC cho BackEnd<br>- Tạo các bảng quảng cáo ở trang LandingPage, tạo Navbar cơ bản<br>- Tạo trang đăng bài, danh sách các Voucher, tạo bài đăng<br>- Làm các ô bài đăng, phân trang, chia các bài đăng theo Category ở trang Cửa hàng<br>- Call API Momo để cho người dùng nạp tiền vào hệ thống và thanh toán bằng Momo<br>- Làm trang Profile và tính năng chỉnh sửa hồ sơ<br>- Làm tính năng thêm Voucher (Add Voucher) bằng form và bằng Excel <br> - Làm tính năng gợi ý các bài đăng dựa trên Category và Transaction History và call API OpenAI <br> - Làm các tính năng của Admin như quản lý bài đăng, quản lý người dùng, quản lý giao dịch,... |
 | Phạm Tấn Gia Quốc        | 23521308 | - Thiết kế và tối ưu CSDL MySQL<br>- Tạo sơ đồ ERD và xử lý truy vấn SQL |
 | Võ Minh Chiến       | 23520184   | - Tính năng đăng nhập, đăng kí, quên mật khẩu<br>- Tính năng thanh toán với số dư tài khoản<br>- Tính năng thông báo và quản lý thông báo<br>- Trang chi tiết voucher và sử dụng mã voucher<br>- Trang chi tiết bài đăng và trang của người bán <br>- Thiết kế layout cho trang web (navbar, sidebar, footer)<br>- Mục flashsale<br>  |

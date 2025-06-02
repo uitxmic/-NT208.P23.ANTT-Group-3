@@ -5,26 +5,20 @@ DROP PROCEDURE IF EXISTS fn_search_posts_with_filters;$$
 CREATE PROCEDURE fn_search_posts_with_filters(
     IN search_term VARCHAR(100),
     IN category VARCHAR(100),
-    IN min_price INT,
-    IN max_price INT,
     IN sort_by VARCHAR(20),
     IN start_date date,
     IN end_date date
 )
 BEGIN
-    SELECT 
+    SELECT DISTINCT
         p.*,
         u.Username
     FROM Post p
     JOIN User u ON p.UserId = u.UserId
-    JOIN Voucher v on v.PostId = p.PostId
+    JOIN Voucher v on v.VoucherId = p.VoucherId
     WHERE 
         (p.Postname LIKE CONCAT('%', search_term, '%') OR p.Content LIKE CONCAT('%', search_term, '%') OR v.VoucherName LIKE CONCAT('%', search_term, '%'))
-        -- AND (p.Interactions >= min_interactions OR min_interactions IS NULL)
-        AND (v.Category = category OR category IS NULL)
-        AND (p.Price >= min_price OR min_price IS NULL)
-        AND (p.Price <= max_price OR max_price IS NULL)
-        AND (DATEDIFF(CURDATE(), p.Date) BETWEEN min_days_posted AND max_days_posted OR min_days_posted IS NULL OR max_days_posted IS NULL)
+        AND (v.Category = category OR category = '')
         AND (start_date is null or start_date <= p.Date)
         AND (end_date is null or end_date >= p.Date) 
         AND p.Expire >= CURDATE()

@@ -86,7 +86,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
                   <option value="Ẩm thực">Ẩm thực</option>
                 </select>
               </div>
-              <div className="flex flex-col">
+              {/* <div className="flex flex-col">
                 <label className="font-semibold mb-1 text-sm">Giá tối thiểu:</label>
                 <input
                   type="number"
@@ -107,21 +107,21 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
                   onChange={handleChange}
                   className="border p-2 rounded focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
+              </div> */}
               <div className="flex flex-col">
                 <label className="font-semibold mb-1 text-sm">Ngày đăng:</label>
                 <div className="flex gap-2">
                   <input
                     type="date"
                     name="start_day"
-                    value={fields.start_day || null}
+                    value={fields.start_day || ""}
                     onChange={handleChange}
                     className="border p-2 rounded w-1/2 focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="date"
                     name="end_day"
-                    value={fields.end_day || null}
+                    value={fields.end_day || ""}
                     onChange={handleChange}
                     className="border p-2 rounded w-1/2 focus:ring-2 focus:ring-blue-500"
                   />
@@ -160,17 +160,7 @@ const SearchFilterModal = ({ onClose, searchTerm }) => {
                   className="border p-2 rounded focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <div className="flex flex-col">
-                <label className="font-semibold mb-1 text-sm">Đã bán tối thiểu:</label>
-                <input
-                  type="number"
-                  name="minSold"
-                  placeholder="Đã bán tối thiểu"
-                  value={fields.minSold || ""}
-                  onChange={handleChange}
-                  className="border p-2 rounded focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+
               <div className="flex flex-col">
                 <label className="font-semibold mb-1 text-sm">Sắp xếp theo:</label>
                 <select
@@ -219,10 +209,7 @@ export const SearchAPI = {
   searchUsers: async (params) => {
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
     const queryParams = new URLSearchParams(params).toString();
-    const endpoint = params.minFeedback || params.minSold || params.sortBy
-      ? "search/users/filters"
-      : "search/users";
-    const response = await fetch(`${API_BASE_URL}/${endpoint}?${queryParams}`);
+    const response = await fetch(`${API_BASE_URL}/search/users?${queryParams}`);
     if (!response.ok) throw new Error("Error searching users");
     return await response.json();
   },

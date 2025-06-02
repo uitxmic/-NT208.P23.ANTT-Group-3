@@ -22,7 +22,6 @@ BEGIN
         OR Fullname LIKE CONCAT('%', search_term, '%') 
         OR Email LIKE CONCAT('%', search_term, '%'))
         AND (AvgRate >= min_feedback OR min_feedback IS NULL)
-        AND (SoldAmount >= min_sold OR min_sold IS NULL)
     ORDER BY 
         CASE 
             WHEN sort_by = 'feedback_desc' THEN -AvgRate

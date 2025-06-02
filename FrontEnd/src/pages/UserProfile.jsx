@@ -1,6 +1,7 @@
 // src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 import Deposit from '../components/Deposit';
 import Layout from '../components/Layout';
 
@@ -73,63 +74,85 @@ const Profile = () => {
   }
 
   return (
-    <Layout>
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8 mt-20">
-        <div className="flex items-center">
-          <img
-            src={user?.Avatar || 'https://www.tenforums.com/attachments/user-accounts-family-safety/322690d1615743307-user-account-image-log-user.png'} // Sửa thành user.Avatar
-            alt="Avatar"
-            className="w-24 h-24 rounded-full mr-6"
-          />
-          <div className="grid grid-cols-1 gap-2">
-            <h2 className="text-2xl font-bold text-gray-800">{user?.Fullname || 'Unknown User'}</h2>
-            <p className="text-gray-600">Email: {user?.Email}</p>
-            <p className="text-gray-600">
-              Số dư:{' '}
-              {user?.AccountBalance != null
-                ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
-                  user.AccountBalance * 1000
-                )
-                : '0 ₫'}
-            </p>
-            <p className="text-gray-600">Số điện thoại: {user?.PhoneNumber || 'Chưa cập nhật'}</p>
-            <p className="text-gray-600">Xếp hạng trung bình: {user?.AvgRate || '0.0'}</p>
-            <p className="text-gray-600">
-              Trạng thái xác thực: {user?.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
-            </p>
-            <div className="flex space-x-4 mt-4">
+    <>
+      <Helmet>
+        <title>Hồ sơ cá nhân | Quản lý voucher, mã giảm giá, coupon | VoucherHub</title>
+        <meta name="description" content="Trang hồ sơ cá nhân, quản lý thông tin, mã ưu đãi đã mua, đã bán tại VoucherHub." />
+        <meta name="keywords" content="hồ sơ cá nhân, quản lý tài khoản, mã ưu đãi, voucherhub" />
+        <meta property="og:title" content="Hồ sơ cá nhân | Quản lý voucher, mã giảm giá, coupon | VoucherHub" />
+        <meta property="og:description" content="Trang hồ sơ cá nhân, quản lý voucher, mã giảm giá, coupon đã mua, đã bán, thông tin tài khoản tại VoucherHub." />
+        <meta property="og:type" content="profile" />
+        <meta property="og:url" content="https://voucherhub.id.vn/profile" />
+        <link rel="canonical" href="https://voucherhub.id.vn/profile" />
+        {/* Schema ProfilePage */}
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "ProfilePage",
+            "name": "Hồ sơ cá nhân",
+            "description": "Trang hồ sơ cá nhân, quản lý voucher, mã giảm giá, coupon tại VoucherHub.",
+            "url": "https://voucherhub.id.vn/profile"
+          }
+        `}</script>
+      </Helmet>
+      <Layout>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 mt-20">
+          <div className="flex items-center">
+            <img
+              src={user?.Avatar || 'https://www.tenforums.com/attachments/user-accounts-family-safety/322690d1615743307-user-account-image-log-user.png'} // Sửa thành user.Avatar
+              alt="Avatar"
+              className="w-24 h-24 rounded-full mr-6"
+            />
+            <div className="grid grid-cols-1 gap-2">
+              <h2 className="text-2xl font-bold text-gray-800">{user?.Fullname || 'Unknown User'}</h2>
+              <p className="text-gray-600">Email: {user?.Email}</p>
+              <p className="text-gray-600">
+                Số dư:{' '}
+                {user?.AccountBalance != null
+                  ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                    user.AccountBalance * 1000
+                  )
+                  : '0 ₫'}
+              </p>
+              <p className="text-gray-600">Số điện thoại: {user?.PhoneNumber || 'Chưa cập nhật'}</p>
+              <p className="text-gray-600">Xếp hạng trung bình: {user?.AvgRate || '0.0'}</p>
+              <p className="text-gray-600">
+                Trạng thái xác thực: {user?.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
+              </p>
+              <div className="flex space-x-4 mt-4">
 
-              <button className="mt-4 bg-gradient-to-r from-green-400 to-blue-500 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-gray-200 transition duration-200"
-                onClick={() => navigate('/update-profile')}
-              >
-                Chỉnh sửa hồ sơ
-              </button>
-              <button
-                className="mt-4 bg-gradient-to-r from-pink-400 to-yellow-300 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-white transition duration-200"
-                onClick={() => navigate('/deposit')}
-              >
-                Nạp tiền vào hệ thống
-              </button>
+                <button className="mt-4 bg-gradient-to-r from-green-400 to-blue-500 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-gray-200 transition duration-200"
+                  onClick={() => navigate('/update-profile')}
+                >
+                  Chỉnh sửa hồ sơ
+                </button>
+                <button
+                  className="mt-4 bg-gradient-to-r from-pink-400 to-yellow-300 py-2 px-4 w-60 rounded-md hover:bg-blue-700 text-white transition duration-200"
+                  onClick={() => navigate('/deposit')}
+                >
+                  Nạp tiền vào hệ thống
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Bài đăng của bạn</h3>
-        {posts.length > 0 ? (
-          <ul>
-            {posts.map((post) => (
-              <li key={post.id} className="mb-4">
-                <h4 className="text-lg font-semibold text-blue-600">{post.title}</h4>
-                <p className="text-gray-700">{post.content}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-600">Bạn chưa có bài đăng nào.</p>
-        )}
-      </div>
-    </Layout>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Bài đăng của bạn</h3>
+          {posts.length > 0 ? (
+            <ul>
+              {posts.map((post) => (
+                <li key={post.id} className="mb-4">
+                  <h4 className="text-lg font-semibold text-blue-600">{post.title}</h4>
+                  <p className="text-gray-700">{post.content}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-600">Bạn chưa có bài đăng nào.</p>
+          )}
+        </div>
+      </Layout>
+    </>
   );
 };
 

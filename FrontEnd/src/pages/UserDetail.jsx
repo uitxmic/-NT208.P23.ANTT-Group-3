@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 import Layout from '../components/Layout';
 
 const UserDetail = () => {
@@ -87,67 +88,89 @@ const UserDetail = () => {
     }
 
     return (
-        <Layout>
-            <div className="container mx-auto px-4 py-8 md:px-6 lg:py-12 max-w-5xl">
-                <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl shadow-lg p-8 mb-10">
-                    <div className="flex items-center justify-center mb-6">
-                        <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <span className="text-3xl font-bold text-indigo-600">
-                                {user?.Fullname?.[0]?.toUpperCase() || 'U'}
-                            </span>
+        <>
+            <Helmet>
+                <title>Chi tiết người dùng | Hồ sơ, voucher, mã giảm giá | VoucherHub</title>
+                <meta name="description" content="Xem chi tiết hồ sơ người dùng, các mã ưu đãi đã đăng bán, đã mua trên VoucherHub." />
+                <meta name="keywords" content="chi tiết người dùng, hồ sơ, mã ưu đãi, voucherhub" />
+                <meta property="og:title" content="Chi tiết người dùng | Hồ sơ, voucher, mã giảm giá | VoucherHub" />
+                <meta property="og:description" content="Xem chi tiết hồ sơ người dùng, các voucher, mã giảm giá, coupon đã đăng bán, đã mua trên VoucherHub." />
+                <meta property="og:type" content="profile" />
+                <meta property="og:url" content={`https://voucherhub.id.vn/profile/${id}`} />
+                <link rel="canonical" href={`https://voucherhub.id.vn/profile/${id}`} />
+                {/* Schema ProfilePage */}
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "ProfilePage",
+                    "name": "Chi tiết người dùng",
+                    "description": "Chi tiết hồ sơ người dùng, các voucher, mã giảm giá, coupon đã đăng bán, đã mua trên VoucherHub.",
+                    "url": "https://voucherhub.id.vn/profile/${id}"
+                  }
+                `}</script>
+            </Helmet>
+            <Layout>
+                <div className="container mx-auto px-4 py-8 md:px-6 lg:py-12 max-w-5xl">
+                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl shadow-lg p-8 mb-10">
+                        <div className="flex items-center justify-center mb-6">
+                            <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <span className="text-3xl font-bold text-indigo-600">
+                                    {user?.Fullname?.[0]?.toUpperCase() || 'U'}
+                                </span>
+                            </div>
+                        </div>
+                        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Hồ sơ người dùng</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                                <span className="text-gray-600 font-medium min-w-[120px]">Họ tên:</span>
+                                <span className="text-gray-800">{user.Fullname || 'Chưa cập nhật'}</span>
+                            </div>
+                            <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                                <span className="text-gray-600 font-medium min-w-[120px]">Email:</span>
+                                <span className="text-gray-800">{user.Email}</span>
+                            </div>
+                            <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                                <span className="text-gray-600 font-medium min-w-[120px]">Số điện thoại:</span>
+                                <span className="text-gray-800">{user.PhoneNumber || 'Chưa cập nhật'}</span>
+                            </div>
+                            <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                                <span className="text-gray-600 font-medium min-w-[120px]">Xếp hạng:</span>
+                                <span className="text-gray-800">{user.AvgRate ? user.AvgRate : 'Chưa có'}</span>
+                            </div>
+                            <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
+                                <span className="text-gray-600 font-medium min-w-[120px]">Xác thực:</span>
+                                <span className={`font-medium ${user.IsVerified ? 'text-green-600' : 'text-red-600'}`}>
+                                    {user.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Hồ sơ người dùng</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                            <span className="text-gray-600 font-medium min-w-[120px]">Họ tên:</span>
-                            <span className="text-gray-800">{user.Fullname || 'Chưa cập nhật'}</span>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                            <span className="text-gray-600 font-medium min-w-[120px]">Email:</span>
-                            <span className="text-gray-800">{user.Email}</span>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                            <span className="text-gray-600 font-medium min-w-[120px]">Số điện thoại:</span>
-                            <span className="text-gray-800">{user.PhoneNumber || 'Chưa cập nhật'}</span>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                            <span className="text-gray-600 font-medium min-w-[120px]">Xếp hạng:</span>
-                            <span className="text-gray-800">{user.AvgRate ? user.AvgRate : 'Chưa có'}</span>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-                            <span className="text-gray-600 font-medium min-w-[120px]">Xác thực:</span>
-                            <span className={`font-medium ${user.IsVerified ? 'text-green-600' : 'text-red-600'}`}>
-                                {user.IsVerified ? 'Đã xác thực' : 'Chưa xác thực'}
-                            </span>
-                        </div>
-                    </div>
-                </div>
 
-                <div className="bg-white rounded-2xl shadow-lg p-8">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng voucher</h3>
-                    {vouchers.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {vouchers.map((voucher) => (
-                                <div
-                                    key={voucher.VoucherId}
-                                    className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-xl transition-all duration-300"
-                                >
-                                    <h4 className="text-lg font-semibold text-indigo-600 mb-2">{voucher.VoucherName}</h4>
-                                    <p className="text-gray-700 mb-1">Nhãn: {voucher.Label}</p>
-                                    <p className="text-gray-600 mb-1">Giá: {voucher.Price ? `${voucher.Price.toLocaleString()} đ` : 'N/A'}</p>
-                                    <p className={`text-sm font-medium ${new Date(voucher.Expire) < new Date() ? 'text-red-600' : 'text-green-600'}`}>
-                                        Hết hạn: {new Date(voucher.Expire).toLocaleDateString()}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-center text-gray-500 py-6">Người dùng chưa có bài đăng voucher nào.</p>
-                    )}
+                    <div className="bg-white rounded-2xl shadow-lg p-8">
+                        <h3 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng voucher</h3>
+                        {vouchers.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {vouchers.map((voucher) => (
+                                    <div
+                                        key={voucher.VoucherId}
+                                        className="border border-gray-200 rounded-lg p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-xl transition-all duration-300"
+                                    >
+                                        <h4 className="text-lg font-semibold text-indigo-600 mb-2">{voucher.VoucherName}</h4>
+                                        <p className="text-gray-700 mb-1">Nhãn: {voucher.Label}</p>
+                                        <p className="text-gray-600 mb-1">Giá: {voucher.Price ? `${voucher.Price.toLocaleString()} đ` : 'N/A'}</p>
+                                        <p className={`text-sm font-medium ${new Date(voucher.Expire) < new Date() ? 'text-red-600' : 'text-green-600'}`}>
+                                            Hết hạn: {new Date(voucher.Expire).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-gray-500 py-6">Người dùng chưa có bài đăng voucher nào.</p>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </Layout>
+            </Layout>
+        </>
     );
 };
 

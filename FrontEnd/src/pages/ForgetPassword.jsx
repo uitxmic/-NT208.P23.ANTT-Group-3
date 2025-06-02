@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Helmet } from 'react-helmet';
 
 const ForgetPassword = () => {
     const navigate = useNavigate();
@@ -42,51 +43,73 @@ const ForgetPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-                <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Quên mật khẩu</h1>
+        <>
+            <Helmet>
+                <title>Quên mật khẩu | Lấy lại mật khẩu tài khoản | VoucherHub</title>
+                <meta name="description" content="Quên mật khẩu? Lấy lại mật khẩu tài khoản VoucherHub nhanh chóng, an toàn qua email." />
+                <meta name="keywords" content="quên mật khẩu, lấy lại mật khẩu, reset password, voucherhub" />
+                <link rel="canonical" href="https://voucherhub.id.vn/forget-password" />
+                <meta property="og:title" content="Quên mật khẩu | Lấy lại mật khẩu tài khoản | VoucherHub" />
+                <meta property="og:description" content="Quên mật khẩu? Lấy lại mật khẩu tài khoản VoucherHub nhanh chóng, an toàn qua email." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/forget-password" />
+                <meta property="og:image" content="https://voucherhub.id.vn/og-forget-password.jpg" />
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Quên mật khẩu | VoucherHub",
+                    "description": "Quên mật khẩu? Lấy lại mật khẩu tài khoản VoucherHub nhanh chóng, an toàn qua email.",
+                    "url": "https://voucherhub.id.vn/forget-password"
+                  }
+                `}</script>
+            </Helmet>
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+                    <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Quên mật khẩu</h1>
 
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-center">
-                        {error}
-                    </div>
-                )}
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-center">
+                            {error}
+                        </div>
+                    )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email của bạn
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Nhập email của bạn"
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                Email của bạn
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Nhập email của bạn"
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={`w-full py-2 rounded-md text-white font-semibold transition-colors ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                                }`}
+                        >
+                            {loading ? 'Đang gửi...' : 'Lấy lại mật khẩu'}
+                        </button>
+                    </form>
 
                     <button
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full py-2 rounded-md text-white font-semibold transition-colors ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-                            }`}
+                        onClick={() => navigate('/login')}
+                        className="w-full mt-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
                     >
-                        {loading ? 'Đang gửi...' : 'Lấy lại mật khẩu'}
+                        Quay lại
                     </button>
-                </form>
-
-                <button
-                    onClick={() => navigate('/login')}
-                    className="w-full mt-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
-                >
-                    Quay lại
-                </button>
+                </div>
+                <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
             </div>
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
-        </div>
+        </>
     );
 };
 

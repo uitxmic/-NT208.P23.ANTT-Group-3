@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import Layout from '../components/Layout';
 import { toast } from 'react-toastify';
+import { Helmet } from 'react-helmet';
 
 const AddVoucher = () => {
     const navigate = useNavigate();
@@ -206,152 +207,174 @@ const AddVoucher = () => {
     };
 
     return (
-        <Layout>
-            <div className="container mx-auto px-4 py-8" style={{ paddingTop: '60px' }}>
-                <h1 className="text-2xl font-bold mb-4">Thêm Voucher</h1>
-                {success && (
-                    <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-                        {success}
-                    </div>
-                )}
-                {error && (
-                    <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                        {error}
-                    </div>
-                )}
-                <div className="mb-4">
-                    <label className="inline-flex items-center">
-                        <input
-                            type="checkbox"
-                            checked={useFileUpload}
-                            onChange={(e) => setUseFileUpload(e.target.checked)}
-                            className="form-checkbox h-5 w-5 text-blue-600"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Sử dụng file Excel để thêm nhiều voucher</span>
-                    </label>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    {!useFileUpload ? (
-                        <>
-                            <div className="mb-4">
-                                <label htmlFor="voucherName" className="block text-sm font-medium text-gray-700">
-                                    Tên Voucher
-                                </label>
-                                <input
-                                    type="text"
-                                    id="VoucherName"
-                                    name="VoucherName"
-                                    value={formData.VoucherName}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                    required
-                                    maxLength={255}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                                    Loại Voucher
-                                </label>
-                                <select
-                                    id="Category"
-                                    name="Category"
-                                    value={formData.Category}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white py-2 px-3"
-                                    required
-                                >
-                                    <option value="">Chọn loại voucher</option>
-                                    <optgroup label="Ẩm thực">
-                                        <option value="Food">Ăn uống</option>
-                                    </optgroup>
-                                    <optgroup label="Du lịch & Giải trí">
-                                        <option value="Travel">Du lịch</option>
-                                        <option value="Entertainment">Giải trí</option>
-                                    </optgroup>
-                                    <optgroup label="Mua sắm">
-                                        <option value="Fashion">Thời trang</option>
-                                        <option value="Electronics">Điện tử</option>
-                                        <option value="Home">Nhà cửa</option>
-                                        <option value="Luxury">Cao cấp</option>
-                                        <option value="Garden">Làm vườn</option>
-                                    </optgroup>
-                                    <optgroup label="Sức khỏe & Làm đẹp">
-                                        <option value="Beauty">Sắc đẹp</option>
-                                        <option value="Fitness">Thể hình</option>
-                                        <option value="Health">Sức khỏe</option>
-                                    </optgroup>
-                                    <optgroup label="Giáo dục & Trẻ em">
-                                        <option value="Education">Giáo dục</option>
-                                        <option value="Books">Sách</option>
-                                        <option value="Kids">Trẻ em</option>
-                                    </optgroup>
-                                    <optgroup label="Khác">
-                                        <option value="Gaming">Trò chơi điện tử</option>
-                                        <option value="Pets">Thú cưng</option>
-                                        <option value="Office">Văn phòng</option>
-                                        <option value="Auto">Ô tô</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="expirationDay" className="block text-sm font-medium text-gray-700">
-                                    Ngày Hết Hạn
-                                </label>
-                                <input
-                                    type="date"
-                                    id="ExpirationDay"
-                                    name="ExpirationDay"
-                                    value={formData.ExpirationDay}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor="voucherCodes" className="block text-sm font-medium text-gray-700">
-                                    Mã Voucher (cách nhau bằng dấu phẩy)
-                                </label>
-                                <textarea
-                                    id="VoucherCodes"
-                                    name="VoucherCodes"
-                                    value={formData.VoucherCodes}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                    rows="4"
-                                    placeholder="VD: CODE1,CODE2,CODE3"
-                                    required
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <div className="mb-4">
-                            <label htmlFor="voucherFile" className="block text-sm font-medium text-gray-700">
-                                Tệp Excel chứa mã Voucher
-                            </label>
-                            <input
-                                type="file"
-                                id="voucherFile"
-                                name="voucherFile"
-                                accept=".xlsx,.xlsm,.xls"
-                                onChange={handleFileChange}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                            {fileName && (
-                                <p className="mt-2 text-sm text-gray-600">Đã chọn: {fileName}</p>
-                            )}
+        <>
+            <Helmet>
+                <title>Thêm voucher mới | Đăng mã giảm giá, coupon | VoucherHub</title>
+                <meta name="description" content="Thêm voucher, mã giảm giá, coupon mới lên VoucherHub. Đăng bán, chia sẻ mã ưu đãi nhanh chóng, hỗ trợ nhập file Excel số lượng lớn." />
+                <meta name="keywords" content="thêm voucher, đăng mã giảm giá, thêm coupon, nhập excel, bán mã ưu đãi, voucherhub" />
+                <link rel="canonical" href="https://voucherhub.id.vn/add-voucher" />
+                <meta property="og:title" content="Thêm voucher mới | Đăng mã giảm giá, coupon | VoucherHub" />
+                <meta property="og:description" content="Thêm voucher, mã giảm giá, coupon mới lên VoucherHub. Đăng bán, chia sẻ mã ưu đãi nhanh chóng, hỗ trợ nhập file Excel số lượng lớn." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/add-voucher" />
+                <meta property="og:image" content="https://voucherhub.id.vn/og-add-voucher.jpg" />
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Thêm voucher mới | VoucherHub",
+                    "description": "Thêm voucher, mã giảm giá, coupon mới lên VoucherHub. Đăng bán, chia sẻ mã ưu đãi nhanh chóng, hỗ trợ nhập file Excel số lượng lớn.",
+                    "url": "https://voucherhub.id.vn/add-voucher"
+                  }
+                `}</script>
+            </Helmet>
+            <Layout>
+                <div className="container mx-auto px-4 py-8" style={{ paddingTop: '60px' }}>
+                    <h1 className="text-2xl font-bold mb-4">Thêm Voucher</h1>
+                    {success && (
+                        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                            {success}
                         </div>
                     )}
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-blue-300 hover:bg-blue-600 transition-colors"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? 'Đang thêm...' : 'Thêm Voucher'}
-                    </button>
-                </form>
-            </div>
-        </Layout>
+                    {error && (
+                        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                            {error}
+                        </div>
+                    )}
+                    <div className="mb-4">
+                        <label className="inline-flex items-center">
+                            <input
+                                type="checkbox"
+                                checked={useFileUpload}
+                                onChange={(e) => setUseFileUpload(e.target.checked)}
+                                className="form-checkbox h-5 w-5 text-blue-600"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">Sử dụng file Excel để thêm nhiều voucher</span>
+                        </label>
+                    </div>
+                    <form onSubmit={handleSubmit}>
+                        {!useFileUpload ? (
+                            <>
+                                <div className="mb-4">
+                                    <label htmlFor="voucherName" className="block text-sm font-medium text-gray-700">
+                                        Tên Voucher
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="VoucherName"
+                                        name="VoucherName"
+                                        value={formData.VoucherName}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                        maxLength={255}
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                                        Loại Voucher
+                                    </label>
+                                    <select
+                                        id="Category"
+                                        name="Category"
+                                        value={formData.Category}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white py-2 px-3"
+                                        required
+                                    >
+                                        <option value="">Chọn loại voucher</option>
+                                        <optgroup label="Ẩm thực">
+                                            <option value="Food">Ăn uống</option>
+                                        </optgroup>
+                                        <optgroup label="Du lịch & Giải trí">
+                                            <option value="Travel">Du lịch</option>
+                                            <option value="Entertainment">Giải trí</option>
+                                        </optgroup>
+                                        <optgroup label="Mua sắm">
+                                            <option value="Fashion">Thời trang</option>
+                                            <option value="Electronics">Điện tử</option>
+                                            <option value="Home">Nhà cửa</option>
+                                            <option value="Luxury">Cao cấp</option>
+                                            <option value="Garden">Làm vườn</option>
+                                        </optgroup>
+                                        <optgroup label="Sức khỏe & Làm đẹp">
+                                            <option value="Beauty">Sắc đẹp</option>
+                                            <option value="Fitness">Thể hình</option>
+                                            <option value="Health">Sức khỏe</option>
+                                        </optgroup>
+                                        <optgroup label="Giáo dục & Trẻ em">
+                                            <option value="Education">Giáo dục</option>
+                                            <option value="Books">Sách</option>
+                                            <option value="Kids">Trẻ em</option>
+                                        </optgroup>
+                                        <optgroup label="Khác">
+                                            <option value="Gaming">Trò chơi điện tử</option>
+                                            <option value="Pets">Thú cưng</option>
+                                            <option value="Office">Văn phòng</option>
+                                            <option value="Auto">Ô tô</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="expirationDay" className="block text-sm font-medium text-gray-700">
+                                        Ngày Hết Hạn
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="ExpirationDay"
+                                        name="ExpirationDay"
+                                        value={formData.ExpirationDay}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label htmlFor="voucherCodes" className="block text-sm font-medium text-gray-700">
+                                        Mã Voucher (cách nhau bằng dấu phẩy)
+                                    </label>
+                                    <textarea
+                                        id="VoucherCodes"
+                                        name="VoucherCodes"
+                                        value={formData.VoucherCodes}
+                                        onChange={handleChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                        rows="4"
+                                        placeholder="VD: CODE1,CODE2,CODE3"
+                                        required
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <div className="mb-4">
+                                <label htmlFor="voucherFile" className="block text-sm font-medium text-gray-700">
+                                    Tệp Excel chứa mã Voucher
+                                </label>
+                                <input
+                                    type="file"
+                                    id="voucherFile"
+                                    name="voucherFile"
+                                    accept=".xlsx,.xlsm,.xls"
+                                    onChange={handleFileChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                                {fileName && (
+                                    <p className="mt-2 text-sm text-gray-600">Đã chọn: {fileName}</p>
+                                )}
+                            </div>
+                        )}
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-blue-300 hover:bg-blue-600 transition-colors"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Đang thêm...' : 'Thêm Voucher'}
+                        </button>
+                    </form>
+                </div>
+            </Layout>
+        </>
     );
 };
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Helmet } from "react-helmet";
 
 
 const VoucherManagement = () => {
@@ -102,86 +103,108 @@ const VoucherManagement = () => {
     const expiredVouchers = vouchers.filter(v => v.IsActive === 0 && v.IsVerified === 1); // Expired
 
     return (
-        <Layout>
-            <ToastContainer position="top-right" autoClose={2000} />
-            <div className="min-h-screen bg-gray-50 py-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
-                        QUẢN LÝ BÀI ĐĂNG
-                    </h1>
+        <>
+            <Helmet>
+                <title>Quản lý voucher (Admin) | Duyệt, kích hoạt, vô hiệu voucher | VoucherHub</title>
+                <meta name="description" content="Trang quản lý mã ưu đãi cho admin. Duyệt, kích hoạt, vô hiệu hóa mã ưu đãi trên VoucherHub." />
+                <meta name="keywords" content="quản lý admin, duyệt mã ưu đãi, kích hoạt, vô hiệu hóa, voucherhub" />
+                <meta property="og:title" content="Quản lý voucher (Admin) | Duyệt, kích hoạt, vô hiệu voucher | VoucherHub" />
+                <meta property="og:description" content="Trang quản lý voucher cho admin. Duyệt, kích hoạt, vô hiệu hóa voucher, mã giảm giá, coupon trên VoucherHub." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/admin/voucher-manager" />
+                <meta property="og:image" content="https://voucherhub.id.vn/og-admin-voucher.jpg" />
+                <link rel="canonical" href="https://voucherhub.id.vn/admin/voucher-manager" />
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Quản lý voucher (Admin) | VoucherHub",
+                    "description": "Trang quản lý voucher cho admin. Duyệt, kích hoạt, vô hiệu hóa voucher, mã giảm giá, coupon trên VoucherHub.",
+                    "url": "https://voucherhub.id.vn/admin/voucher-manager"
+                  }
+                `}</script>
+            </Helmet>
+            <Layout>
+                <ToastContainer position="top-right" autoClose={2000} />
+                <div className="min-h-screen bg-gray-50 py-10">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
+                            QUẢN LÝ BÀI ĐĂNG
+                        </h1>
 
-                    {/* Error Message */}
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl text-center font-medium">
-                            {error}
-                        </div>
-                    )}
-
-                    {/* Loading State */}
-                    {loading ? (
-                        <p className="text-center text-gray-600 text-lg">Đang tải danh sách các bài đăng...</p>
-                    ) : (
-                        <div className="space-y-12">
-                            {/* Pending Vouchers */}
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đang chờ duyệt</h2>
-                                {pendingVouchers.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                        {pendingVouchers.map((voucher) => (
-                                            <VoucherCard
-                                                key={voucher.PostId}
-                                                voucher={voucher}
-                                                onActivate={handleActivateVoucher}
-                                                status="Pending"
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-center text-gray-600 text-lg">Không có bài đăng đang chờ duyệt.</p>
-                                )}
+                        {/* Error Message */}
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-xl text-center font-medium">
+                                {error}
                             </div>
+                        )}
 
-                            {/* Active Vouchers */}
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đang hoạt động</h2>
-                                {activeVouchers.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                        {activeVouchers.map((voucher) => (
-                                            <VoucherCard
-                                                key={voucher.PostId}
-                                                voucher={voucher}
-                                                onActivate={handleDeactivateVoucher}
-                                                status="Active"
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-center text-gray-600 text-lg">Không có bài đăng đang hoạt động.</p>
-                                )}
-                            </div>
+                        {/* Loading State */}
+                        {loading ? (
+                            <p className="text-center text-gray-600 text-lg">Đang tải danh sách các bài đăng...</p>
+                        ) : (
+                            <div className="space-y-12">
+                                {/* Pending Vouchers */}
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đang chờ duyệt</h2>
+                                    {pendingVouchers.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {pendingVouchers.map((voucher) => (
+                                                <VoucherCard
+                                                    key={voucher.PostId}
+                                                    voucher={voucher}
+                                                    onActivate={handleActivateVoucher}
+                                                    status="Pending"
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-gray-600 text-lg">Không có bài đăng đang chờ duyệt.</p>
+                                    )}
+                                </div>
 
-                            {/* Expired Vouchers */}
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đã hết hạn</h2>
-                                {expiredVouchers.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                        {expiredVouchers.map((voucher) => (
-                                            <VoucherCard
-                                                key={voucher.PostId}
-                                                voucher={voucher}
-                                                status="Expired"
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-center text-gray-600 text-lg">Không có bài đăng đã hết hạn.</p>
-                                )}
+                                {/* Active Vouchers */}
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đang hoạt động</h2>
+                                    {activeVouchers.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {activeVouchers.map((voucher) => (
+                                                <VoucherCard
+                                                    key={voucher.PostId}
+                                                    voucher={voucher}
+                                                    onActivate={handleDeactivateVoucher}
+                                                    status="Active"
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-gray-600 text-lg">Không có bài đăng đang hoạt động.</p>
+                                    )}
+                                </div>
+
+                                {/* Expired Vouchers */}
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Bài đăng đã hết hạn</h2>
+                                    {expiredVouchers.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {expiredVouchers.map((voucher) => (
+                                                <VoucherCard
+                                                    key={voucher.PostId}
+                                                    voucher={voucher}
+                                                    status="Expired"
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-gray-600 text-lg">Không có bài đăng đã hết hạn.</p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
-        </Layout>
+            </Layout>
+        </>
     );
 };
 

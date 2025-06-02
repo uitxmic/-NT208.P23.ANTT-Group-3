@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { FaShoppingCart, FaGift, FaWallet, FaCog } from 'react-icons/fa';
+import { Helmet } from "react-helmet";
 
 const Notification = () => {
     const navigate = useNavigate();
@@ -56,94 +57,116 @@ const Notification = () => {
     };
 
     return (
-        <Layout>
-            <div className="min-h-screen bg-gray-50 py-10">
-                <div className="max-w-6xl mx-auto px-4">
-                    <h1 className="text-3xl font-bold mb-6 text-center">Danh sách Thông Báo</h1>
+        <>
+            <Helmet>
+                <title>Thông báo | VoucherHub</title>
+                <meta name="description" content="Xem thông báo đơn hàng, khuyến mãi, ví, hệ thống, cập nhật mới nhất về ưu đãi, voucher, coupon tại VoucherHub." />
+                <meta name="keywords" content="thông báo, đơn hàng, khuyến mãi, ví, hệ thống, ưu đãi, voucherhub" />
+                <meta property="og:title" content="Thông báo | VoucherHub" />
+                <meta property="og:description" content="Xem thông báo đơn hàng, khuyến mãi, ví, hệ thống, cập nhật mới nhất về ưu đãi, voucher, coupon tại VoucherHub." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/notification" />
+                <link rel="canonical" href="https://voucherhub.id.vn/notification" />
+                {/* Schema WebPage */}
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Thông báo",
+                    "description": "Xem thông báo đơn hàng, khuyến mãi, ví, hệ thống tại VoucherHub.",
+                    "url": "https://voucherhub.id.vn/notification"
+                  }
+                `}</script>
+            </Helmet>
+            <Layout>
+                <div className="min-h-screen bg-gray-50 py-10">
+                    <div className="max-w-6xl mx-auto px-4">
+                        <h1 className="text-3xl font-bold mb-6 text-center">Danh sách Thông Báo</h1>
 
-                    {/* 4 lựa chọn */}
-                    <div className="flex justify-center space-x-4 mb-8">
-                        {categories.map((category) => {
-                            const Icon = category.icon; // Lấy component icon từ category
-                            return (
-                                <button
-                                    key={category.type}
-                                    onClick={() => handleCategoryClick(category)}
-                                    className={`flex items-center space-x-2 px-6 py-3 rounded-lg shadow-md font-semibold transition-all duration-200 
+                        {/* 4 lựa chọn */}
+                        <div className="flex justify-center space-x-4 mb-8">
+                            {categories.map((category) => {
+                                const Icon = category.icon; // Lấy component icon từ category
+                                return (
+                                    <button
+                                        key={category.type}
+                                        onClick={() => handleCategoryClick(category)}
+                                        className={`flex items-center space-x-2 px-6 py-3 rounded-lg shadow-md font-semibold transition-all duration-200 
                     ${selectedType === category.type
-                                            ? `bg-${category.color}-500 text-white`
-                                            : `border-2 border-${category.color}-500 text-${category.color}-500 hover:bg-${category.color}-500 hover:text-white`
-                                        }`}
-                                >
-                                    <Icon className="text-lg" />
-                                    <span>{category.label}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* Thông báo lỗi */}
-                    {error && (
-                        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-center">
-                            {error}
+                                                ? `bg-${category.color}-500 text-white`
+                                                : `border-2 border-${category.color}-500 text-${category.color}-500 hover:bg-${category.color}-500 hover:text-white`
+                                            }`}
+                                    >
+                                        <Icon className="text-lg" />
+                                        <span>{category.label}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
-                    )}
 
-                    {/* Danh sách thông báo */}
-                    {loading ? (
-                        <p className="text-center text-gray-600 animate-pulse">Đang tải thông báo...</p>
-                    ) : notifications.length > 0 ? (
-                        <div className="space-y-6">
-                            {notifications.map((notif) => (
-                                <div
-                                    key={notif.noti_id}
-                                    className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                                    onClick={() => {
-                                        if (notif.noti_type === 'order') {
-                                            navigate(`/notification/${notif.noti_id}`);
-                                        }
-                                    }}
-                                >
-                                    <div className="flex items-start space-x-4">
-                                        {notif.image_url ? (
-                                            <img
-                                                src={notif.image_url}
-                                                alt={notif.noti_title}
-                                                className="w-16 h-16 object-cover rounded"
-                                            />
-                                        ) : (
-                                            <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
-                                                <span className="text-gray-500">No Image</span>
+                        {/* Thông báo lỗi */}
+                        {error && (
+                            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg text-center">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Danh sách thông báo */}
+                        {loading ? (
+                            <p className="text-center text-gray-600 animate-pulse">Đang tải thông báo...</p>
+                        ) : notifications.length > 0 ? (
+                            <div className="space-y-6">
+                                {notifications.map((notif) => (
+                                    <div
+                                        key={notif.noti_id}
+                                        className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                                        onClick={() => {
+                                            if (notif.noti_type === 'order') {
+                                                navigate(`/notification/${notif.noti_id}`);
+                                            }
+                                        }}
+                                    >
+                                        <div className="flex items-start space-x-4">
+                                            {notif.image_url ? (
+                                                <img
+                                                    src={notif.image_url}
+                                                    alt={notif.noti_title}
+                                                    className="w-16 h-16 object-cover rounded"
+                                                />
+                                            ) : (
+                                                <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                                                    <span className="text-gray-500">No Image</span>
+                                                </div>
+                                            )}
+                                            <div className="flex-1">
+                                                <h2 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1">
+                                                    {notif.noti_title}
+                                                </h2>
+                                                <p className="text-sm text-gray-500 mb-4">
+                                                    Ngày đăng:{' '}
+                                                    {new Date(notif.created_at).toLocaleString('vi-VN', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric',
+                                                    }).replace(/,/, '')}
+                                                </p>
+                                                <p className="text-gray-700 line-clamp-3">{notif.noti_content}</p>
                                             </div>
-                                        )}
-                                        <div className="flex-1">
-                                            <h2 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1">
-                                                {notif.noti_title}
-                                            </h2>
-                                            <p className="text-sm text-gray-500 mb-4">
-                                                Ngày đăng:{' '}
-                                                {new Date(notif.created_at).toLocaleString('vi-VN', {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                    day: '2-digit',
-                                                    month: '2-digit',
-                                                    year: 'numeric',
-                                                }).replace(/,/, '')}
-                                            </p>
-                                            <p className="text-gray-700 line-clamp-3">{notif.noti_content}</p>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : selectedType ? (
-                        <p className="text-center text-gray-600">Không có thông báo nào cho danh mục này.</p>
-                    ) : (
-                        <p className="text-center text-gray-600">Vui lòng chọn một danh mục để xem thông báo.</p>
-                    )}
+                                ))}
+                            </div>
+                        ) : selectedType ? (
+                            <p className="text-center text-gray-600">Không có thông báo nào cho danh mục này.</p>
+                        ) : (
+                            <p className="text-center text-gray-600">Vui lòng chọn một danh mục để xem thông báo.</p>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </Layout>
+            </Layout>
+        </>
     );
 };
 

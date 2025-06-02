@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Helmet } from 'react-helmet';
 
 
 const ChangePassword = () => {
@@ -81,6 +82,28 @@ const ChangePassword = () => {
 
     return (
         <Layout>
+            <Helmet>
+                <title>Đổi mật khẩu | VoucherHub - Bảo mật tài khoản, đổi password an toàn</title>
+                <meta name="description" content="Đổi mật khẩu tài khoản VoucherHub nhanh chóng, an toàn. Bảo vệ tài khoản, cập nhật password để tăng bảo mật khi sử dụng dịch vụ." />
+                <meta name="keywords" content="đổi mật khẩu, đổi password, bảo mật, tài khoản, voucherhub" />
+                <link rel="canonical" href="https://voucherhub.id.vn/change-password" />
+                {/* Open Graph */}
+                <meta property="og:title" content="Đổi mật khẩu | VoucherHub - Bảo mật tài khoản, đổi password an toàn" />
+                <meta property="og:description" content="Đổi mật khẩu tài khoản VoucherHub nhanh chóng, an toàn. Bảo vệ tài khoản, cập nhật password để tăng bảo mật khi sử dụng dịch vụ." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://voucherhub.id.vn/change-password" />
+                <meta property="og:image" content="https://voucherhub.id.vn/og-change-password.jpg" />
+                {/* Schema.org */}
+                <script type="application/ld+json">{`
+                  {
+                    "@context": "https://schema.org",
+                    "@type": "WebPage",
+                    "name": "Đổi mật khẩu | VoucherHub",
+                    "description": "Đổi mật khẩu tài khoản VoucherHub nhanh chóng, an toàn. Bảo vệ tài khoản, cập nhật password để tăng bảo mật khi sử dụng dịch vụ.",
+                    "url": "https://voucherhub.id.vn/change-password"
+                  }
+                `}</script>
+            </Helmet>
             <div className="container mx-auto mt-20 p-4 max-w-md bg-white rounded-lg shadow-md">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Thay đổi Mật khẩu</h2>
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}

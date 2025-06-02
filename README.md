@@ -139,7 +139,7 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 
 ### 4. Luồng đăng bài
 Luồng Đăng bài
-
+![Luồng Đăng bài](./docs/flows/ThreadPosting.png)
   - Người dùng sau khi đăng nhập, gửi POST request đến endpoint /posting/createPosting với dữ liệu bao gồm VoucherId, Postname, Content và JWT token trong header authorization PostingController.
   - Request được định tuyến qua BackEnd/routes/posting.js posting.js:12 , trước tiên phải qua middleware xác thực posting.js.
   - Phương thức CreatePosting của PostingController sẽ thực hiện 3 bước cơ bản:
@@ -150,7 +150,7 @@ Luồng Đăng bài
   - Controller trả kết quả từ procedure cho client hoặc thông báo lỗi nếu có exception.
 
 Luồng thông báo (notification)
-
+![Luồng thông báo](./docs/flows/ThreadNotification.png)
   - Trang notification được khởi tạo trong component Notification.jsx, sử dụng React hooks để quản lý trạng thái (state).
   - Khi component mount, useEffect tự động gọi hàm fetchNotifications để thực hiện GET request đến endpoint của notification: http://localhost:3000/notification .
   - Request được định tuyến qua hệ thống routing backend. Endpoint /notification được đăng ký trong main router index.js.

@@ -98,7 +98,9 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 - Database gửi response về BackEnd.
 - BackEnd tạo dựa vào ID hoặc UserId được database gửi về để tạo SessionId
 - FrontEnd dựa vào SessionId này để tạo Cookies
-![Luồng Đăng nhập](./docs/flows/ThreadLogin.png)
+
+![ThreadLogin](https://github.com/user-attachments/assets/e99cab51-ccb1-49ab-a519-fba8489dc7a5)
+
 ![Luồng Đăng ký](./docs/flows/ThreadSignUp.jpg)
 
 ### 2. Luồng đăng Voucher
@@ -139,7 +141,7 @@ Dưới đây là các luồng chức năng chính trong hệ thống VoucherHub
 
 ### 4. Luồng đăng bài
 Luồng Đăng bài
-
+![Luồng Đăng bài](./docs/flows/ThreadPosting.png)
   - Người dùng sau khi đăng nhập, gửi POST request đến endpoint /posting/createPosting với dữ liệu bao gồm VoucherId, Postname, Content và JWT token trong header authorization PostingController.
   - Request được định tuyến qua BackEnd/routes/posting.js posting.js:12 , trước tiên phải qua middleware xác thực posting.js.
   - Phương thức CreatePosting của PostingController sẽ thực hiện 3 bước cơ bản:
@@ -150,19 +152,13 @@ Luồng Đăng bài
   - Controller trả kết quả từ procedure cho client hoặc thông báo lỗi nếu có exception.
 
 Luồng thông báo (notification)
-
+![Luồng thông báo](./docs/flows/ThreadNotification.png)
   - Trang notification được khởi tạo trong component Notification.jsx, sử dụng React hooks để quản lý trạng thái (state).
   - Khi component mount, useEffect tự động gọi hàm fetchNotifications để thực hiện GET request đến endpoint của notification: http://localhost:3000/notification .
   - Request được định tuyến qua hệ thống routing backend. Endpoint /notification được đăng ký trong main router index.js.
   - Trong notification router, route gốc / được map đến method Get20LastestNotifications trong notification.js.
   - NotificationController xử lý request thông qua method Get20LastestNotifications NotificationController.js:27-38 . Controller thực thi stored procedure fn_get_20_lastest_notifications() và trả về kết quả.
   - Sau khi nhận response thành công, frontend cập nhật state và render danh sách notification Notification.jsx:28-33 . Mỗi notification hiển thị title, content và timestamp.
-### 5. Luồng yêu cầu hoàn tiền
--------- Khôi Lê ----------
-![Luồng Yêu cầu hoàn tiền](./docs/flows/ThreadRequestRefund.jpg)
-
-
-
 
 ## Giao diện của các chức năng chính
 
@@ -229,7 +225,7 @@ Trang quản lý giao dịch cho Admin
 - Video giới thiệu trang web:
   + Video trailer: https://www.tiktok.com/@dyff5hja2xeb/video/7510990677174455560
   + Video phỏng vấn: https://www.tiktok.com/@dyff5hja2xeb/video/7510989647057636615
-
+  + Các video demo: https://drive.google.com/drive/folders/1PrvTnKsEWQAuDVap5Zgw-GF0BiEz73e0?usp=sharing
 
 
 ## Kết luận
@@ -272,9 +268,9 @@ Trong các giai đoạn tiếp theo, nhóm định hướng mở rộng hệ th�
 
 | Thành viên                | MSSV     | Công việc cụ thể |
 |---------------------------|----------|------------------|
-| Trưởng nhóm              | [MSSV]   | - Thiết kế API, xử lý logic giao dịch, tích hợp MySQL<br>- Quản lý phân công công việc |
+| Lê Đăng Khoi              | 23520766   | - Cấu hình front end sử dụng reactjs và tailwind<br>- Cấu hình session để lưu phiên làm việc của user<br>- Cấu hình lại kết nối db<br>- Trang giỏ hàng<br>- Chức năng đánh giá post và người bán<br>- Chức năng redirect cho người dùng chưa đăng nhập<br>- Tạo, quản lí bộ dữ liệu voucher và post<br>- SEO<br>- Tái cấu trúc final project|
 | Nguyễn Trần Minh Khôi    | 23520780 | - Xây dựng cấu trúc MVC cho BackEnd<br>- Tạo các bảng quảng cáo ở trang LandingPage, tạo Navbar cơ bản<br>- Tạo trang đăng bài, danh sách các Voucher, tạo bài đăng<br>- Làm các ô bài đăng, phân trang, chia các bài đăng theo Category ở trang Cửa hàng<br>- Call API Momo để cho người dùng nạp tiền vào hệ thống và thanh toán bằng Momo<br>- Làm trang Profile và tính năng chỉnh sửa hồ sơ<br>- Làm tính năng thêm Voucher (Add Voucher) bằng form và bằng Excel <br> - Làm tính năng gợi ý các bài đăng dựa trên Category và Transaction History và call API OpenAI <br> - Làm các tính năng của Admin như quản lý bài đăng, quản lý người dùng, quản lý giao dịch,... |
-| Phạm Tấn Gia Quốc        | 23521308 | - Thiết kế và tối ưu CSDL MySQL<br>- Tạo sơ đồ ERD và xử lý truy vấn SQL |
+| Phạm Tấn Gia Quốc        | 23521308 | - Thiết kế và tối ưu CSDL MySQL<br>- Tạo sơ đồ ERD và xử lý truy vấn SQL <br> - Tính năng search các bài đăng |
 | Võ Minh Chiến       | 23520184   | - Tính năng đăng nhập, đăng kí, quên mật khẩu<br>- Tính năng thanh toán với số dư tài khoản<br>- Tính năng thông báo và quản lý thông báo<br>- Trang chi tiết voucher và sử dụng mã voucher<br>- Trang chi tiết bài đăng và trang của người bán <br>- Thiết kế layout cho trang web (navbar, sidebar, footer)<br>- Mục flashsale<br>  |
 
 

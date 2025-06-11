@@ -149,7 +149,10 @@ const Payment = () => {
       } else if (paymentMethod === 'bank') {
         setSuccess('Vui lòng hoàn tất thanh toán bằng tài khoản ngân hàng.');
       } else if (paymentMethod === 'momo') {
-        const userId = JSON.parse(atob(document.cookie.split('; ').find(row => row.startsWith('session_id')).split('=')[1])).userId;
+        console.log(document.cookie);
+        const sessionCookie = document.cookie.split('; ').find(row => row.startsWith('session_id='));
+        console.log('Session Cookie:', sessionCookie);
+        const userId = sessionCookie ? sessionCookie.split('=')[1] : 2;
         const qrCodeUrl = await getMomoQRCodeUrl(userId);
         if (qrCodeUrl) {
           window.open(qrCodeUrl, '_blank');

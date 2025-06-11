@@ -7,42 +7,48 @@ class SearchController {
     }
 
     async init() {
-        this.connection = await initConnection();
+        this.pool = await initConnection();
     }
 
     // [GET] /search/vouchers
-    SearchVouchers = async (req, res) => {
-        const { searchTerm, category,min_price, max_price, sortBy, expiredDays } = req.query;
+    // SearchVouchers = async (req, res) => {
+    //     const { searchTerm, category,min_price, max_price, sortBy, expiredDays } = req.query;
 
-        try {
-            const [results] = await this.pool.query(
-                'CALL fn_search_vouchers_with_filters(?, ?, ?, ?, ?, ?)',
-                [
-                    searchTerm || '',
-                    category || null,
-                    min_price || 0,
-                    max_price || 99999,
-                    sortBy || 'price_asc',
-                    expiredDays || null
-                ]
-            );
-            res.json(results[0]);
-        } catch (error) {
-            console.error('Error searching vouchers:', error);
-            res.status(500).json({ error: 'Error searching vouchers' });
-        }
-    };
+    //     try {
+    //         const [results] = await this.pool.query(
+    //             'CALL fn_search_vouchers_with_filters(?, ?, ?, ?, ?, ?)',
+    //             [
+    //                 searchTerm || '',
+    //                 category || null,
+    //                 min_price || 0,
+    //                 max_price || 99999,
+    //                 sortBy || 'price_asc',
+    //                 expiredDays || null
+    //             ]
+    //         );
+    //         res.json(results[0]);
+    //     } catch (error) {
+    //         console.error('Error searching vouchers:', error);
+    //         res.status(500).json({ error: 'Error searching vouchers' });
+    //     }
+    // };
 
     // [GET] /search/posts
     SearchPosts = async (req, res) => {
 
-        try {
-            const { query } = req.query;
-            if (!query) {
-                return res.status(400).json({ message: "Bad Request: query is required" });
-            }
+        const { searchTerm, category, sortBy, start_day, end_day } = req.query;
 
-            const [results] = await this.pool.query('CALL fn_search_posts(?)', [query]);
+        try {
+            const [results] = await this.pool.query('CALL fn_search_posts_with_filters(?,?,?,?,?)',
+            [
+                searchTerm || '',
+                category || '',
+                // minPrice || 0,
+                // maxPrice || 99999,
+                sortBy || 'price_asc',
+                start_day || null,
+                end_day || null
+            ]);
             res.json(results[0]);
         } catch (error) {
             console.error('Query error:', error);
@@ -77,11 +83,10 @@ class SearchController {
 
         try{
             const[results] = await this.pool.query(
-                'CALL fn_search_users_with_filters(?, ?, ?, ?)',
+                'CALL fn_search_users_with_filters(?, ?, ?)',
                 [
                 searchTerm || '', 
                 minFeedback || null, 
-                minSold || null, 
                 sortBy || 'feedback_desc'
             ]
             );

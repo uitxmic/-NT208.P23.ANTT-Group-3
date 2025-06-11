@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaFire, FaGift, FaClock, FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
@@ -10,22 +11,32 @@ const FreePost = () => {
     const navigate = useNavigate();
 
     const fetchFreePosts = async () => {
+
         try {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-            const response = await fetch(`${API_BASE_URL}/posting/getAllFreePostings?page=1&limit=10`, {
+            const response = await fetch(`${API_BASE_URL}/posting/getAllFreePostings?page=1&limit=8`, {
                 method: 'GET',
-                credentials: 'include', // Use session-based authentication
+                credentials: 'include',
             });
 
             if (!response.ok) {
-                throw new Error('Unable to fetch free posts');
+                throw new Error('Không thể lấy danh sách flash sale');
             }
 
             const data = await response.json();
-            const freePostsFiltered = data.filter(post => post.Status === 'Active');
+            let fetchedPosts = [];
+            if (data && Array.isArray(data.result)) {
+                fetchedPosts = data.result;
+            } else if (Array.isArray(data)) {
+                fetchedPosts = data
+                    .filter(item => item.result && Array.isArray(item.result))
+                    .flatMap(item => item.result);
+            }
+
+            const freePostsFiltered = fetchedPosts.filter(post => post.Status === 'Active');
             setFreePosts(freePostsFiltered.slice(0, 4));
         } catch (err) {
-            setError(err.message || 'An error occurred while fetching free posts');
+            setError(err.message || 'Đã xảy ra lỗi khi lấy danh sách flash sale');
             setFreePosts([]);
         } finally {
             setLoading(false);
@@ -33,6 +44,12 @@ const FreePost = () => {
     };
 
     const handleCollectVoucher = async (post) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            setError('Vui lòng đăng nhập để tiếp tục');
+            return;
+        }
+
         setLoading(true);
         setError('');
         setSuccessMessage('');
@@ -43,6 +60,7 @@ const FreePost = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `${token}`,
                 },
                 body: JSON.stringify({
                     VoucherId: post.VoucherId,
@@ -95,23 +113,21 @@ const FreePost = () => {
 
     useEffect(() => {
         fetchFreePosts();
-    }, []);
-
-    useEffect(() => {
-        if (freePosts.length === 0) {
-            return; // Don't start a timer if there are no posts
-        }
 
         const timer = setInterval(() => {
             setFreePosts(prevPosts =>
                 prevPosts.map(post => ({
                     ...post,
-                    timeLeft: calculateTimeLeft(post.Expire), // Update timeLeft
+                    timeLeft: calculateTimeLeft(post.Expire),
                 }))
             );
+            if (freePosts.length > 0) {
+                const commonTimeLeft = calculateTimeLeft(freePosts[0].Expire);
+                console.log('Thời gian chung còn lại:', commonTimeLeft);
+            }
         }, 1000);
 
-        return () => clearInterval(timer); // Cleanup timer on unmount or when freePosts changes
+        return () => clearInterval(timer);
     }, [freePosts]);
 
     return (

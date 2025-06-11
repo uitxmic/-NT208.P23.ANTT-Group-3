@@ -29,7 +29,7 @@ const Layout = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
-          userRoleId = Number(data.UserRoleId); 
+          userRoleId = Number(data.UserRoleId);
         } else {
           console.error('Failed to fetch user role');
         }
